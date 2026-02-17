@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.5rem;
+        --background: 0.98 0 0;
+        --foreground: 0.15 0 0;
+        --card: 1 0 0;
+        --card-foreground: 0.15 0 0;
+        --popover: 1 0 0;
+        --popover-foreground: 0.15 0 0;
+        --primary: 0.45 0.15 240;
+        --primary-foreground: 0.98 0 0;
+        --secondary: 0.92 0.02 240;
+        --secondary-foreground: 0.15 0 0;
+        --muted: 0.94 0.01 240;
+        --muted-foreground: 0.50 0.02 240;
+        --accent: 0.92 0.02 240;
+        --accent-foreground: 0.15 0 0;
+        --destructive: 0.55 0.22 25;
+        --destructive-foreground: 0.98 0 0;
+        --border: 0.88 0.01 240;
+        --input: 0.88 0.01 240;
+        --ring: 0.45 0.15 240;
+        --chart-1: 0.60 0.18 150;
+        --chart-2: 0.55 0.20 280;
+        --chart-3: 0.65 0.16 45;
+        --chart-4: 0.50 0.22 320;
+        --chart-5: 0.58 0.19 200;
+    }
+
+    .dark {
+        --background: 0.12 0.01 240;
+        --foreground: 0.95 0.01 240;
+        --card: 0.16 0.01 240;
+        --card-foreground: 0.95 0.01 240;
+        --popover: 0.14 0.01 240;
+        --popover-foreground: 0.95 0.01 240;
+        --primary: 0.65 0.18 240;
+        --primary-foreground: 0.12 0.01 240;
+        --secondary: 0.22 0.02 240;
+        --secondary-foreground: 0.95 0.01 240;
+        --muted: 0.22 0.02 240;
+        --muted-foreground: 0.65 0.02 240;
+        --accent: 0.28 0.03 240;
+        --accent-foreground: 0.95 0.01 240;
+        --destructive: 0.60 0.20 25;
+        --destructive-foreground: 0.95 0.01 240;
+        --border: 0.28 0.02 240;
+        --input: 0.28 0.02 240;
+        --ring: 0.65 0.18 240;
+        --chart-1: 0.65 0.18 150;
+        --chart-2: 0.60 0.20 280;
+        --chart-3: 0.70 0.16 45;
+        --chart-4: 0.55 0.22 320;
+        --chart-5: 0.63 0.19 200;
+    }
+
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings: "rlig" 1, "calt" 1;
+    }
+}

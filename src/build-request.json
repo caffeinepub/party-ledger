@@ -1,0 +1,78 @@
+{
+  "kind": "build_request",
+  "title": "Speed up app startup and login flow",
+  "projectName": "Party Ledger",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-51",
+      "text": "Reduce startup latency by preventing unnecessary data fetching before the user is fully authenticated (Internet Identity + staff login), including gating the due-today alert logic so it does not trigger party/payment queries until the app is ready to show main content.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Rebuild make fast"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When the user is not authenticated with Internet Identity, the app does not start fetching parties/payments for alerts/dashboard/screens.",
+        "When the user is authenticated with Internet Identity but not yet staff-authenticated, the app does not start fetching parties/payments for alerts/dashboard/screens.",
+        "After staff login succeeds, the main screens load data normally and the due-today alert can run without requiring a manual refresh.",
+        "No additional network calls are triggered by the due-today alert hook while it is effectively disabled."
+      ]
+    },
+    {
+      "id": "REQ-52",
+      "text": "Eliminate redundant actor initialization work during bootstrap by ensuring actor creation/initialization is performed once per identity session and shared across hooks/components (instead of multiple hooks each performing their own actor readiness/initialization checks).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Rebuild make fast"
+        ]
+      },
+      "acceptanceCriteria": [
+        "During a normal login flow, the backend actor initialization (including access-control secret initialization) happens once per Internet Identity principal change, not multiple times due to multiple hooks mounting.",
+        "Profile fetch and staff login do not each trigger their own separate actor initialization sequence.",
+        "Refreshing the page while already logged in does not result in repeated initialization loops; the app reaches Staff Login (or Dashboard if staff session exists) promptly."
+      ]
+    },
+    {
+      "id": "REQ-53",
+      "text": "Optimize React Query bootstrap behavior to reduce perceived slowness by removing/avoiding any broad query invalidation/refetch cascades on actor readiness and by tuning startup queries so they do not refetch repeatedly during initial render.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "Rebuild make fast"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On app start, the profile query is executed at most once per actor readiness event (no repeated rapid refetching loops).",
+        "App does not trigger a blanket refetch of unrelated queries when the actor becomes available; only relevant queries refresh when needed (e.g., after mutations or explicit user actions).",
+        "The UI does not get stuck on “Loading profile...” or “Initializing...” indefinitely due to repeated query churn; if a fetch fails, the existing retry/error UI remains reachable."
+      ]
+    }
+  ],
+  "constraints": [
+    "Use English for any user-facing text.",
+    "Do not edit files under frontend/src/components/ui (compose them instead).",
+    "Do not edit immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
+    "Backend must remain a single Motoko actor (backend/main.mo); only add a migration file if state upgrade is required."
+  ],
+  "nonGoals": [
+    "Speeding up the platform build/deploy pipeline itself (CI/build iteration time).",
+    "Adding new product features unrelated to performance/startup/login responsiveness.",
+    "Changing authentication/security requirements (Internet Identity + staff login) or relaxing admin-only permissions."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}
