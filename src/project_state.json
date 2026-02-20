@@ -1,21 +1,24 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Party app with permission-free party ID generation",
-  "architectural_notes": [
-    "Backend authentication guards need to be removed to allow unauthenticated access",
-    "Party ID generation endpoint should be publicly accessible"
-  ],
-  "known_issues": [
-    "Authentication checks are blocking party ID generation despite previous attempts to remove them"
-  ],
-  "isFixRequest": true,
+  "summary": "CRM/Dashboard application with customer visit tracking and reporting features",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-test-that-the-partyformdialog-component-in-the-frontend-can-successfully-generate-party-ids-and-create-parties-without-encountering-authorization-errors",
-      "title": "Test that the PartyFormDialog component in the frontend can successfully generate party IDs and create parties without encountering authorization errors",
+      "id": "feature-display-notifications-on-the-dashboard-for-parties-whose-next-visit-day-is-today-showing-the-party-name-and-a-clickable-call-button-that-initiates-a-direct-phone-call",
+      "title": "Display notifications on the dashboard for parties whose next visit day is today, showing the party name and a clickable call button that initiates a direct phone call",
       "reqIds": [
-        "REQ-4"
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-search-box-to-the-reports-page-that-filters-the-party-dropdown-by-party-name-phone-number-or-pan",
+      "title": "Add a search box to the Reports page that filters the party dropdown by party name, phone number, or PAN",
+      "reqIds": [
+        "REQ-2"
       ],
       "version": 1
     }
@@ -23,48 +26,27 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Remove all authentication guards from backend code",
+      "summary": "Dashboard notifications for today's visit schedule with direct call functionality",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Remove staff authentication requirement for party ID generation",
+      "summary": "Add party search box in reports section",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Make party ID generation accessible without authentication",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Remove all authentication checks from the validateAndGeneratePartyId function in backend/main.mo",
-      "reqIds": [
-        "REQ-1"
-      ],
       "status": "pending"
     },
     {
       "id": "AR-5",
-      "summary": "Remove or modify the staff authentication requirement from the addParty function in backend/main.mo to allow unauthenticated party creation",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Review and remove any caller identity checks or authentication guards from all public query and update methods in backend/main.mo that are used for party management",
+      "summary": "Implement a backend query to fetch parties whose next payment date matches today's date for dashboard notifications",
       "reqIds": [
         "REQ-3"
       ],
       "status": "pending"
     }
   ],
-  "projectName": "Remove all authentication guards from party ID generation",
+  "gameProjectType": "none",
+  "projectName": "Party Ledger",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

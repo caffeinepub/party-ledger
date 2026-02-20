@@ -1,18 +1,35 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useGetAllParties } from '../hooks/queries/useParties';
 import { useActorSafe } from '../hooks/useActorSafe';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { formatMoney } from '../lib/format';
 import { formatDateTime, formatDate } from '../lib/time';
-import { Calendar, IndianRupee, MapPin } from 'lucide-react';
+import { Calendar, IndianRupee, MapPin, Search, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { PartyId, PartyVisitRecord, PaymentId } from '../backend';
 
 export default function ReportsPage() {
   const { data: parties = [], isLoading: partiesLoading } = useGetAllParties();
   const [selectedPartyId, setSelectedPartyId] = useState<PartyId | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const { actor } = useActorSafe();
+
+  // Filter parties based on search query
+  const filteredParties = useMemo(() => {
+    if (!searchQuery.trim()) return parties;
+    
+    const query = searchQuery.toLowerCase();
+    return parties.filter(([_, party]) => {
+      return (
+        party.name.toLowerCase().includes(query) ||
+        party.phone.toLowerCase().includes(query) ||
+        party.pan.toLowerCase().includes(query)
+      );
+    });
+  }, [parties, searchQuery]);
 
   // Fetch full visit records instead of just metadata
   const { data: payments = [] } = useQuery<Array<[PaymentId, PartyVisitRecord]>>({
@@ -38,7 +55,29 @@ export default function ReportsPage() {
         <CardHeader>
           <CardTitle>Select Party</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, phone, or PAN..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-9"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                onClick={() => setSearchQuery('')}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+
+          {/* Party Selector */}
           <Select value={selectedPartyId || ''} onValueChange={setSelectedPartyId}>
             <SelectTrigger>
               <SelectValue placeholder="Choose a party to view reports" />
@@ -48,12 +87,12 @@ export default function ReportsPage() {
                 <SelectItem value="loading" disabled>
                   Loading parties...
                 </SelectItem>
-              ) : parties.length === 0 ? (
+              ) : filteredParties.length === 0 ? (
                 <SelectItem value="empty" disabled>
-                  No parties available
+                  {searchQuery ? 'No parties match your search' : 'No parties available'}
                 </SelectItem>
               ) : (
-                parties.map(([id, party]) => (
+                filteredParties.map(([id, party]) => (
                   <SelectItem key={id} value={id}>
                     {party.name}
                   </SelectItem>

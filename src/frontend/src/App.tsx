@@ -12,6 +12,7 @@ import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import NewPartyVisitPage from './pages/NewPartyVisitPage';
 import VisitDetailsPage from './pages/VisitDetailsPage';
+import MapPage from './pages/MapPage';
 import { TopLevelErrorBoundary } from './components/auth/TopLevelErrorBoundary';
 
 const queryClient = new QueryClient({
@@ -73,6 +74,12 @@ const visitDetailsRoute = createRoute({
   component: VisitDetailsPage,
 });
 
+const mapRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/map',
+  component: MapPage,
+});
+
 const routeTree = rootRoute.addChildren([
   dashboardRoute,
   partiesRoute,
@@ -81,6 +88,7 @@ const routeTree = rootRoute.addChildren([
   settingsRoute,
   newPartyVisitRoute,
   visitDetailsRoute,
+  mapRoute,
 ]);
 
 const router = createRouter({ routeTree });

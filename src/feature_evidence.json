@@ -2,12 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-test-that-the-partyformdialog-component-in-the-frontend-can-successfully-generate-party-ids-and-create-parties-without-encountering-authorization-errors",
-      "featureTitle": "Test that the PartyFormDialog component in the frontend can successfully generate party IDs and create parties without encountering authorization errors",
+      "featureId": "feature-display-notifications-on-the-dashboard-for-parties-whose-next-visit-day-is-today-showing-the-party-name-and-a-clickable-call-button-that-initiates-a-direct-phone-call",
+      "featureTitle": "Display notifications on the dashboard for parties whose next visit day is today, showing the party name and a clickable call button that initiates a direct phone call",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/parties/PartyFormDialog.tsx",
-        "frontend/src/hooks/queries/useParties.ts"
+        "frontend/src/components/dashboard/TodayNotifications.tsx",
+        "frontend/src/hooks/queries/useTodayNotifications.ts",
+        "frontend/src/pages/DashboardPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -19,7 +19,27 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-4"
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-search-box-to-the-reports-page-that-filters-the-party-dropdown-by-party-name-phone-number-or-pan",
+      "featureTitle": "Add a search box to the Reports page that filters the party dropdown by party name, phone number, or PAN",
+      "files": [
+        "frontend/src/pages/ReportsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
       ],
       "confidence": "high"
     }

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useGetAllParties } from '../hooks/queries/useParties';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Plus, Search, Users } from 'lucide-react';
 import { formatMoney } from '../lib/format';
 import PartyFormDialog from '../components/parties/PartyFormDialog';
@@ -14,14 +15,16 @@ export default function PartiesPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddDialog, setShowAddDialog] = useState(false);
 
-  const filteredParties = parties.filter(([_, party]) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      party.name.toLowerCase().includes(query) ||
-      party.phone.toLowerCase().includes(query) ||
-      party.pan.toLowerCase().includes(query)
-    );
-  });
+  const filteredParties = useMemo(() => {
+    return parties.filter(([_, party]) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        party.name.toLowerCase().includes(query) ||
+        party.phone.toLowerCase().includes(query) ||
+        party.pan.toLowerCase().includes(query)
+      );
+    });
+  }, [parties, searchQuery]);
 
   const handlePartyClick = (partyId: string) => {
     navigate({ to: '/parties/$partyId', params: { partyId } });
@@ -29,10 +32,30 @@ export default function PartiesPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading parties...</p>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-9 w-32 mb-2" />
+            <Skeleton className="h-5 w-48" />
+          </div>
+          <Skeleton className="h-10 w-32" />
+        </div>
+
+        <Skeleton className="h-10 w-full" />
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );

@@ -6,6 +6,7 @@ import { formatMoney } from '../lib/format';
 import { formatDateTime } from '../lib/time';
 import { createTelLink } from '../lib/phone';
 import { useNavigate } from '@tanstack/react-router';
+import TodayNotifications from '../components/dashboard/TodayNotifications';
 
 export default function DashboardPage() {
   const { data, isLoading } = useTodayDashboard();
@@ -27,6 +28,9 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold">Today's Dashboard</h1>
         <p className="text-muted-foreground">Overview of today's visits and payments</p>
       </div>
+
+      {/* Today's Notifications */}
+      <TodayNotifications />
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2">

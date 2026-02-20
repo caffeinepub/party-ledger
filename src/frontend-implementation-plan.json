@@ -1,36 +1,51 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Remove all authentication guards from party ID generation",
+  "title": "Add dashboard notifications and report search",
   "requirements": [
     {
-      "id": "REQ-4",
-      "summary": "Test that the PartyFormDialog component can successfully generate party IDs and create parties without encountering authorization errors",
+      "id": "REQ-1",
+      "summary": "Display notifications on the dashboard for parties whose next visit day is today, showing the party name and a clickable call button that initiates a direct phone call",
       "acceptanceCriteria": [
-        "The 'Add Party' dialog successfully generates party IDs",
-        "Party creation completes without 'Unauthorized' errors",
-        "Users can create parties immediately after opening the app"
+        "Dashboard shows a notification section listing all parties where the next payment date equals today's date",
+        "Each notification entry displays the party name",
+        "Each notification includes a call button/icon that uses the tel: link format to initiate a phone call",
+        "Notifications are visible immediately when the dashboard loads",
+        "Empty state is shown when no parties have next visit date scheduled for today"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/queries/useParties.ts",
-          "operation": "modify",
-          "description": "Update the useValidateAndGeneratePartyId hook to handle both authenticated and anonymous actors. Remove any frontend-side authentication checks that may prevent party ID generation. Ensure error handling gracefully manages any residual backend errors during the transition period."
+          "path": "frontend/src/hooks/queries/useTodayNotifications.ts",
+          "operation": "create",
+          "description": "Create a React Query hook that fetches parties with today's due payments using the backend method getPartiesWithTodayDuePayments(). Returns an array of parties with their visit records where the next payment date matches today. Configure auto-refresh every minute to keep notifications current. Handle loading and error states appropriately."
         },
         {
-          "path": "frontend/src/components/parties/PartyFormDialog.tsx",
-          "operation": "modify",
-          "description": "Verify that the party form dialog can call validateAndGeneratePartyId without requiring authentication. Remove any UI-level authentication guards that block party ID generation or party creation. Ensure the dialog displays appropriate error messages if backend issues occur."
+          "path": "frontend/src/components/dashboard/TodayNotifications.tsx",
+          "operation": "create",
+          "description": "Create a notification component that displays parties with payments due today. Use the useTodayNotifications hook to fetch data. For each party, display the party name and a phone icon button that uses the tel: link format from frontend/src/lib/phone.ts (createTelLink function). Show an empty state message when no notifications exist. Style consistently with existing dashboard components using shadcn/ui Card components."
         },
         {
-          "path": "frontend/src/hooks/queries/useParties.ts",
+          "path": "frontend/src/pages/DashboardPage.tsx",
           "operation": "modify",
-          "description": "Update the useAddParty mutation to work with both authenticated and anonymous users. Remove any frontend authentication requirements for adding parties. Ensure proper error handling and user feedback for successful and failed party creation attempts."
-        },
+          "description": "Add the TodayNotifications component at the top of the dashboard, above the existing summary cards. Import and render the component to display notifications for parties with payments due today. Ensure the notifications section is prominently visible when the page loads."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add a search box to the Reports page that filters the party dropdown by party name, phone number, or PAN",
+      "acceptanceCriteria": [
+        "Search box is placed above or integrated with the party selector dropdown on the Reports page",
+        "Search filters parties by matching text against party name, phone number, or PAN",
+        "Search is case-insensitive",
+        "Filtered results update in real-time as the user types",
+        "Search box has a clear/reset button to remove the filter"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/pages/ReportsPage.tsx",
           "operation": "modify",
-          "description": "Review the main app routing and authentication flow to ensure unauthenticated users can access party creation features. If there are route guards or conditional rendering that block party creation for anonymous users, adjust them to allow public access to party management features while preserving authentication for admin-only functions."
+          "description": "Add a search input field above the party selector dropdown. Implement local state for the search query using useState. Filter the parties array client-side by checking if the search query (case-insensitive) matches any of: party name, phone number, or PAN. Use the filtered array to populate the party selector dropdown. Add a clear button (X icon) that appears when text is entered to reset the search query. Use shadcn/ui Input component with proper spacing and styling consistent with the existing page layout."
         }
       ]
     }

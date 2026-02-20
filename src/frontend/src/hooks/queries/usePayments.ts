@@ -14,7 +14,8 @@ export function useGetPayments(partyId: PartyId, options?: { enabled?: boolean }
       return actor.getPartyVisitRecordMetadata(partyId);
     },
     enabled: enabled && !!actor && !actorLoading && !!partyId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 3 * 60 * 1000, // 3 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
   });
 }
@@ -44,6 +45,7 @@ export function useRecordPayment() {
       queryClient.invalidateQueries({ queryKey: ['payments', variables.partyId] });
       queryClient.invalidateQueries({ queryKey: ['parties'] });
       queryClient.invalidateQueries({ queryKey: ['todayDashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['mapLocationData'] });
     },
   });
 }
@@ -75,6 +77,7 @@ export function useRecordPartyVisit() {
       queryClient.invalidateQueries({ queryKey: ['payments', variables.partyId] });
       queryClient.invalidateQueries({ queryKey: ['parties'] });
       queryClient.invalidateQueries({ queryKey: ['todayDashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['mapLocationData'] });
     },
   });
 }

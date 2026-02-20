@@ -24,6 +24,11 @@ export type LocationConstraint = { 'greaterLatitude' : number } |
   { 'withinRadius' : [number, number, number] } |
   { 'lessLatitude' : number } |
   { 'lessLongitude' : number };
+export interface PaginatedPartyVisitRecordResponse {
+  'nextOffset' : bigint,
+  'records' : Array<[string, PartyVisitRecord]>,
+  'totalRecords' : bigint,
+}
 export interface Party {
   'id' : PartyId,
   'pan' : string,
@@ -119,9 +124,17 @@ export interface _SERVICE {
     Array<[PaymentId, PartyVisitRecord]>
   >,
   'getAllParties' : ActorMethod<[], Array<[string, Party]>>,
+  'getAllPartiesWithVisitRecords' : ActorMethod<
+    [],
+    Array<[string, Party, Array<PartyVisitRecord>]>
+  >,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getLogs' : ActorMethod<[], Array<[Time, string]>>,
+  'getPartiesWithTodayDuePayments' : ActorMethod<
+    [],
+    Array<[PartyId, Array<PartyVisitRecord>]>
+  >,
   'getParty' : ActorMethod<
     [PartyId],
     [] | [
@@ -148,6 +161,10 @@ export interface _SERVICE {
   'importUpgradeData' : ActorMethod<[UpgradeData], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'logError' : ActorMethod<[string], undefined>,
+  'paginatedPartyVisitRecords' : ActorMethod<
+    [PartyId, bigint, bigint],
+    PaginatedPartyVisitRecordResponse
+  >,
   'recordPartyVisit' : ActorMethod<
     [PartyId, bigint, string, Time, [] | [Time], [] | [Location]],
     string

@@ -96,6 +96,11 @@ export const AggregateVisitRecordMetadata = IDL.Record({
   'allPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
 });
 export const UserProfile = IDL.Record({ 'name' : IDL.Text });
+export const PaginatedPartyVisitRecordResponse = IDL.Record({
+  'nextOffset' : IDL.Nat,
+  'records' : IDL.Vec(IDL.Tuple(IDL.Text, PartyVisitRecord)),
+  'totalRecords' : IDL.Nat,
+});
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -149,9 +154,19 @@ export const idlService = IDL.Service({
       [IDL.Vec(IDL.Tuple(IDL.Text, Party))],
       ['query'],
     ),
+  'getAllPartiesWithVisitRecords' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(IDL.Text, Party, IDL.Vec(PartyVisitRecord)))],
+      ['query'],
+    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getLogs' : IDL.Func([], [IDL.Vec(IDL.Tuple(Time, IDL.Text))], ['query']),
+  'getPartiesWithTodayDuePayments' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Tuple(PartyId, IDL.Vec(PartyVisitRecord)))],
+      ['query'],
+    ),
   'getParty' : IDL.Func(
       [PartyId],
       [
@@ -187,6 +202,11 @@ export const idlService = IDL.Service({
   'importUpgradeData' : IDL.Func([UpgradeData], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'logError' : IDL.Func([IDL.Text], [], []),
+  'paginatedPartyVisitRecords' : IDL.Func(
+      [PartyId, IDL.Nat, IDL.Nat],
+      [PaginatedPartyVisitRecordResponse],
+      ['query'],
+    ),
   'recordPartyVisit' : IDL.Func(
       [PartyId, IDL.Int, IDL.Text, Time, IDL.Opt(Time), IDL.Opt(Location)],
       [IDL.Text],
@@ -309,6 +329,11 @@ export const idlFactory = ({ IDL }) => {
     'allPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
   });
   const UserProfile = IDL.Record({ 'name' : IDL.Text });
+  const PaginatedPartyVisitRecordResponse = IDL.Record({
+    'nextOffset' : IDL.Nat,
+    'records' : IDL.Vec(IDL.Tuple(IDL.Text, PartyVisitRecord)),
+    'totalRecords' : IDL.Nat,
+  });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -362,9 +387,19 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(IDL.Text, Party))],
         ['query'],
       ),
+    'getAllPartiesWithVisitRecords' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(IDL.Text, Party, IDL.Vec(PartyVisitRecord)))],
+        ['query'],
+      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getLogs' : IDL.Func([], [IDL.Vec(IDL.Tuple(Time, IDL.Text))], ['query']),
+    'getPartiesWithTodayDuePayments' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Tuple(PartyId, IDL.Vec(PartyVisitRecord)))],
+        ['query'],
+      ),
     'getParty' : IDL.Func(
         [PartyId],
         [
@@ -400,6 +435,11 @@ export const idlFactory = ({ IDL }) => {
     'importUpgradeData' : IDL.Func([UpgradeData], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'logError' : IDL.Func([IDL.Text], [], []),
+    'paginatedPartyVisitRecords' : IDL.Func(
+        [PartyId, IDL.Nat, IDL.Nat],
+        [PaginatedPartyVisitRecordResponse],
+        ['query'],
+      ),
     'recordPartyVisit' : IDL.Func(
         [PartyId, IDL.Int, IDL.Text, Time, IDL.Opt(Time), IDL.Opt(Location)],
         [IDL.Text],

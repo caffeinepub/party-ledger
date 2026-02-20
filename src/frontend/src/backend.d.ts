@@ -46,6 +46,11 @@ export type IntConstraint = {
     __kind__: "lessThan";
     lessThan: bigint;
 };
+export interface PaginatedPartyVisitRecordResponse {
+    nextOffset: bigint;
+    records: Array<[string, PartyVisitRecord]>;
+    totalRecords: bigint;
+}
 export interface PartyVisitRecord {
     comment: string;
     paymentDate: Time;
@@ -127,9 +132,11 @@ export interface backendInterface {
     filterPartyVisitRecordMetadata(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<AggregateVisitRecordMetadata>;
     filterPartyVisitRecords(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<Array<[PaymentId, PartyVisitRecord]>>;
     getAllParties(): Promise<Array<[string, Party]>>;
+    getAllPartiesWithVisitRecords(): Promise<Array<[string, Party, Array<PartyVisitRecord>]>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getLogs(): Promise<Array<[Time, string]>>;
+    getPartiesWithTodayDuePayments(): Promise<Array<[PartyId, Array<PartyVisitRecord>]>>;
     getParty(_id: PartyId): Promise<{
         pan: string;
         name: string;
@@ -145,6 +152,7 @@ export interface backendInterface {
     importUpgradeData(data: UpgradeData): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     logError(message: string): Promise<void>;
+    paginatedPartyVisitRecords(partyId: PartyId, offset: bigint, limit: bigint): Promise<PaginatedPartyVisitRecordResponse>;
     recordPartyVisit(partyId: PartyId, amount: bigint, comment: string, paymentDate: Time, nextPayment: Time | null, location: Location | null): Promise<string>;
     recordPayment(partyId: PartyId, amount: bigint, comment: string, paymentDate: Time, nextPayment: Time | null): Promise<string>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;

@@ -1,71 +1,64 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T14:13:34.792Z",
+  "generatedAt": "2026-02-20T15:21:46.137Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 1,
+    "total": 3,
+    "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Remove all authentication checks from the validateAndGeneratePartyId function in backend/main.mo",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "Display notifications on the dashboard for parties whose next visit day is today, showing the party name and a clickable call button that initiates a direct phone call",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/queries/useTodayNotifications.ts",
+          "frontend/src/components/dashboard/TodayNotifications.tsx",
+          "frontend/src/pages/DashboardPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/queries/useTodayNotifications.ts",
+          "frontend/src/components/dashboard/TodayNotifications.tsx",
+          "frontend/src/pages/DashboardPage.tsx"
+        ]
       },
       {
         "id": "REQ-2",
-        "summary": "Remove or modify the staff authentication requirement from the addParty function in backend/main.mo to allow unauthenticated party creation",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "Add a search box to the Reports page that filters the party dropdown by party name, phone number, or PAN",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/ReportsPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/ReportsPage.tsx"
+        ]
       },
       {
         "id": "REQ-3",
-        "summary": "Review and remove any caller identity checks or authentication guards from all public query and update methods in backend/main.mo that are used for party management",
+        "summary": "Implement a backend query to fetch parties whose next payment date matches today's date for dashboard notifications",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Test that the PartyFormDialog component in the frontend can successfully generate party IDs and create parties without encountering authorization errors",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/components/parties/PartyFormDialog.tsx",
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/App.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/components/parties/PartyFormDialog.tsx",
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/App.tsx"
-        ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/auth/ProfileSetupDialog.tsx",
-    "frontend/src/components/parties/PartyFormDialog.tsx",
+    "frontend/src/components/dashboard/TodayNotifications.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/queries/useParties.ts",
-    "frontend/src/hooks/queries/useStaffPermissions.ts",
+    "frontend/src/hooks/queries/useTodayNotifications.ts",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/ReportsPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,45 +1,26 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T14:13:34.789Z",
-  "summary": "The diff shows comprehensive removal of authentication guards from party management functions. Backend authentication checks were removed from validateAndGeneratePartyId, addParty, and other party-related methods. Frontend was simplified to remove staff authentication hooks and login requirements. Migration code was added to handle data structure changes. However, some authentication checks remain for user profiles and admin functions (as required by constraints), and explicit frontend testing evidence for REQ-4 is not present in the diff.",
-  "missing_requirements": [
-    {
-      "id": "REQ-4",
-      "requirement": "Test that the PartyFormDialog component in the frontend can successfully generate party IDs and create parties without encountering authorization errors",
-      "reason": "No test files or test execution results are present in the diff. While the PartyFormDialog code shows improved error handling and logging, there is no evidence of actual testing being performed to verify the absence of authorization errors.",
-      "evidence": [
-        "frontend/src/components/parties/PartyFormDialog.tsx"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-20T15:21:46.134Z",
+  "summary": "The diff successfully implements all three requirements: REQ-1 (dashboard notifications with call buttons), REQ-2 (reports page search filtering), and REQ-3 (backend query for parties with today's due payments). All acceptance criteria are satisfied with proper implementation of the notification component, search functionality, and backend query logic.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Migration module created to transform user profiles data structure from Map<Principal, Text> to Map<Principal, { name: Text }>",
-      "reason": "The BuildRequest explicitly states 'Preserve existing data structures' as a constraint, and there is no requirement to change the user profile data structure. This migration introduces a data structure change that was not requested.",
+      "description": "Auto-refresh functionality for notifications with 60-second refetch interval and 30-second stale time",
+      "reason": "BuildRequest explicitly lists 'Notification scheduling or reminder system' as a non-goal, and auto-refresh could be considered a form of automated notification delivery not requested in requirements",
       "evidence": [
-        "backend/migration.mo",
-        "backend/main.mo"
-      ]
-    },
-    {
-      "description": "Complete removal of staff authentication system including staffAccounts Map and all staff-related functionality",
-      "reason": "The BuildRequest constraint states 'Do not remove authentication from admin-only functions like adding/removing admin principals'. The migration code shows staffAccounts being removed entirely, which may include admin management functionality that should have been preserved.",
-      "evidence": [
-        "backend/migration.mo"
+        "frontend/src/hooks/queries/useTodayNotifications.ts"
       ]
     }
   ],
-  "confidence": 0.75,
+  "confidence": 0.92,
   "changed_files": [
     "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/components/auth/ProfileSetupDialog.tsx",
-    "frontend/src/components/parties/PartyFormDialog.tsx",
-    "frontend/src/hooks/queries/useParties.ts",
-    "frontend/src/hooks/queries/useStaffPermissions.ts",
+    "frontend/src/components/dashboard/TodayNotifications.tsx",
+    "frontend/src/hooks/queries/useTodayNotifications.ts",
+    "frontend/src/pages/DashboardPage.tsx",
+    "frontend/src/pages/ReportsPage.tsx",
     "project_state.json"
   ]
 }

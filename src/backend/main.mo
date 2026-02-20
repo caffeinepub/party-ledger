@@ -14,9 +14,7 @@ import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -28,6 +26,12 @@ actor {
   public type Location = {
     latitude : Float;
     longitude : Float;
+  };
+
+  public type PaginatedPartyVisitRecordResponse = {
+    records : [(Text, PartyVisitRecord)];
+    nextOffset : Nat;
+    totalRecords : Nat;
   };
 
   public type IntConstraint = {
@@ -141,7 +145,6 @@ actor {
     };
   };
 
-  // User profile management
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view profiles");
@@ -163,7 +166,6 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  // Logging functions
   public shared ({ caller }) func logError(message : Text) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can log errors");
@@ -171,7 +173,10 @@ actor {
     logger.logs.add("Error: " # message);
   };
 
-  public query func getLogs() : async [(Time.Time, Text)] {
+  public query ({ caller }) func getLogs() : async [(Time.Time, Text)] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can view logs");
+    };
     let logsArray = logger.logs.toArray();
     var timestampIdx = 0;
     logsArray.map(
@@ -190,7 +195,6 @@ actor {
     logger.logs.clear();
   };
 
-  // Shop branding functions
   public query func getShopBranding() : async ?ShopBranding {
     shopBranding;
   };
@@ -202,7 +206,6 @@ actor {
     shopBranding := ?{ name; logo };
   };
 
-  // Party ID validation and generation
   public shared ({ caller }) func validateAndGenerateNewPartyId(name : Text, phone : Text) : async Text {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can generate party IDs");
@@ -225,7 +228,6 @@ actor {
     partyId;
   };
 
-  // Party management functions
   public shared ({ caller }) func addParty(
     partyId : PartyId,
     name : Text,
@@ -253,11 +255,34 @@ actor {
     parties.add(partyId, party);
   };
 
-  public query func getAllParties() : async [(Text, Party)] {
+  public query ({ caller }) func getAllParties() : async [(Text, Party)] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view parties");
+    };
     parties.toArray();
   };
 
-  public query func getParty(_id : PartyId) : async ?{ name : Text; address : Text; phone : Text; pan : Text; dueAmount : Int } {
+  public query ({ caller }) func getAllPartiesWithVisitRecords() : async [(Text, Party, [PartyVisitRecord])] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view parties with visit records");
+    };
+    (parties.keys()).toArray().map(
+      func(partyId) {
+        switch (partyPayments.get(partyId), parties.get(partyId)) {
+          case (null, ?_) { ([] : [(Text, Party, [PartyVisitRecord])]) };
+          case (?visitRecords, ?party) {
+            [(partyId, party, (visitRecords.values()).toArray().map(func(tuple) { tuple.1 }))];
+          };
+          case (_, null) { ([] : [(Text, Party, [PartyVisitRecord])]) };
+        };
+      }
+    ).flatten();
+  };
+
+  public query ({ caller }) func getParty(_id : PartyId) : async ?{ name : Text; address : Text; phone : Text; pan : Text; dueAmount : Int } {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view party details");
+    };
     switch (parties.get(_id)) {
       case (null) { null };
       case (?party) {
@@ -286,7 +311,6 @@ actor {
     partyPayments.remove(partyId);
   };
 
-  // Payment and visit recording functions
   public shared ({ caller }) func recordPayment(partyId : PartyId, amount : Int, comment : Text, paymentDate : Time.Time, nextPayment : ?Time.Time) : async Text {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can record payments");
@@ -365,8 +389,10 @@ actor {
     paymentId;
   };
 
-  // Query functions for visit records
-  public query func getPartyVisitRecords(partyId : PartyId) : async [(PaymentId, PartyVisitRecord)] {
+  public query ({ caller }) func getPartyVisitRecords(partyId : PartyId) : async [(PaymentId, PartyVisitRecord)] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view visit records");
+    };
     switch (partyPayments.get(partyId)) {
       case (null) { ([] : [(PaymentId, PartyVisitRecord)]) };
       case (?paymentsList) {
@@ -375,7 +401,10 @@ actor {
     };
   };
 
-  public query func getPartyVisitRecordMetadata(partyId : PartyId) : async [VisitRecordMetadata] {
+  public query ({ caller }) func getPartyVisitRecordMetadata(partyId : PartyId) : async [VisitRecordMetadata] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view visit record metadata");
+    };
     switch (partyPayments.get(partyId)) {
       case (null) { ([] : [VisitRecordMetadata]) };
       case (?paymentsList) {
@@ -397,16 +426,22 @@ actor {
     partyId : PartyId,
     _filter : PartyVisitRecordFilter,
   ) : async [(PaymentId, PartyVisitRecord)] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can filter visit records");
+    };
     switch (partyPayments.get(partyId)) {
       case (null) { ([] : [(PaymentId, PartyVisitRecord)]) };
       case (?paymentsList) { paymentsList.toArray() };
     };
   };
 
-  public query func filterPartyVisitRecordMetadata(
+  public query ({ caller }) func filterPartyVisitRecordMetadata(
     partyId : PartyId,
     _filter : PartyVisitRecordFilter,
   ) : async AggregateVisitRecordMetadata {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can filter visit record metadata");
+    };
     let allPaymentsMetadata = switch (partyPayments.get(partyId)) {
       case (null) { ([] : [VisitRecordMetadata]) };
       case (?paymentsList) {
@@ -429,7 +464,36 @@ actor {
     };
   };
 
-  // Data import/export functions
+  public query ({ caller }) func paginatedPartyVisitRecords(
+    partyId : PartyId,
+    offset : Nat,
+    limit : Nat,
+  ) : async PaginatedPartyVisitRecordResponse {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view paginated visit records");
+    };
+    switch (partyPayments.get(partyId)) {
+      case (null) {
+        {
+          records = ([] : [(Text, PartyVisitRecord)]);
+          nextOffset = offset;
+          totalRecords = 0;
+        };
+      };
+      case (?paymentsList) {
+        let allRecords = paymentsList.toArray().sort();
+        let totalRecords = allRecords.size();
+        let end = Nat.min(offset + limit, totalRecords);
+        let views = allRecords.sliceToArray(offset, end);
+        {
+          records = views;
+          nextOffset = end;
+          totalRecords;
+        };
+      };
+    };
+  };
+
   public shared ({ caller }) func importUpgradeData(data : UpgradeData) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
       Runtime.trap("Unauthorized: Only admins can import data");
@@ -454,7 +518,10 @@ actor {
     shopBranding := data.branding;
   };
 
-  public query func exportUpgradeData() : async UpgradeData {
+  public query ({ caller }) func exportUpgradeData() : async UpgradeData {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can export data");
+    };
     let recordsArray = partyPayments.toArray().map(
       func((partyId, recordsList)) : (PartyId, [PartyVisitRecord]) {
         let records = recordsList.toArray().map(
@@ -471,12 +538,13 @@ actor {
     };
   };
 
-  // Test function
-  public query func getPartyIdTest(name : Text, phone : Text) : async Text {
+  public query ({ caller }) func getPartyIdTest(name : Text, phone : Text) : async Text {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can test party ID generation");
+    };
     generatePartyIdFromNameAndPhone(name, phone);
   };
 
-  // Helper functions
   func generatePartyIdFromNameAndPhone(name : Text, _phone : Text) : Text {
     name # "." # getNextIdAndIncrement(name).toText();
   };
@@ -492,5 +560,38 @@ actor {
         currentValue;
       };
     };
+  };
+
+  func isSameDay(time1 : Time.Time, time2 : Time.Time) : Bool {
+    let oneDay = 24 * 3600 * 1_000_000_000;
+    let diff = Int.abs(time1 - time2);
+    diff <= oneDay;
+  };
+
+  public query ({ caller }) func getPartiesWithTodayDuePayments() : async [(PartyId, [PartyVisitRecord])] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+    let today = Time.now();
+    let resultList = List.empty<(PartyId, [PartyVisitRecord])>();
+
+    for ((partyId, recordsList) in partyPayments.entries()) {
+      let todaysRecords = List.empty<PartyVisitRecord>();
+      for ((_, record) in recordsList.values()) {
+        switch (record.nextPaymentDate) {
+          case (?date) {
+            if (isSameDay(date, today)) {
+              todaysRecords.add(record);
+            };
+          };
+          case (null) {};
+        };
+      };
+      if (todaysRecords.size() > 0) {
+        resultList.add((partyId, todaysRecords.toArray()));
+      };
+    };
+
+    resultList.toArray();
   };
 };

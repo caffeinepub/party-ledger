@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useGetAllParties } from '../hooks/queries/useParties';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Search, MapPin, Users } from 'lucide-react';
 import { formatMoney } from '../lib/format';
 import PartyVisitFormDialog from '../components/visits/PartyVisitFormDialog';
@@ -12,14 +13,16 @@ export default function NewPartyVisitPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedParty, setSelectedParty] = useState<{ id: PartyId; name: string } | null>(null);
 
-  const filteredParties = parties.filter(([_, party]) => {
-    const query = searchQuery.toLowerCase();
-    return (
-      party.name.toLowerCase().includes(query) ||
-      party.phone.toLowerCase().includes(query) ||
-      party.pan.toLowerCase().includes(query)
-    );
-  });
+  const filteredParties = useMemo(() => {
+    return parties.filter(([_, party]) => {
+      const query = searchQuery.toLowerCase();
+      return (
+        party.name.toLowerCase().includes(query) ||
+        party.phone.toLowerCase().includes(query) ||
+        party.pan.toLowerCase().includes(query)
+      );
+    });
+  }, [parties, searchQuery]);
 
   const handlePartySelect = (partyId: PartyId, partyName: string) => {
     setSelectedParty({ id: partyId, name: partyName });
@@ -31,10 +34,32 @@ export default function NewPartyVisitPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading parties...</p>
+      <div className="space-y-6">
+        <div className="flex items-center gap-3">
+          <MapPin className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold">New Party Visit</h1>
+            <p className="text-muted-foreground">Select a party to record a visit</p>
+          </div>
+        </div>
+
+        <div className="relative">
+          <Skeleton className="h-10 w-full" />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i}>
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4" />
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardContent>
+            </Card>
+          ))}
         </div>
       </div>
     );
