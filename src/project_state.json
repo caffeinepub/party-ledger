@@ -1,32 +1,21 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
-  "known_issues": [],
-  "isFixRequest": false,
+  "summary": "Party app with permission-free party ID generation",
+  "architectural_notes": [
+    "Backend authentication guards need to be removed to allow unauthenticated access",
+    "Party ID generation endpoint should be publicly accessible"
+  ],
+  "known_issues": [
+    "Authentication checks are blocking party ID generation despite previous attempts to remove them"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-remove-authentication-check-from-partyformdialog-when-generating-new-party-ids-allowing-unauthenticated-users-to-create-parties",
-      "title": "Remove authentication check from PartyFormDialog when generating new party IDs, allowing unauthenticated users to create parties",
+      "id": "feature-test-that-the-partyformdialog-component-in-the-frontend-can-successfully-generate-party-ids-and-create-parties-without-encountering-authorization-errors",
+      "title": "Test that the PartyFormDialog component in the frontend can successfully generate party IDs and create parties without encountering authorization errors",
       "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-remove-authentication-check-from-excelpartyimportcard-allowing-unauthenticated-users-to-import-parties-from-excel-csv-files",
-      "title": "Remove authentication check from ExcelPartyImportCard, allowing unauthenticated users to import parties from Excel/CSV files",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-remove-authentication-check-from-jsontransfercard-import-functionality-allowing-unauthenticated-users-to-import-json-data",
-      "title": "Remove authentication check from JsonTransferCard import functionality, allowing unauthenticated users to import JSON data",
-      "reqIds": [
-        "REQ-3"
+        "REQ-4"
       ],
       "version": 1
     }
@@ -34,12 +23,48 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Remove authentication requirements from login and import file functionality",
+      "summary": "Remove all authentication guards from backend code",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Remove staff authentication requirement for party ID generation",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Make party ID generation accessible without authentication",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Remove all authentication checks from the validateAndGeneratePartyId function in backend/main.mo",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Remove or modify the staff authentication requirement from the addParty function in backend/main.mo to allow unauthenticated party creation",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Review and remove any caller identity checks or authentication guards from all public query and update methods in backend/main.mo that are used for party management",
+      "reqIds": [
+        "REQ-3"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Remove authentication requirements from login and import functionality",
+  "projectName": "Remove all authentication guards from party ID generation",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

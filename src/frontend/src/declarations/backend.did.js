@@ -95,12 +95,7 @@ export const AggregateVisitRecordMetadata = IDL.Record({
   'filteredPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
   'allPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
 });
-export const StaffAccount = IDL.Record({
-  'boundPrincipal' : IDL.Opt(IDL.Principal),
-  'loginName' : IDL.Text,
-  'canViewAllRecords' : IDL.Bool,
-  'isDisabled' : IDL.Bool,
-});
+export const UserProfile = IDL.Record({ 'name' : IDL.Text });
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -136,11 +131,8 @@ export const idlService = IDL.Service({
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'authenticateStaff' : IDL.Func([IDL.Text], [IDL.Bool], []),
   'clearLogs' : IDL.Func([], [], []),
-  'createStaffAccount' : IDL.Func([IDL.Text, IDL.Bool], [], []),
   'deleteParty' : IDL.Func([PartyId], [], []),
-  'disableStaffAccount' : IDL.Func([IDL.Text], [], []),
   'exportUpgradeData' : IDL.Func([], [UpgradeData], ['query']),
   'filterPartyVisitRecordMetadata' : IDL.Func(
       [PartyId, PartyVisitRecordFilter],
@@ -152,17 +144,12 @@ export const idlService = IDL.Service({
       [IDL.Vec(IDL.Tuple(PaymentId, PartyVisitRecord))],
       ['query'],
     ),
-  'generatePartyId' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
   'getAllParties' : IDL.Func(
       [],
       [IDL.Vec(IDL.Tuple(IDL.Text, Party))],
       ['query'],
     ),
-  'getCallerUserProfile' : IDL.Func(
-      [],
-      [IDL.Opt(IDL.Record({ 'name' : IDL.Text }))],
-      ['query'],
-    ),
+  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getLogs' : IDL.Func([], [IDL.Vec(IDL.Tuple(Time, IDL.Text))], ['query']),
   'getParty' : IDL.Func(
@@ -194,12 +181,12 @@ export const idlService = IDL.Service({
   'getShopBranding' : IDL.Func([], [IDL.Opt(ShopBranding)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
-      [IDL.Opt(IDL.Record({ 'name' : IDL.Text }))],
+      [IDL.Opt(UserProfile)],
       ['query'],
     ),
   'importUpgradeData' : IDL.Func([UpgradeData], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'listStaffAccounts' : IDL.Func([], [IDL.Vec(StaffAccount)], ['query']),
+  'logError' : IDL.Func([IDL.Text], [], []),
   'recordPartyVisit' : IDL.Func(
       [PartyId, IDL.Int, IDL.Text, Time, IDL.Opt(Time), IDL.Opt(Location)],
       [IDL.Text],
@@ -210,11 +197,7 @@ export const idlService = IDL.Service({
       [IDL.Text],
       [],
     ),
-  'saveCallerUserProfile' : IDL.Func(
-      [IDL.Record({ 'name' : IDL.Text })],
-      [],
-      [],
-    ),
+  'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'setShopBranding' : IDL.Func(
       [IDL.Opt(IDL.Text), IDL.Opt(ExternalBlob)],
       [],
@@ -225,16 +208,12 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
-  'updateStaffAccount' : IDL.Func(
-      [IDL.Text, IDL.Opt(IDL.Bool), IDL.Opt(IDL.Bool)],
-      [],
-      [],
-    ),
   'validateAndGenerateNewPartyId' : IDL.Func(
       [IDL.Text, IDL.Text],
       [IDL.Text],
       [],
     ),
+  'validateAndGeneratePartyId' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
 });
 
 export const idlInitArgs = [];
@@ -329,12 +308,7 @@ export const idlFactory = ({ IDL }) => {
     'filteredPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
     'allPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
   });
-  const StaffAccount = IDL.Record({
-    'boundPrincipal' : IDL.Opt(IDL.Principal),
-    'loginName' : IDL.Text,
-    'canViewAllRecords' : IDL.Bool,
-    'isDisabled' : IDL.Bool,
-  });
+  const UserProfile = IDL.Record({ 'name' : IDL.Text });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -370,11 +344,8 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'authenticateStaff' : IDL.Func([IDL.Text], [IDL.Bool], []),
     'clearLogs' : IDL.Func([], [], []),
-    'createStaffAccount' : IDL.Func([IDL.Text, IDL.Bool], [], []),
     'deleteParty' : IDL.Func([PartyId], [], []),
-    'disableStaffAccount' : IDL.Func([IDL.Text], [], []),
     'exportUpgradeData' : IDL.Func([], [UpgradeData], ['query']),
     'filterPartyVisitRecordMetadata' : IDL.Func(
         [PartyId, PartyVisitRecordFilter],
@@ -386,17 +357,12 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(PaymentId, PartyVisitRecord))],
         ['query'],
       ),
-    'generatePartyId' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
     'getAllParties' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Text, Party))],
         ['query'],
       ),
-    'getCallerUserProfile' : IDL.Func(
-        [],
-        [IDL.Opt(IDL.Record({ 'name' : IDL.Text }))],
-        ['query'],
-      ),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getLogs' : IDL.Func([], [IDL.Vec(IDL.Tuple(Time, IDL.Text))], ['query']),
     'getParty' : IDL.Func(
@@ -428,12 +394,12 @@ export const idlFactory = ({ IDL }) => {
     'getShopBranding' : IDL.Func([], [IDL.Opt(ShopBranding)], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
-        [IDL.Opt(IDL.Record({ 'name' : IDL.Text }))],
+        [IDL.Opt(UserProfile)],
         ['query'],
       ),
     'importUpgradeData' : IDL.Func([UpgradeData], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'listStaffAccounts' : IDL.Func([], [IDL.Vec(StaffAccount)], ['query']),
+    'logError' : IDL.Func([IDL.Text], [], []),
     'recordPartyVisit' : IDL.Func(
         [PartyId, IDL.Int, IDL.Text, Time, IDL.Opt(Time), IDL.Opt(Location)],
         [IDL.Text],
@@ -444,11 +410,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Text],
         [],
       ),
-    'saveCallerUserProfile' : IDL.Func(
-        [IDL.Record({ 'name' : IDL.Text })],
-        [],
-        [],
-      ),
+    'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'setShopBranding' : IDL.Func(
         [IDL.Opt(IDL.Text), IDL.Opt(ExternalBlob)],
         [],
@@ -459,12 +421,12 @@ export const idlFactory = ({ IDL }) => {
         [],
         [],
       ),
-    'updateStaffAccount' : IDL.Func(
-        [IDL.Text, IDL.Opt(IDL.Bool), IDL.Opt(IDL.Bool)],
-        [],
+    'validateAndGenerateNewPartyId' : IDL.Func(
+        [IDL.Text, IDL.Text],
+        [IDL.Text],
         [],
       ),
-    'validateAndGenerateNewPartyId' : IDL.Func(
+    'validateAndGeneratePartyId' : IDL.Func(
         [IDL.Text, IDL.Text],
         [IDL.Text],
         [],

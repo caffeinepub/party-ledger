@@ -1,58 +1,71 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T13:03:43.690Z",
+  "generatedAt": "2026-02-20T14:13:34.792Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 4,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Remove authentication check from PartyFormDialog when generating new party IDs, allowing unauthenticated users to create parties",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/parties/PartyFormDialog.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/parties/PartyFormDialog.tsx"
-        ]
+        "summary": "Remove all authentication checks from the validateAndGeneratePartyId function in backend/main.mo",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Remove authentication check from ExcelPartyImportCard, allowing unauthenticated users to import parties from Excel/CSV files",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/import/ExcelPartyImportCard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/import/ExcelPartyImportCard.tsx"
-        ]
+        "summary": "Remove or modify the staff authentication requirement from the addParty function in backend/main.mo to allow unauthenticated party creation",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-3",
-        "summary": "Remove authentication check from JsonTransferCard import functionality, allowing unauthenticated users to import JSON data",
+        "summary": "Review and remove any caller identity checks or authentication guards from all public query and update methods in backend/main.mo that are used for party management",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Test that the PartyFormDialog component in the frontend can successfully generate party IDs and create parties without encountering authorization errors",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/transfer/JsonTransferCard.tsx"
+          "frontend/src/hooks/queries/useParties.ts",
+          "frontend/src/components/parties/PartyFormDialog.tsx",
+          "frontend/src/hooks/queries/useParties.ts",
+          "frontend/src/App.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/transfer/JsonTransferCard.tsx"
+          "frontend/src/hooks/queries/useParties.ts",
+          "frontend/src/components/parties/PartyFormDialog.tsx",
+          "frontend/src/hooks/queries/useParties.ts",
+          "frontend/src/App.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/import/ExcelPartyImportCard.tsx",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/auth/ProfileSetupDialog.tsx",
     "frontend/src/components/parties/PartyFormDialog.tsx",
-    "frontend/src/components/transfer/JsonTransferCard.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/queries/useParties.ts",
+    "frontend/src/hooks/queries/useStaffPermissions.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

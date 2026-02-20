@@ -1,72 +1,87 @@
 {
   "kind": "build_request",
-  "title": "Remove authentication requirements from login and import functionality",
-  "priority": "normal",
+  "title": "Remove all authentication guards from party ID generation",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove authentication check from PartyFormDialog when generating new party IDs, allowing unauthenticated users to create parties",
-      "target": "frontend",
+      "text": "Remove all authentication checks from the validateAndGeneratePartyId function in backend/main.mo",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-5"
         ],
         "quotes": [
-          "remove all authenticated for login and import file"
+          "Review the current backend code to locate all authentication guards"
         ]
       },
       "acceptanceCriteria": [
-        "PartyFormDialog allows party creation without authentication",
-        "Party ID generation works for unauthenticated users",
-        "No authentication errors appear when creating parties"
+        "The validateAndGeneratePartyId function can be called without any authentication",
+        "No 'Unauthorized' errors are thrown during party ID generation",
+        "The function executes successfully for both authenticated and anonymous users"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Remove authentication check from ExcelPartyImportCard, allowing unauthenticated users to import parties from Excel/CSV files",
-      "target": "frontend",
+      "text": "Remove or modify the staff authentication requirement from the addParty function in backend/main.mo to allow unauthenticated party creation",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-5"
         ],
         "quotes": [
-          "remove all authenticated for login and import file"
+          "Remove or modify the staff authentication requirement"
         ]
       },
       "acceptanceCriteria": [
-        "Excel/CSV import works without authentication",
-        "Batch party imports succeed for unauthenticated users",
-        "No authentication errors during file import process"
+        "The addParty function can be called without staff authentication",
+        "Party records can be created by any user, authenticated or not",
+        "No authentication guards block the party creation flow"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Remove authentication check from JsonTransferCard import functionality, allowing unauthenticated users to import JSON data",
-      "target": "frontend",
+      "text": "Review and remove any caller identity checks or authentication guards from all public query and update methods in backend/main.mo that are used for party management",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-5"
         ],
         "quotes": [
-          "remove all authenticated for login and import file"
+          "Ensure the party ID generation is accessible without authentication"
         ]
       },
       "acceptanceCriteria": [
-        "JSON data import works without authentication",
-        "Both merge and overwrite modes function for unauthenticated users",
-        "No authentication errors during JSON import"
+        "All party-related public methods are accessible without authentication",
+        "No authentication checks prevent anonymous users from using core party features",
+        "The app functions without requiring Internet Identity login"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Test that the PartyFormDialog component in the frontend can successfully generate party IDs and create parties without encountering authorization errors",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-5"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The 'Add Party' dialog successfully generates party IDs",
+        "Party creation completes without 'Unauthorized' errors",
+        "Users can create parties immediately after opening the app"
       ]
     }
   ],
   "constraints": [
-    "Do not modify backend authentication logic or actor methods",
-    "Preserve existing UI component structure and styling",
-    "Maintain data validation and error handling for imports"
+    "Do not remove authentication from admin-only functions like adding/removing admin principals",
+    "Preserve existing data structures and party ledger functionality",
+    "Maintain backward compatibility with existing stored data"
   ],
   "nonGoals": [
-    "Removing authentication from other parts of the application",
-    "Modifying the Internet Identity integration",
-    "Changing the ProfileSetupDialog or login flow"
+    "Implementing new authentication mechanisms",
+    "Adding role-based access control for party operations",
+    "Modifying the Internet Identity integration"
   ],
   "imageRequirements": {
     "required": [],

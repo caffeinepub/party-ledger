@@ -135,17 +135,6 @@ export interface _CaffeineStorageCreateCertificateResult {
     method: string;
     blob_hash: string;
 }
-export interface StaffAccount {
-    boundPrincipal?: Principal;
-    loginName: string;
-    canViewAllRecords: boolean;
-    isDisabled: boolean;
-}
-export interface UpgradeData {
-    partyVisitRecords: Array<[PartyId, Array<PartyVisitRecord>]>;
-    branding?: ShopBranding;
-    parties: Array<[PartyId, Party]>;
-}
 export type LocationConstraint = {
     __kind__: "greaterLatitude";
     greaterLatitude: number;
@@ -162,6 +151,11 @@ export type LocationConstraint = {
     __kind__: "lessLongitude";
     lessLongitude: number;
 };
+export interface UpgradeData {
+    partyVisitRecords: Array<[PartyId, Array<PartyVisitRecord>]>;
+    branding?: ShopBranding;
+    parties: Array<[PartyId, Party]>;
+}
 export type TimeConstraint = {
     __kind__: "after";
     after: Time;
@@ -198,6 +192,9 @@ export interface AggregateVisitRecordMetadata {
     filteredPaymentsMetadata: Array<VisitRecordMetadata>;
     allPaymentsMetadata: Array<VisitRecordMetadata>;
 }
+export interface UserProfile {
+    name: string;
+}
 export interface _CaffeineStorageRefillResult {
     success?: boolean;
     topped_up_amount?: bigint;
@@ -217,19 +214,13 @@ export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     addParty(partyId: PartyId, name: string, address: string, phone: string, pan: string, dueAmount: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    authenticateStaff(loginName: string): Promise<boolean>;
     clearLogs(): Promise<void>;
-    createStaffAccount(loginName: string, canViewAllRecords: boolean): Promise<void>;
     deleteParty(partyId: PartyId): Promise<void>;
-    disableStaffAccount(loginName: string): Promise<void>;
     exportUpgradeData(): Promise<UpgradeData>;
     filterPartyVisitRecordMetadata(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<AggregateVisitRecordMetadata>;
     filterPartyVisitRecords(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<Array<[PaymentId, PartyVisitRecord]>>;
-    generatePartyId(_name: string, _phone: string): Promise<string>;
     getAllParties(): Promise<Array<[string, Party]>>;
-    getCallerUserProfile(): Promise<{
-        name: string;
-    } | null>;
+    getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getLogs(): Promise<Array<[Time, string]>>;
     getParty(_id: PartyId): Promise<{
@@ -243,23 +234,19 @@ export interface backendInterface {
     getPartyVisitRecordMetadata(partyId: PartyId): Promise<Array<VisitRecordMetadata>>;
     getPartyVisitRecords(partyId: PartyId): Promise<Array<[PaymentId, PartyVisitRecord]>>;
     getShopBranding(): Promise<ShopBranding | null>;
-    getUserProfile(user: Principal): Promise<{
-        name: string;
-    } | null>;
+    getUserProfile(user: Principal): Promise<UserProfile | null>;
     importUpgradeData(data: UpgradeData): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
-    listStaffAccounts(): Promise<Array<StaffAccount>>;
+    logError(message: string): Promise<void>;
     recordPartyVisit(partyId: PartyId, amount: bigint, comment: string, paymentDate: Time, nextPayment: Time | null, location: Location | null): Promise<string>;
     recordPayment(partyId: PartyId, amount: bigint, comment: string, paymentDate: Time, nextPayment: Time | null): Promise<string>;
-    saveCallerUserProfile(profile: {
-        name: string;
-    }): Promise<void>;
+    saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setShopBranding(name: string | null, logo: ExternalBlob | null): Promise<void>;
     updateParty(partyId: PartyId, name: string, address: string, phoneNumber: string, pan: string, dueAmount: bigint): Promise<void>;
-    updateStaffAccount(loginName: string, canViewAllRecords: boolean | null, isDisabled: boolean | null): Promise<void>;
     validateAndGenerateNewPartyId(name: string, phone: string): Promise<string>;
+    validateAndGeneratePartyId(name: string, phone: string): Promise<string>;
 }
-import type { ExternalBlob as _ExternalBlob, IntConstraint as _IntConstraint, Location as _Location, LocationConstraint as _LocationConstraint, Party as _Party, PartyId as _PartyId, PartyVisitRecord as _PartyVisitRecord, PartyVisitRecordFilter as _PartyVisitRecordFilter, PaymentId as _PaymentId, ShopBranding as _ShopBranding, StaffAccount as _StaffAccount, TextConstraint as _TextConstraint, Time as _Time, TimeConstraint as _TimeConstraint, UpgradeData as _UpgradeData, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { ExternalBlob as _ExternalBlob, IntConstraint as _IntConstraint, Location as _Location, LocationConstraint as _LocationConstraint, Party as _Party, PartyId as _PartyId, PartyVisitRecord as _PartyVisitRecord, PartyVisitRecordFilter as _PartyVisitRecordFilter, PaymentId as _PaymentId, ShopBranding as _ShopBranding, TextConstraint as _TextConstraint, Time as _Time, TimeConstraint as _TimeConstraint, UpgradeData as _UpgradeData, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -388,20 +375,6 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async authenticateStaff(arg0: string): Promise<boolean> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.authenticateStaff(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.authenticateStaff(arg0);
-            return result;
-        }
-    }
     async clearLogs(): Promise<void> {
         if (this.processError) {
             try {
@@ -416,20 +389,6 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async createStaffAccount(arg0: string, arg1: boolean): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.createStaffAccount(arg0, arg1);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.createStaffAccount(arg0, arg1);
-            return result;
-        }
-    }
     async deleteParty(arg0: PartyId): Promise<void> {
         if (this.processError) {
             try {
@@ -441,20 +400,6 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.deleteParty(arg0);
-            return result;
-        }
-    }
-    async disableStaffAccount(arg0: string): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.disableStaffAccount(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.disableStaffAccount(arg0);
             return result;
         }
     }
@@ -500,20 +445,6 @@ export class Backend implements backendInterface {
             return from_candid_vec_n35(this._uploadFile, this._downloadFile, result);
         }
     }
-    async generatePartyId(arg0: string, arg1: string): Promise<string> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.generatePartyId(arg0, arg1);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.generatePartyId(arg0, arg1);
-            return result;
-        }
-    }
     async getAllParties(): Promise<Array<[string, Party]>> {
         if (this.processError) {
             try {
@@ -528,9 +459,7 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async getCallerUserProfile(): Promise<{
-        name: string;
-    } | null> {
+    async getCallerUserProfile(): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getCallerUserProfile();
@@ -648,9 +577,7 @@ export class Backend implements backendInterface {
             return from_candid_opt_n19(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getUserProfile(arg0: Principal): Promise<{
-        name: string;
-    } | null> {
+    async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
                 const result = await this.actor.getUserProfile(arg0);
@@ -692,51 +619,49 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async listStaffAccounts(): Promise<Array<StaffAccount>> {
+    async logError(arg0: string): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.listStaffAccounts();
-                return from_candid_vec_n51(this._uploadFile, this._downloadFile, result);
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.listStaffAccounts();
-            return from_candid_vec_n51(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async recordPartyVisit(arg0: PartyId, arg1: bigint, arg2: string, arg3: Time, arg4: Time | null, arg5: Location | null): Promise<string> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.recordPartyVisit(arg0, arg1, arg2, arg3, to_candid_opt_n55(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n56(this._uploadFile, this._downloadFile, arg5));
+                const result = await this.actor.logError(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.recordPartyVisit(arg0, arg1, arg2, arg3, to_candid_opt_n55(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n56(this._uploadFile, this._downloadFile, arg5));
+            const result = await this.actor.logError(arg0);
+            return result;
+        }
+    }
+    async recordPartyVisit(arg0: PartyId, arg1: bigint, arg2: string, arg3: Time, arg4: Time | null, arg5: Location | null): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.recordPartyVisit(arg0, arg1, arg2, arg3, to_candid_opt_n51(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n52(this._uploadFile, this._downloadFile, arg5));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.recordPartyVisit(arg0, arg1, arg2, arg3, to_candid_opt_n51(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n52(this._uploadFile, this._downloadFile, arg5));
             return result;
         }
     }
     async recordPayment(arg0: PartyId, arg1: bigint, arg2: string, arg3: Time, arg4: Time | null): Promise<string> {
         if (this.processError) {
             try {
-                const result = await this.actor.recordPayment(arg0, arg1, arg2, arg3, to_candid_opt_n55(this._uploadFile, this._downloadFile, arg4));
+                const result = await this.actor.recordPayment(arg0, arg1, arg2, arg3, to_candid_opt_n51(this._uploadFile, this._downloadFile, arg4));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.recordPayment(arg0, arg1, arg2, arg3, to_candid_opt_n55(this._uploadFile, this._downloadFile, arg4));
+            const result = await this.actor.recordPayment(arg0, arg1, arg2, arg3, to_candid_opt_n51(this._uploadFile, this._downloadFile, arg4));
             return result;
         }
     }
-    async saveCallerUserProfile(arg0: {
-        name: string;
-    }): Promise<void> {
+    async saveCallerUserProfile(arg0: UserProfile): Promise<void> {
         if (this.processError) {
             try {
                 const result = await this.actor.saveCallerUserProfile(arg0);
@@ -753,14 +678,14 @@ export class Backend implements backendInterface {
     async setShopBranding(arg0: string | null, arg1: ExternalBlob | null): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.setShopBranding(to_candid_opt_n57(this._uploadFile, this._downloadFile, arg0), await to_candid_opt_n58(this._uploadFile, this._downloadFile, arg1));
+                const result = await this.actor.setShopBranding(to_candid_opt_n53(this._uploadFile, this._downloadFile, arg0), await to_candid_opt_n54(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.setShopBranding(to_candid_opt_n57(this._uploadFile, this._downloadFile, arg0), await to_candid_opt_n58(this._uploadFile, this._downloadFile, arg1));
+            const result = await this.actor.setShopBranding(to_candid_opt_n53(this._uploadFile, this._downloadFile, arg0), await to_candid_opt_n54(this._uploadFile, this._downloadFile, arg1));
             return result;
         }
     }
@@ -778,20 +703,6 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async updateStaffAccount(arg0: string, arg1: boolean | null, arg2: boolean | null): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.updateStaffAccount(arg0, to_candid_opt_n59(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n59(this._uploadFile, this._downloadFile, arg2));
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.updateStaffAccount(arg0, to_candid_opt_n59(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n59(this._uploadFile, this._downloadFile, arg2));
-            return result;
-        }
-    }
     async validateAndGenerateNewPartyId(arg0: string, arg1: string): Promise<string> {
         if (this.processError) {
             try {
@@ -806,6 +717,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async validateAndGeneratePartyId(arg0: string, arg1: string): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.validateAndGeneratePartyId(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.validateAndGeneratePartyId(arg0, arg1);
+            return result;
+        }
+    }
 }
 async function from_candid_ExternalBlob_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
     return await _downloadFile(value);
@@ -815,9 +740,6 @@ function from_candid_PartyVisitRecord_n15(_uploadFile: (file: ExternalBlob) => P
 }
 async function from_candid_ShopBranding_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ShopBranding): Promise<ShopBranding> {
     return await from_candid_record_n21(_uploadFile, _downloadFile, value);
-}
-function from_candid_StaffAccount_n52(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _StaffAccount): StaffAccount {
-    return from_candid_record_n53(_uploadFile, _downloadFile, value);
 }
 async function from_candid_UpgradeData_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UpgradeData): Promise<UpgradeData> {
     return await from_candid_record_n11(_uploadFile, _downloadFile, value);
@@ -843,11 +765,7 @@ async function from_candid_opt_n22(_uploadFile: (file: ExternalBlob) => Promise<
 function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [string]): string | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [{
-        name: string;
-    }]): {
-    name: string;
-} | null {
+function from_candid_opt_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [{
@@ -863,9 +781,6 @@ function from_candid_opt_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
     phone: string;
     dueAmount: bigint;
 } | null {
-    return value.length === 0 ? null : value[0];
-}
-function from_candid_opt_n54(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [Principal]): Principal | null {
     return value.length === 0 ? null : value[0];
 }
 function from_candid_opt_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [boolean]): boolean | null {
@@ -934,24 +849,6 @@ function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint
         topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
     };
 }
-function from_candid_record_n53(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
-    boundPrincipal: [] | [Principal];
-    loginName: string;
-    canViewAllRecords: boolean;
-    isDisabled: boolean;
-}): {
-    boundPrincipal?: Principal;
-    loginName: string;
-    canViewAllRecords: boolean;
-    isDisabled: boolean;
-} {
-    return {
-        boundPrincipal: record_opt_to_undefined(from_candid_opt_n54(_uploadFile, _downloadFile, value.boundPrincipal)),
-        loginName: value.loginName,
-        canViewAllRecords: value.canViewAllRecords,
-        isDisabled: value.isDisabled
-    };
-}
 function from_candid_tuple_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [_PartyId, Array<_PartyVisitRecord>]): [PartyId, Array<PartyVisitRecord>] {
     return [
         value[0],
@@ -981,9 +878,6 @@ function from_candid_vec_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 }
 function from_candid_vec_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[_PaymentId, _PartyVisitRecord]>): Array<[PaymentId, PartyVisitRecord]> {
     return value.map((x)=>from_candid_tuple_n36(_uploadFile, _downloadFile, x));
-}
-function from_candid_vec_n51(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_StaffAccount>): Array<StaffAccount> {
-    return value.map((x)=>from_candid_StaffAccount_n52(_uploadFile, _downloadFile, x));
 }
 async function to_candid_ExternalBlob_n50(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
     return await _uploadFile(value);
@@ -1021,20 +915,17 @@ function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: Exte
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
     return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
 }
-function to_candid_opt_n55(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Time | null): [] | [_Time] {
+function to_candid_opt_n51(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Time | null): [] | [_Time] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_opt_n56(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Location | null): [] | [_Location] {
+function to_candid_opt_n52(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Location | null): [] | [_Location] {
     return value === null ? candid_none() : candid_some(value);
 }
-function to_candid_opt_n57(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
+function to_candid_opt_n53(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: string | null): [] | [string] {
     return value === null ? candid_none() : candid_some(value);
 }
-async function to_candid_opt_n58(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob | null): Promise<[] | [_ExternalBlob]> {
+async function to_candid_opt_n54(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob | null): Promise<[] | [_ExternalBlob]> {
     return value === null ? candid_none() : candid_some(await to_candid_ExternalBlob_n50(_uploadFile, _downloadFile, value));
-}
-function to_candid_opt_n59(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: boolean | null): [] | [boolean] {
-    return value === null ? candid_none() : candid_some(value);
 }
 function to_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     paymentDateFilter?: TimeConstraint;

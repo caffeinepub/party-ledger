@@ -45,8 +45,52 @@ export function useValidateAndGeneratePartyId() {
 
   return useMutation({
     mutationFn: async (params: { name: string; phone: string }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.validateAndGenerateNewPartyId(params.name, params.phone);
+      const timestamp = new Date().toISOString();
+      console.log(`[${timestamp}] 🔵 Starting party ID generation`, {
+        name: params.name,
+        phone: params.phone,
+        nameLength: params.name.length,
+        phoneLength: params.phone.length,
+      });
+
+      if (!actor) {
+        console.error(`[${timestamp}] ❌ Actor not available`);
+        throw new Error('Backend connection not available. Please refresh the page.');
+      }
+
+      console.log(`[${timestamp}] ✅ Actor is available, calling validateAndGeneratePartyId...`);
+
+      try {
+        const startTime = performance.now();
+        const partyId = await actor.validateAndGeneratePartyId(params.name, params.phone);
+        const endTime = performance.now();
+        const duration = (endTime - startTime).toFixed(2);
+
+        console.log(`[${timestamp}] ✅ Party ID generated successfully`, {
+          partyId,
+          duration: `${duration}ms`,
+        });
+
+        return partyId;
+      } catch (error: any) {
+        console.error(`[${timestamp}] ❌ Party ID generation failed`, {
+          errorMessage: error?.message || 'Unknown error',
+          errorName: error?.name,
+          errorStack: error?.stack,
+          fullError: JSON.stringify(error, Object.getOwnPropertyNames(error)),
+        });
+
+        // Provide user-friendly error messages
+        if (error?.message?.includes('already exists')) {
+          throw new Error('A party with this name already exists. Please use a different name.');
+        } else if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
+          throw new Error('Unable to connect to the backend. Please check your internet connection.');
+        } else if (error?.message?.includes('timeout')) {
+          throw new Error('Party ID generation timed out. Please try again.');
+        } else {
+          throw new Error(error?.message || 'Failed to generate party ID. Please try again.');
+        }
+      }
     },
   });
 }
@@ -57,7 +101,7 @@ export function useAddParty() {
 
   return useMutation({
     mutationFn: async (party: { partyId: string; name: string; address: string; phone: string; pan: string; dueAmount: bigint }) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error('Backend connection not available. Please refresh the page.');
       await actor.addParty(party.partyId, party.name, party.address, party.phone, party.pan, party.dueAmount);
     },
     onSuccess: () => {
@@ -72,7 +116,7 @@ export function useUpdateParty() {
 
   return useMutation({
     mutationFn: async (params: { partyId: PartyId; name: string; address: string; phone: string; pan: string; dueAmount: bigint }) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error('Backend connection not available. Please refresh the page.');
       await actor.updateParty(params.partyId, params.name, params.address, params.phone, params.pan, params.dueAmount);
     },
     onSuccess: (_, variables) => {
@@ -88,7 +132,7 @@ export function useDeleteParty() {
 
   return useMutation({
     mutationFn: async (partyId: PartyId) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error('Backend connection not available. Please refresh the page.');
       await actor.deleteParty(partyId);
     },
     onSuccess: () => {

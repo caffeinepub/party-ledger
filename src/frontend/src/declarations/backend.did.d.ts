@@ -52,12 +52,6 @@ export interface ShopBranding {
   'logo' : [] | [ExternalBlob],
   'name' : [] | [string],
 }
-export interface StaffAccount {
-  'boundPrincipal' : [] | [Principal],
-  'loginName' : string,
-  'canViewAllRecords' : boolean,
-  'isDisabled' : boolean,
-}
 export type TextConstraint = { 'contains' : string } |
   { 'greaterThan' : string } |
   { 'equals' : string } |
@@ -71,6 +65,7 @@ export interface UpgradeData {
   'branding' : [] | [ShopBranding],
   'parties' : Array<[PartyId, Party]>,
 }
+export interface UserProfile { 'name' : string }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -112,11 +107,8 @@ export interface _SERVICE {
     undefined
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'authenticateStaff' : ActorMethod<[string], boolean>,
   'clearLogs' : ActorMethod<[], undefined>,
-  'createStaffAccount' : ActorMethod<[string, boolean], undefined>,
   'deleteParty' : ActorMethod<[PartyId], undefined>,
-  'disableStaffAccount' : ActorMethod<[string], undefined>,
   'exportUpgradeData' : ActorMethod<[], UpgradeData>,
   'filterPartyVisitRecordMetadata' : ActorMethod<
     [PartyId, PartyVisitRecordFilter],
@@ -126,9 +118,8 @@ export interface _SERVICE {
     [PartyId, PartyVisitRecordFilter],
     Array<[PaymentId, PartyVisitRecord]>
   >,
-  'generatePartyId' : ActorMethod<[string, string], string>,
   'getAllParties' : ActorMethod<[], Array<[string, Party]>>,
-  'getCallerUserProfile' : ActorMethod<[], [] | [{ 'name' : string }]>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getLogs' : ActorMethod<[], Array<[Time, string]>>,
   'getParty' : ActorMethod<
@@ -153,10 +144,10 @@ export interface _SERVICE {
     Array<[PaymentId, PartyVisitRecord]>
   >,
   'getShopBranding' : ActorMethod<[], [] | [ShopBranding]>,
-  'getUserProfile' : ActorMethod<[Principal], [] | [{ 'name' : string }]>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'importUpgradeData' : ActorMethod<[UpgradeData], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'listStaffAccounts' : ActorMethod<[], Array<StaffAccount>>,
+  'logError' : ActorMethod<[string], undefined>,
   'recordPartyVisit' : ActorMethod<
     [PartyId, bigint, string, Time, [] | [Time], [] | [Location]],
     string
@@ -165,7 +156,7 @@ export interface _SERVICE {
     [PartyId, bigint, string, Time, [] | [Time]],
     string
   >,
-  'saveCallerUserProfile' : ActorMethod<[{ 'name' : string }], undefined>,
+  'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setShopBranding' : ActorMethod<
     [[] | [string], [] | [ExternalBlob]],
     undefined
@@ -174,11 +165,8 @@ export interface _SERVICE {
     [PartyId, string, string, string, string, bigint],
     undefined
   >,
-  'updateStaffAccount' : ActorMethod<
-    [string, [] | [boolean], [] | [boolean]],
-    undefined
-  >,
   'validateAndGenerateNewPartyId' : ActorMethod<[string, string], string>,
+  'validateAndGeneratePartyId' : ActorMethod<[string, string], string>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

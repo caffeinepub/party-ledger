@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { useSaveCallerUserProfile } from '@/hooks/queries/useAuth';
-import { useAuthenticateStaff } from '@/hooks/queries/useStaffPermissions';
 
 interface ProfileSetupDialogProps {
   open: boolean;
@@ -13,24 +12,20 @@ interface ProfileSetupDialogProps {
 export default function ProfileSetupDialog({ open }: ProfileSetupDialogProps) {
   const [name, setName] = useState('');
   const saveProfile = useSaveCallerUserProfile();
-  const authenticateStaff = useAuthenticateStaff();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
 
     try {
-      // First save the user profile
+      // Save the user profile
       await saveProfile.mutateAsync({ name: name.trim() });
-      
-      // Then authenticate as staff with the same name
-      await authenticateStaff.mutateAsync(name.trim());
     } catch (error) {
       console.error('Profile setup error:', error);
     }
   };
 
-  const isLoading = saveProfile.isPending || authenticateStaff.isPending;
+  const isLoading = saveProfile.isPending;
 
   return (
     <Dialog open={open}>

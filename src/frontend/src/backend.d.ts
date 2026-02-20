@@ -53,17 +53,6 @@ export interface PartyVisitRecord {
     nextPaymentDate?: Time;
     location?: Location;
 }
-export interface StaffAccount {
-    boundPrincipal?: Principal;
-    loginName: string;
-    canViewAllRecords: boolean;
-    isDisabled: boolean;
-}
-export interface UpgradeData {
-    partyVisitRecords: Array<[PartyId, Array<PartyVisitRecord>]>;
-    branding?: ShopBranding;
-    parties: Array<[PartyId, Party]>;
-}
 export type LocationConstraint = {
     __kind__: "greaterLatitude";
     greaterLatitude: number;
@@ -80,6 +69,11 @@ export type LocationConstraint = {
     __kind__: "lessLongitude";
     lessLongitude: number;
 };
+export interface UpgradeData {
+    partyVisitRecords: Array<[PartyId, Array<PartyVisitRecord>]>;
+    branding?: ShopBranding;
+    parties: Array<[PartyId, Party]>;
+}
 export type TimeConstraint = {
     __kind__: "after";
     after: Time;
@@ -116,6 +110,9 @@ export interface AggregateVisitRecordMetadata {
     filteredPaymentsMetadata: Array<VisitRecordMetadata>;
     allPaymentsMetadata: Array<VisitRecordMetadata>;
 }
+export interface UserProfile {
+    name: string;
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -124,19 +121,13 @@ export enum UserRole {
 export interface backendInterface {
     addParty(partyId: PartyId, name: string, address: string, phone: string, pan: string, dueAmount: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    authenticateStaff(loginName: string): Promise<boolean>;
     clearLogs(): Promise<void>;
-    createStaffAccount(loginName: string, canViewAllRecords: boolean): Promise<void>;
     deleteParty(partyId: PartyId): Promise<void>;
-    disableStaffAccount(loginName: string): Promise<void>;
     exportUpgradeData(): Promise<UpgradeData>;
     filterPartyVisitRecordMetadata(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<AggregateVisitRecordMetadata>;
     filterPartyVisitRecords(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<Array<[PaymentId, PartyVisitRecord]>>;
-    generatePartyId(_name: string, _phone: string): Promise<string>;
     getAllParties(): Promise<Array<[string, Party]>>;
-    getCallerUserProfile(): Promise<{
-        name: string;
-    } | null>;
+    getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getLogs(): Promise<Array<[Time, string]>>;
     getParty(_id: PartyId): Promise<{
@@ -150,19 +141,15 @@ export interface backendInterface {
     getPartyVisitRecordMetadata(partyId: PartyId): Promise<Array<VisitRecordMetadata>>;
     getPartyVisitRecords(partyId: PartyId): Promise<Array<[PaymentId, PartyVisitRecord]>>;
     getShopBranding(): Promise<ShopBranding | null>;
-    getUserProfile(user: Principal): Promise<{
-        name: string;
-    } | null>;
+    getUserProfile(user: Principal): Promise<UserProfile | null>;
     importUpgradeData(data: UpgradeData): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
-    listStaffAccounts(): Promise<Array<StaffAccount>>;
+    logError(message: string): Promise<void>;
     recordPartyVisit(partyId: PartyId, amount: bigint, comment: string, paymentDate: Time, nextPayment: Time | null, location: Location | null): Promise<string>;
     recordPayment(partyId: PartyId, amount: bigint, comment: string, paymentDate: Time, nextPayment: Time | null): Promise<string>;
-    saveCallerUserProfile(profile: {
-        name: string;
-    }): Promise<void>;
+    saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setShopBranding(name: string | null, logo: ExternalBlob | null): Promise<void>;
     updateParty(partyId: PartyId, name: string, address: string, phoneNumber: string, pan: string, dueAmount: bigint): Promise<void>;
-    updateStaffAccount(loginName: string, canViewAllRecords: boolean | null, isDisabled: boolean | null): Promise<void>;
     validateAndGenerateNewPartyId(name: string, phone: string): Promise<string>;
+    validateAndGeneratePartyId(name: string, phone: string): Promise<string>;
 }
