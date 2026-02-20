@@ -1,13 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActorSession } from '../../context/ActorSessionContext';
-import { useAppReadiness } from '../../context/AppReadinessContext';
 import type { VisitRecordMetadata, PaymentId, PartyId, Time, Location } from '../../backend';
 
 export function useGetPayments(partyId: PartyId, options?: { enabled?: boolean }) {
-  const { actor } = useActorSession();
-  const { isAppReadyForMainData } = useAppReadiness();
+  const { actor, isLoading: actorLoading } = useActorSession();
   
-  const enabled = options?.enabled !== undefined ? options.enabled : isAppReadyForMainData;
+  const enabled = options?.enabled !== undefined ? options.enabled : true;
 
   return useQuery<Array<VisitRecordMetadata>>({
     queryKey: ['payments', partyId],
@@ -15,7 +13,7 @@ export function useGetPayments(partyId: PartyId, options?: { enabled?: boolean }
       if (!actor) return [];
       return actor.getPartyVisitRecordMetadata(partyId);
     },
-    enabled: enabled && !!actor && !!partyId,
+    enabled: enabled && !!actor && !actorLoading && !!partyId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     refetchOnWindowFocus: false,
   });

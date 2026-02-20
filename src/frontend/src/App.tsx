@@ -1,11 +1,10 @@
 import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile, useSaveCallerUserProfile } from './hooks/queries/useAuth';
-import { useActorSession } from './context/ActorSessionContext';
-import { useStaffAuthContext } from './context/StaffAuthContext';
-import { useAppReadiness } from './context/AppReadinessContext';
+import { useActorSession, ActorSessionProvider } from './context/ActorSessionContext';
 import { ThemeProvider } from 'next-themes';
 import { Toaster } from '@/components/ui/sonner';
+import { TopLevelErrorBoundary } from './components/auth/TopLevelErrorBoundary';
 import AppShell from './components/layout/AppShell';
 import DashboardPage from './pages/DashboardPage';
 import PartiesPage from './pages/PartiesPage';
@@ -15,7 +14,7 @@ import VisitDetailsPage from './pages/VisitDetailsPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
 import LoginScreen from './components/auth/LoginScreen';
-import StaffLoginScreen from './components/auth/StaffLoginScreen';
+import StartupLoadingScreen from './components/auth/StartupLoadingScreen';
 import ProfileSetupDialog from './components/auth/ProfileSetupDialog';
 import BootstrapErrorScreen from './components/auth/BootstrapErrorScreen';
 import ProfileBootstrapErrorScreen from './components/auth/ProfileBootstrapErrorScreen';
@@ -102,9 +101,6 @@ function AppContent() {
   const { mutate: saveProfile } = useSaveCallerUserProfile();
   const [profileSetupOpen, setProfileSetupOpen] = useState(false);
 
-  const { isStaffAuthenticated } = useStaffAuthContext();
-  const { isAppReadyForMainData } = useAppReadiness();
-
   const isAuthenticated = !!identity;
   const isInitializing = loginStatus === 'initializing';
 
@@ -119,65 +115,40 @@ function AppContent() {
     });
   };
 
-  // Due today alert - only runs when app is ready for main data
+  // Due today alert - only runs when authenticated and actor is ready
   const { partiesDueToday, dismissAlert } = useDueTodayAlert();
 
-  // Handle initialization state
+  // Bootstrap phase 1: Internet Identity initialization
   if (isInitializing) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return <StartupLoadingScreen message="Loading..." />;
   }
 
-  // Show login screen for unauthenticated users
+  // Bootstrap phase 2: Not authenticated - show login
   if (!isAuthenticated) {
     return <LoginScreen />;
   }
 
-  // Handle actor initialization errors
+  // Bootstrap phase 3: Actor initialization error
   if (actorError) {
     return <BootstrapErrorScreen onRetry={() => retryActor()} />;
   }
 
-  // Show loading while actor is initializing
+  // Bootstrap phase 4: Actor loading
   if (actorLoading || !actor) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Initializing...</p>
-        </div>
-      </div>
-    );
+    return <StartupLoadingScreen message="Initializing..." />;
   }
 
-  // Handle profile fetch errors
+  // Bootstrap phase 5: Profile fetch error
   if (profileError) {
     return <ProfileBootstrapErrorScreen onRetry={() => retryProfile()} />;
   }
 
-  // Show loading only while profile is actively being fetched
+  // Bootstrap phase 6: Profile loading (only show if not yet fetched)
   if (profileLoading && !profileFetched) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <StartupLoadingScreen message="Loading profile..." />;
   }
 
-  // Show staff login screen if not authenticated at staff level
-  if (!isStaffAuthenticated) {
-    return <StaffLoginScreen />;
-  }
-
+  // Bootstrap complete - render main app with router
   return (
     <>
       <RouterProvider router={router} />
@@ -197,8 +168,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <AppContent />
-    </ThemeProvider>
+    <TopLevelErrorBoundary>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ActorSessionProvider>
+          <AppContent />
+        </ActorSessionProvider>
+      </ThemeProvider>
+    </TopLevelErrorBoundary>
   );
 }

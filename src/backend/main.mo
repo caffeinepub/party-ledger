@@ -9,6 +9,7 @@ import Array "mo:core/Array";
 import Float "mo:core/Float";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
+import Iter "mo:core/Iter";
 import Storage "blob-storage/Storage";
 import MixinStorage "blob-storage/Mixin";
 
@@ -17,14 +18,13 @@ import MixinAuthorization "authorization/MixinAuthorization";
 
 // Apply migration on canister upgrade
 
+
 actor {
   // Integrate storage and authorization mixins
   include MixinStorage();
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  type LoginName = Text;
-  type Password = Text;
   type PartyId = Text;
   type PaymentId = Text;
 
@@ -102,15 +102,7 @@ actor {
   };
 
   public type StaffAccount = {
-    loginName : LoginName;
-    password : Password;
-    boundPrincipal : ?Principal;
-    isDisabled : Bool;
-    canViewAllRecords : Bool;
-  };
-
-  public type StaffAccountInfo = {
-    loginName : LoginName;
+    loginName : Text;
     boundPrincipal : ?Principal;
     isDisabled : Bool;
     canViewAllRecords : Bool;
@@ -125,17 +117,12 @@ actor {
   // State
   let parties = Map.empty<PartyId, Party>();
   let partyPayments = Map.empty<PartyId, List.List<(PaymentId, PartyVisitRecord)>>();
-  let staffAccounts = Map.empty<LoginName, StaffAccount>();
+  let staffAccounts = Map.empty<Text, StaffAccount>();
   let partyIdCounters = Map.empty<Text, Nat>();
   var nextPaymentId = 0;
   var shopBranding : ?ShopBranding = null;
-  let adminLoginName : Text = "rkbrothers.lts";
-  let secondaryAdminLogin : Text = "rajan";
 
-  let userProfiles = Map.empty<Principal, {
-    name : Text;
-    staffLoginName : ?LoginName;
-  }>();
+  let userProfiles = Map.empty<Principal, Text>();
 
   module PartyVisitRecord {
     public func compare(tuple1 : (PaymentId, PartyVisitRecord), tuple2 : (PaymentId, PartyVisitRecord)) : Order.Order {
@@ -156,19 +143,17 @@ actor {
   };
 
   func isAuthenticatedStaff(caller : Principal) : Bool {
+    // Must have at least user role
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      return false;
+    };
+
     switch (userProfiles.get(caller)) {
       case (null) { false };
-      case (?profile) {
-        switch (profile.staffLoginName) {
+      case (?loginName) {
+        switch (staffAccounts.get(loginName)) {
           case (null) { false };
-          case (?loginName) {
-            switch (staffAccounts.get(loginName)) {
-              case (null) { false };
-              case (?account) {
-                not account.isDisabled and account.boundPrincipal == ?caller;
-              };
-            };
-          };
+          case (?account) { not account.isDisabled };
         };
       };
     };
@@ -181,41 +166,19 @@ actor {
 
     switch (userProfiles.get(caller)) {
       case (null) { false };
-      case (?profile) {
-        switch (profile.staffLoginName) {
+      case (?loginName) {
+        switch (staffAccounts.get(loginName)) {
           case (null) { false };
-          case (?loginName) {
-            switch (staffAccounts.get(loginName)) {
-              case (null) { false };
-              case (?account) {
-                not account.isDisabled and account.canViewAllRecords;
-              };
-            };
+          case (?account) {
+            not account.isDisabled and account.canViewAllRecords;
           };
         };
       };
     };
   };
 
-  public shared ({ caller }) func setAdminStaffPassword(adminPassword : Text) : async () {
-    if (not (AccessControl.isAdmin(accessControlState, caller))) {
-      Runtime.trap("Unauthorized: Only admins can set admin staff password");
-    };
-
-    let adminAccount : StaffAccount = {
-      loginName = adminLoginName;
-      password = adminPassword;
-      boundPrincipal = null;
-      isDisabled = false;
-      canViewAllRecords = true;
-    };
-
-    staffAccounts.add(adminLoginName, adminAccount);
-  };
-
   public shared ({ caller }) func createStaffAccount(
-    loginName : LoginName,
-    password : Password,
+    loginName : Text,
     canViewAllRecords : Bool,
   ) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
@@ -228,7 +191,6 @@ actor {
 
     let account : StaffAccount = {
       loginName;
-      password;
       boundPrincipal = null;
       isDisabled = false;
       canViewAllRecords;
@@ -238,8 +200,7 @@ actor {
   };
 
   public shared ({ caller }) func updateStaffAccount(
-    loginName : LoginName,
-    newPassword : ?Password,
+    loginName : Text,
     canViewAllRecords : ?Bool,
     isDisabled : ?Bool,
   ) : async () {
@@ -254,10 +215,6 @@ actor {
       case (?account) {
         let updatedAccount : StaffAccount = {
           loginName = account.loginName;
-          password = switch (newPassword) {
-            case (null) { account.password };
-            case (?pwd) { pwd };
-          };
           boundPrincipal = account.boundPrincipal;
           isDisabled = switch (isDisabled) {
             case (null) { account.isDisabled };
@@ -273,7 +230,7 @@ actor {
     };
   };
 
-  public shared ({ caller }) func disableStaffAccount(loginName : LoginName) : async () {
+  public shared ({ caller }) func disableStaffAccount(loginName : Text) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can disable staff accounts");
     };
@@ -285,7 +242,6 @@ actor {
       case (?account) {
         let updatedAccount : StaffAccount = {
           loginName = account.loginName;
-          password = account.password;
           boundPrincipal = account.boundPrincipal;
           isDisabled = true;
           canViewAllRecords = account.canViewAllRecords;
@@ -295,46 +251,33 @@ actor {
     };
   };
 
-  public query ({ caller }) func listStaffAccounts() : async [StaffAccountInfo] {
+  public query ({ caller }) func listStaffAccounts() : async [StaffAccount] {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can list staff accounts");
     };
 
-    staffAccounts.values().toArray().map(
-      func(account : StaffAccount) : StaffAccountInfo {
-        {
-          loginName = account.loginName;
-          boundPrincipal = account.boundPrincipal;
-          isDisabled = account.isDisabled;
-          canViewAllRecords = account.canViewAllRecords;
-        };
-      }
-    );
+    staffAccounts.values().toArray();
   };
 
-  public shared ({ caller }) func authenticateStaff(loginName : LoginName, password : Password) : async Bool {
+  public shared ({ caller }) func authenticateStaff(loginName : Text) : async Bool {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Must be authenticated with Internet Identity");
     };
 
     switch (staffAccounts.get(loginName)) {
-      case (null) {
-        false;
-      };
+      case (null) { false };
       case (?account) {
-        if (account.isDisabled) {
-          return false;
-        };
-
-        if (account.password != password) {
-          return false;
-        };
+        if (account.isDisabled) { return false };
 
         switch (account.boundPrincipal) {
           case (null) {
+            // Only admins can bind new staff accounts to prevent unauthorized binding
+            if (not (AccessControl.isAdmin(accessControlState, caller))) {
+              Runtime.trap("Unauthorized: Only admins can bind unbound staff accounts");
+            };
+
             let updatedAccount : StaffAccount = {
               loginName = account.loginName;
-              password = account.password;
               boundPrincipal = ?caller;
               isDisabled = account.isDisabled;
               canViewAllRecords = account.canViewAllRecords;
@@ -348,89 +291,57 @@ actor {
           };
         };
 
-        let profile = switch (userProfiles.get(caller)) {
-          case (null) {
-            {
-              name = "";
-              staffLoginName = ?loginName;
-            };
-          };
-          case (?existingProfile) {
-            {
-              name = existingProfile.name;
-              staffLoginName = ?loginName;
-            };
-          };
-        };
-        userProfiles.add(caller, profile);
+        userProfiles.add(caller, loginName);
 
         true;
       };
     };
   };
 
-  public query ({ caller }) func getCallerUserProfile() : async ?{
-    name : Text;
-  } {
+  public query ({ caller }) func getCallerUserProfile() : async ?{ name : Text } {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can fetch user profile");
     };
 
     switch (userProfiles.get(caller)) {
       case (null) { null };
-      case (?profile) {
-        ?{ name = profile.name };
+      case (?loginName) {
+        ?{ name = loginName };
       };
     };
   };
 
-  public query ({ caller }) func getUserProfile(user : Principal) : async ?{
-    name : Text;
-  } {
+  public shared ({ caller }) func saveCallerUserProfile(profile : { name : Text }) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can save profiles");
+    };
+
+    userProfiles.add(caller, profile.name);
+  };
+
+  public query ({ caller }) func getUserProfile(user : Principal) : async ?{ name : Text } {
     if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
       Runtime.trap("Unauthorized: Can only view your own profile");
     };
 
     switch (userProfiles.get(user)) {
       case (null) { null };
-      case (?profile) {
-        ?{ name = profile.name };
+      case (?loginName) {
+        ?{ name = loginName };
       };
     };
   };
 
-  public shared ({ caller }) func saveCallerUserProfile(profile : {
-    name : Text;
-  }) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profiles");
-    };
-
-    let existingProfile = userProfiles.get(caller);
-    let staffLoginName = switch (existingProfile) {
-      case (null) { null };
-      case (?p) { p.staffLoginName };
-    };
-
-    userProfiles.add(
-      caller,
-      {
-        name = profile.name;
-        staffLoginName;
-      },
-    );
+  public query func getShopBranding() : async ?ShopBranding {
+    // Public endpoint - no authorization required for viewing branding
+    shopBranding;
   };
 
   public shared ({ caller }) func setShopBranding(name : ?Text, logo : ?Storage.ExternalBlob) : async () {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
       Runtime.trap("Unauthorized: Only admins can set shop branding");
     };
-
     shopBranding := ?{ name; logo };
-  };
-
-  public query ({ caller }) func getShopBranding() : async ?ShopBranding {
-    shopBranding;
   };
 
   public shared ({ caller }) func validateAndGenerateNewPartyId(name : Text, phone : Text) : async Text {
@@ -445,7 +356,14 @@ actor {
     partyId;
   };
 
-  public shared ({ caller }) func addParty(partyId : PartyId, name : Text, address : Text, phone : Text, pan : Text, dueAmount : Int) : async () {
+  public shared ({ caller }) func addParty(
+    partyId : PartyId,
+    name : Text,
+    address : Text,
+    phone : Text,
+    pan : Text,
+    dueAmount : Int,
+  ) : async () {
     if (not isAuthenticatedStaff(caller)) {
       Runtime.trap("Unauthorized: Only authenticated staff can add parties");
     };
@@ -453,7 +371,16 @@ actor {
     if (parties.containsKey(partyId)) {
       Runtime.trap("Party already exists");
     };
-    let party : Party = { id = partyId; name; address; phone; pan; dueAmount };
+
+    let party : Party = {
+      id = partyId;
+      name;
+      address;
+      phone;
+      pan;
+      dueAmount;
+    };
+
     parties.add(partyId, party);
   };
 
@@ -469,13 +396,7 @@ actor {
     parties.toArray();
   };
 
-  public query ({ caller }) func getParty(_id : PartyId) : async ?{
-    name : Text;
-    address : Text;
-    phone : Text;
-    pan : Text;
-    dueAmount : Int;
-  } {
+  public query ({ caller }) func getParty(_id : PartyId) : async ?{ name : Text; address : Text; phone : Text; pan : Text; dueAmount : Int } {
     if (not isAuthenticatedStaff(caller)) {
       Runtime.trap("Unauthorized: Only authenticated staff can view party details");
     };
@@ -487,13 +408,7 @@ actor {
     switch (parties.get(_id)) {
       case (null) { null };
       case (?party) {
-        ?{
-          name = party.name;
-          address = party.address;
-          phone = party.phone;
-          pan = party.pan;
-          dueAmount = party.dueAmount;
-        };
+        ?{ name = party.name; address = party.address; phone = party.phone; pan = party.pan; dueAmount = party.dueAmount };
       };
     };
   };
@@ -507,14 +422,7 @@ actor {
       Runtime.trap("Party does not exist");
     };
 
-    let party : Party = {
-      id = partyId;
-      name;
-      address;
-      phone = phoneNumber;
-      pan;
-      dueAmount;
-    };
+    let party : Party = { id = partyId; name; address; phone = phoneNumber; pan; dueAmount };
     parties.add(partyId, party);
   };
 
@@ -650,7 +558,10 @@ actor {
     };
   };
 
-  public query ({ caller }) func filterPartyVisitRecords(partyId : PartyId, _filter : PartyVisitRecordFilter) : async [(PaymentId, PartyVisitRecord)] {
+  public query ({ caller }) func filterPartyVisitRecords(
+    partyId : PartyId,
+    _filter : PartyVisitRecordFilter,
+  ) : async [(PaymentId, PartyVisitRecord)] {
     if (not isAuthenticatedStaff(caller)) {
       Runtime.trap("Unauthorized: Only authenticated staff can filter visit records");
     };
@@ -665,7 +576,10 @@ actor {
     };
   };
 
-  public query ({ caller }) func filterPartyVisitRecordMetadata(partyId : PartyId, _filter : PartyVisitRecordFilter) : async AggregateVisitRecordMetadata {
+  public query ({ caller }) func filterPartyVisitRecordMetadata(
+    partyId : PartyId,
+    _filter : PartyVisitRecordFilter,
+  ) : async AggregateVisitRecordMetadata {
     if (not isAuthenticatedStaff(caller)) {
       Runtime.trap("Unauthorized: Only authenticated staff can filter visit record metadata");
     };

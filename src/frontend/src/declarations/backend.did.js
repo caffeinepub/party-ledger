@@ -25,8 +25,6 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const LoginName = IDL.Text;
-export const Password = IDL.Text;
 export const Time = IDL.Int;
 export const Location = IDL.Record({
   'latitude' : IDL.Float64,
@@ -97,9 +95,9 @@ export const AggregateVisitRecordMetadata = IDL.Record({
   'filteredPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
   'allPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
 });
-export const StaffAccountInfo = IDL.Record({
+export const StaffAccount = IDL.Record({
   'boundPrincipal' : IDL.Opt(IDL.Principal),
-  'loginName' : LoginName,
+  'loginName' : IDL.Text,
   'canViewAllRecords' : IDL.Bool,
   'isDisabled' : IDL.Bool,
 });
@@ -138,10 +136,10 @@ export const idlService = IDL.Service({
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'authenticateStaff' : IDL.Func([LoginName, Password], [IDL.Bool], []),
-  'createStaffAccount' : IDL.Func([LoginName, Password, IDL.Bool], [], []),
+  'authenticateStaff' : IDL.Func([IDL.Text], [IDL.Bool], []),
+  'createStaffAccount' : IDL.Func([IDL.Text, IDL.Bool], [], []),
   'deleteParty' : IDL.Func([PartyId], [], []),
-  'disableStaffAccount' : IDL.Func([LoginName], [], []),
+  'disableStaffAccount' : IDL.Func([IDL.Text], [], []),
   'exportUpgradeData' : IDL.Func([], [UpgradeData], ['query']),
   'filterPartyVisitRecordMetadata' : IDL.Func(
       [PartyId, PartyVisitRecordFilter],
@@ -198,7 +196,7 @@ export const idlService = IDL.Service({
     ),
   'importUpgradeData' : IDL.Func([UpgradeData], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'listStaffAccounts' : IDL.Func([], [IDL.Vec(StaffAccountInfo)], ['query']),
+  'listStaffAccounts' : IDL.Func([], [IDL.Vec(StaffAccount)], ['query']),
   'recordPartyVisit' : IDL.Func(
       [PartyId, IDL.Int, IDL.Text, Time, IDL.Opt(Time), IDL.Opt(Location)],
       [IDL.Text],
@@ -214,7 +212,6 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
-  'setAdminStaffPassword' : IDL.Func([IDL.Text], [], []),
   'setShopBranding' : IDL.Func(
       [IDL.Opt(IDL.Text), IDL.Opt(ExternalBlob)],
       [],
@@ -226,7 +223,7 @@ export const idlService = IDL.Service({
       [],
     ),
   'updateStaffAccount' : IDL.Func(
-      [LoginName, IDL.Opt(Password), IDL.Opt(IDL.Bool), IDL.Opt(IDL.Bool)],
+      [IDL.Text, IDL.Opt(IDL.Bool), IDL.Opt(IDL.Bool)],
       [],
       [],
     ),
@@ -257,8 +254,6 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const LoginName = IDL.Text;
-  const Password = IDL.Text;
   const Time = IDL.Int;
   const Location = IDL.Record({
     'latitude' : IDL.Float64,
@@ -331,9 +326,9 @@ export const idlFactory = ({ IDL }) => {
     'filteredPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
     'allPaymentsMetadata' : IDL.Vec(VisitRecordMetadata),
   });
-  const StaffAccountInfo = IDL.Record({
+  const StaffAccount = IDL.Record({
     'boundPrincipal' : IDL.Opt(IDL.Principal),
-    'loginName' : LoginName,
+    'loginName' : IDL.Text,
     'canViewAllRecords' : IDL.Bool,
     'isDisabled' : IDL.Bool,
   });
@@ -372,10 +367,10 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'authenticateStaff' : IDL.Func([LoginName, Password], [IDL.Bool], []),
-    'createStaffAccount' : IDL.Func([LoginName, Password, IDL.Bool], [], []),
+    'authenticateStaff' : IDL.Func([IDL.Text], [IDL.Bool], []),
+    'createStaffAccount' : IDL.Func([IDL.Text, IDL.Bool], [], []),
     'deleteParty' : IDL.Func([PartyId], [], []),
-    'disableStaffAccount' : IDL.Func([LoginName], [], []),
+    'disableStaffAccount' : IDL.Func([IDL.Text], [], []),
     'exportUpgradeData' : IDL.Func([], [UpgradeData], ['query']),
     'filterPartyVisitRecordMetadata' : IDL.Func(
         [PartyId, PartyVisitRecordFilter],
@@ -432,7 +427,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'importUpgradeData' : IDL.Func([UpgradeData], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'listStaffAccounts' : IDL.Func([], [IDL.Vec(StaffAccountInfo)], ['query']),
+    'listStaffAccounts' : IDL.Func([], [IDL.Vec(StaffAccount)], ['query']),
     'recordPartyVisit' : IDL.Func(
         [PartyId, IDL.Int, IDL.Text, Time, IDL.Opt(Time), IDL.Opt(Location)],
         [IDL.Text],
@@ -448,7 +443,6 @@ export const idlFactory = ({ IDL }) => {
         [],
         [],
       ),
-    'setAdminStaffPassword' : IDL.Func([IDL.Text], [], []),
     'setShopBranding' : IDL.Func(
         [IDL.Opt(IDL.Text), IDL.Opt(ExternalBlob)],
         [],
@@ -460,7 +454,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'updateStaffAccount' : IDL.Func(
-        [LoginName, IDL.Opt(Password), IDL.Opt(IDL.Bool), IDL.Opt(IDL.Bool)],
+        [IDL.Text, IDL.Opt(IDL.Bool), IDL.Opt(IDL.Bool)],
         [],
         [],
       ),

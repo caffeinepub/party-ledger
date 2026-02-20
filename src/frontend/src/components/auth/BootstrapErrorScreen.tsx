@@ -1,11 +1,15 @@
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 
 interface BootstrapErrorScreenProps {
   onRetry: () => void;
 }
 
 export default function BootstrapErrorScreen({ onRetry }: BootstrapErrorScreenProps) {
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="text-center max-w-md px-6">
@@ -18,9 +22,15 @@ export default function BootstrapErrorScreen({ onRetry }: BootstrapErrorScreenPr
         <p className="text-muted-foreground mb-6">
           We couldn't initialize the application. This might be a temporary network issue.
         </p>
-        <Button onClick={onRetry} size="lg">
-          Retry
-        </Button>
+        <div className="flex gap-3 justify-center">
+          <Button onClick={onRetry} size="lg" variant="default">
+            Retry
+          </Button>
+          <Button onClick={handleReload} size="lg" variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Reload Page
+          </Button>
+        </div>
       </div>
     </div>
   );

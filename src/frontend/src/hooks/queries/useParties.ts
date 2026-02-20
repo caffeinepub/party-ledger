@@ -1,13 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActorSession } from '../../context/ActorSessionContext';
-import { useAppReadiness } from '../../context/AppReadinessContext';
 import type { Party, PartyId } from '../../backend';
 
 export function useGetAllParties(options?: { enabled?: boolean }) {
-  const { actor } = useActorSession();
-  const { isAppReadyForMainData } = useAppReadiness();
+  const { actor, isLoading: actorLoading } = useActorSession();
   
-  const enabled = options?.enabled !== undefined ? options.enabled : isAppReadyForMainData;
+  const enabled = options?.enabled !== undefined ? options.enabled : true;
 
   return useQuery<Array<[PartyId, Party]>>({
     queryKey: ['parties'],
@@ -15,15 +13,14 @@ export function useGetAllParties(options?: { enabled?: boolean }) {
       if (!actor) return [];
       return actor.getAllParties();
     },
-    enabled: enabled && !!actor,
+    enabled: enabled && !!actor && !actorLoading,
     staleTime: 2 * 60 * 1000, // 2 minutes
     refetchOnWindowFocus: false,
   });
 }
 
 export function useGetParty(partyId: PartyId) {
-  const { actor } = useActorSession();
-  const { isAppReadyForMainData } = useAppReadiness();
+  const { actor, isLoading: actorLoading } = useActorSession();
 
   return useQuery<Party | null>({
     queryKey: ['party', partyId],
@@ -37,7 +34,7 @@ export function useGetParty(partyId: PartyId) {
         ...result,
       };
     },
-    enabled: isAppReadyForMainData && !!actor && !!partyId,
+    enabled: !!actor && !actorLoading && !!partyId,
     staleTime: 2 * 60 * 1000, // 2 minutes
     refetchOnWindowFocus: false,
   });

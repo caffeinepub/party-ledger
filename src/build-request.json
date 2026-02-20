@@ -1,75 +1,71 @@
 {
   "kind": "build_request",
-  "title": "Speed up app startup and login flow",
-  "projectName": "Party Ledger",
-  "priority": "normal",
+  "title": "Fix admin Principal registration and authorization system",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-51",
-      "text": "Reduce startup latency by preventing unnecessary data fetching before the user is fully authenticated (Internet Identity + staff login), including gating the due-today alert logic so it does not trigger party/payment queries until the app is ready to show main content.",
-      "target": "frontend",
+      "id": "REQ-1",
+      "text": "Modify the backend to automatically register the first authenticated user's Principal as an admin when no admins exist in the system",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-latest"
         ],
         "quotes": [
-          "Rebuild make fast"
+          "Failed to update shop name: Unauthorized: Only admins can set shop branding",
+          "WHO IS ADMIN"
         ]
       },
       "acceptanceCriteria": [
-        "When the user is not authenticated with Internet Identity, the app does not start fetching parties/payments for alerts/dashboard/screens.",
-        "When the user is authenticated with Internet Identity but not yet staff-authenticated, the app does not start fetching parties/payments for alerts/dashboard/screens.",
-        "After staff login succeeds, the main screens load data normally and the due-today alert can run without requiring a manual refresh.",
-        "No additional network calls are triggered by the due-today alert hook while it is effectively disabled."
+        "When the admin list is empty, the first user to authenticate is automatically added as an admin",
+        "Subsequent users are not automatically granted admin access",
+        "The automatic registration persists across canister upgrades"
       ]
     },
     {
-      "id": "REQ-52",
-      "text": "Eliminate redundant actor initialization work during bootstrap by ensuring actor creation/initialization is performed once per identity session and shared across hooks/components (instead of multiple hooks each performing their own actor readiness/initialization checks).",
-      "target": "frontend",
+      "id": "REQ-2",
+      "text": "Ensure the isAdmin check in the backend properly validates the caller's Principal against the adminPrincipals set before allowing shop branding operations",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-latest"
         ],
         "quotes": [
-          "Rebuild make fast"
+          "Failed to update shop name: Unauthorized: Only admins can set shop branding"
         ]
       },
       "acceptanceCriteria": [
-        "During a normal login flow, the backend actor initialization (including access-control secret initialization) happens once per Internet Identity principal change, not multiple times due to multiple hooks mounting.",
-        "Profile fetch and staff login do not each trigger their own separate actor initialization sequence.",
-        "Refreshing the page while already logged in does not result in repeated initialization loops; the app reaches Staff Login (or Dashboard if staff session exists) promptly."
+        "setBranding function correctly rejects non-admin users with 'Unauthorized' error",
+        "setBranding function allows admin users to update shop name and logo",
+        "The admin check uses the correct Principal comparison logic"
       ]
     },
     {
-      "id": "REQ-53",
-      "text": "Optimize React Query bootstrap behavior to reduce perceived slowness by removing/avoiding any broad query invalidation/refetch cascades on actor readiness and by tuning startup queries so they do not refetch repeatedly during initial render.",
-      "target": "frontend",
+      "id": "REQ-3",
+      "text": "Add debug logging in the backend to trace Principal authentication flow and admin authorization checks for troubleshooting",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
-        ],
-        "quotes": [
-          "Rebuild make fast"
+          "msg-latest"
         ]
       },
       "acceptanceCriteria": [
-        "On app start, the profile query is executed at most once per actor readiness event (no repeated rapid refetching loops).",
-        "App does not trigger a blanket refetch of unrelated queries when the actor becomes available; only relevant queries refresh when needed (e.g., after mutations or explicit user actions).",
-        "The UI does not get stuck on “Loading profile...” or “Initializing...” indefinitely due to repeated query churn; if a fetch fails, the existing retry/error UI remains reachable."
+        "Log the caller's Principal when they authenticate",
+        "Log the list of admin Principals when authorization is checked",
+        "Log the result of the isAdmin check (true/false)"
       ]
     }
   ],
   "constraints": [
-    "Use English for any user-facing text.",
-    "Do not edit files under frontend/src/components/ui (compose them instead).",
-    "Do not edit immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx.",
-    "Backend must remain a single Motoko actor (backend/main.mo); only add a migration file if state upgrade is required."
+    "Preserve the existing adminPrincipals HashSet structure in the backend",
+    "Maintain compatibility with the existing addAdminPrincipal and removeAdminPrincipal functions",
+    "Do not modify frontend authentication or admin management UI components"
   ],
   "nonGoals": [
-    "Speeding up the platform build/deploy pipeline itself (CI/build iteration time).",
-    "Adding new product features unrelated to performance/startup/login responsiveness.",
-    "Changing authentication/security requirements (Internet Identity + staff login) or relaxing admin-only permissions."
+    "Changing the Internet Identity authentication flow",
+    "Modifying the frontend admin management UI",
+    "Adding password-based authentication",
+    "Creating a separate super-admin role"
   ],
   "imageRequirements": {
     "required": [],

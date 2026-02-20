@@ -1,101 +1,47 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-17T17:16:14.008Z",
+  "generatedAt": "2026-02-20T10:13:16.753Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 3,
-    "implemented": 3,
+    "implemented": 0,
     "items": [
       {
-        "id": "REQ-51",
-        "summary": "Reduce startup latency by preventing unnecessary data fetching before the user is fully authenticated (Internet Identity + staff login), including gating the due-today alert logic so it does not trigger party/payment queries until the app is ready to show main content.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/context/AppReadinessContext.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/hooks/queries/usePayments.ts",
-          "frontend/src/hooks/queries/useTodayDashboard.ts",
-          "frontend/src/hooks/useDueTodayAlert.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/context/AppReadinessContext.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/hooks/queries/usePayments.ts",
-          "frontend/src/hooks/queries/useTodayDashboard.ts",
-          "frontend/src/hooks/useDueTodayAlert.ts"
-        ]
+        "id": "REQ-1",
+        "summary": "Modify the backend to automatically register the first authenticated user's Principal as an admin when no admins exist in the system",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
-        "id": "REQ-52",
-        "summary": "Eliminate redundant actor initialization work during bootstrap by ensuring actor creation/initialization is performed once per identity session and shared across hooks/components (instead of multiple hooks each performing their own actor readiness/initialization checks).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/context/ActorSessionContext.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/hooks/queries/useAuth.ts",
-          "frontend/src/hooks/useStaffAuth.ts",
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/hooks/queries/usePayments.ts",
-          "frontend/src/hooks/queries/useBranding.ts",
-          "frontend/src/hooks/queries/useStaffPermissions.ts",
-          "frontend/src/hooks/queries/useTransfer.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/context/ActorSessionContext.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/hooks/queries/useAuth.ts",
-          "frontend/src/hooks/useStaffAuth.ts",
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/hooks/queries/usePayments.ts",
-          "frontend/src/hooks/queries/useBranding.ts",
-          "frontend/src/hooks/queries/useStaffPermissions.ts",
-          "frontend/src/hooks/queries/useTransfer.ts"
-        ]
+        "id": "REQ-2",
+        "summary": "Ensure the isAdmin check in the backend properly validates the caller's Principal against the adminPrincipals set before allowing shop branding operations",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
-        "id": "REQ-53",
-        "summary": "Optimize React Query bootstrap behavior to reduce perceived slowness by removing/avoiding any broad query invalidation/refetch cascades on actor readiness and by tuning startup queries so they do not refetch repeatedly during initial render.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/hooks/queries/useAuth.ts",
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/hooks/queries/usePayments.ts",
-          "frontend/src/hooks/queries/useTodayDashboard.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/hooks/queries/useAuth.ts",
-          "frontend/src/hooks/queries/useParties.ts",
-          "frontend/src/hooks/queries/usePayments.ts",
-          "frontend/src/hooks/queries/useTodayDashboard.ts"
-        ]
+        "id": "REQ-3",
+        "summary": "Add debug logging in the backend to trace Principal authentication flow and admin authorization checks for troubleshooting",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
-    "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/context/ActorSessionContext.tsx",
-    "frontend/src/context/AppReadinessContext.tsx",
-    "frontend/src/hooks/queries/useAuth.ts",
-    "frontend/src/hooks/queries/useBranding.ts",
-    "frontend/src/hooks/queries/useParties.ts",
-    "frontend/src/hooks/queries/usePayments.ts",
-    "frontend/src/hooks/queries/useStaffPermissions.ts",
-    "frontend/src/hooks/queries/useTodayDashboard.ts",
-    "frontend/src/hooks/queries/useTransfer.ts",
-    "frontend/src/hooks/useDueTodayAlert.ts",
-    "frontend/src/hooks/useStaffAuth.ts",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

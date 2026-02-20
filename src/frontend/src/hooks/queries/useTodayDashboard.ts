@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { useActorSession } from '../../context/ActorSessionContext';
-import { useAppReadiness } from '../../context/AppReadinessContext';
 import { useGetAllParties } from './useParties';
 import type { Party, PartyId, PartyVisitRecord, PaymentId } from '../../backend';
 import { timeToDate, isSameLocalDate } from '../../lib/time';
@@ -14,8 +13,7 @@ export interface TodayVisitEntry {
 }
 
 export function useTodayDashboard() {
-  const { actor } = useActorSession();
-  const { isAppReadyForMainData } = useAppReadiness();
+  const { actor, isLoading: actorLoading } = useActorSession();
   const { data: partiesData, isLoading: partiesLoading } = useGetAllParties();
 
   return useQuery<{
@@ -71,7 +69,7 @@ export function useTodayDashboard() {
         totalAmount,
       };
     },
-    enabled: isAppReadyForMainData && !!actor && !!partiesData && !partiesLoading,
+    enabled: !!actor && !actorLoading && !!partiesData && !partiesLoading,
     staleTime: 30 * 1000, // 30 seconds
     refetchInterval: 60000, // Refresh every minute
     refetchOnWindowFocus: false,

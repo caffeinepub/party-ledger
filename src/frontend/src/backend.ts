@@ -124,7 +124,6 @@ export type IntConstraint = {
 export interface _CaffeineStorageRefillInformation {
     proposed_top_up_amount?: bigint;
 }
-export type LoginName = string;
 export interface PartyVisitRecord {
     comment: string;
     paymentDate: Time;
@@ -135,6 +134,17 @@ export interface PartyVisitRecord {
 export interface _CaffeineStorageCreateCertificateResult {
     method: string;
     blob_hash: string;
+}
+export interface StaffAccount {
+    boundPrincipal?: Principal;
+    loginName: string;
+    canViewAllRecords: boolean;
+    isDisabled: boolean;
+}
+export interface UpgradeData {
+    partyVisitRecords: Array<[PartyId, Array<PartyVisitRecord>]>;
+    branding?: ShopBranding;
+    parties: Array<[PartyId, Party]>;
 }
 export type LocationConstraint = {
     __kind__: "greaterLatitude";
@@ -152,17 +162,6 @@ export type LocationConstraint = {
     __kind__: "lessLongitude";
     lessLongitude: number;
 };
-export interface UpgradeData {
-    partyVisitRecords: Array<[PartyId, Array<PartyVisitRecord>]>;
-    branding?: ShopBranding;
-    parties: Array<[PartyId, Party]>;
-}
-export interface StaffAccountInfo {
-    boundPrincipal?: Principal;
-    loginName: LoginName;
-    canViewAllRecords: boolean;
-    isDisabled: boolean;
-}
 export type TimeConstraint = {
     __kind__: "after";
     after: Time;
@@ -181,7 +180,6 @@ export interface PartyVisitRecordFilter {
     locationFilter?: LocationConstraint;
     amountFilter?: IntConstraint;
 }
-export type Password = string;
 export type PartyId = string;
 export interface Party {
     id: PartyId;
@@ -219,10 +217,10 @@ export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     addParty(partyId: PartyId, name: string, address: string, phone: string, pan: string, dueAmount: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    authenticateStaff(loginName: LoginName, password: Password): Promise<boolean>;
-    createStaffAccount(loginName: LoginName, password: Password, canViewAllRecords: boolean): Promise<void>;
+    authenticateStaff(loginName: string): Promise<boolean>;
+    createStaffAccount(loginName: string, canViewAllRecords: boolean): Promise<void>;
     deleteParty(partyId: PartyId): Promise<void>;
-    disableStaffAccount(loginName: LoginName): Promise<void>;
+    disableStaffAccount(loginName: string): Promise<void>;
     exportUpgradeData(): Promise<UpgradeData>;
     filterPartyVisitRecordMetadata(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<AggregateVisitRecordMetadata>;
     filterPartyVisitRecords(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<Array<[PaymentId, PartyVisitRecord]>>;
@@ -247,19 +245,18 @@ export interface backendInterface {
     } | null>;
     importUpgradeData(data: UpgradeData): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
-    listStaffAccounts(): Promise<Array<StaffAccountInfo>>;
+    listStaffAccounts(): Promise<Array<StaffAccount>>;
     recordPartyVisit(partyId: PartyId, amount: bigint, comment: string, paymentDate: Time, nextPayment: Time | null, location: Location | null): Promise<string>;
     recordPayment(partyId: PartyId, amount: bigint, comment: string, paymentDate: Time, nextPayment: Time | null): Promise<string>;
     saveCallerUserProfile(profile: {
         name: string;
     }): Promise<void>;
-    setAdminStaffPassword(adminPassword: string): Promise<void>;
     setShopBranding(name: string | null, logo: ExternalBlob | null): Promise<void>;
     updateParty(partyId: PartyId, name: string, address: string, phoneNumber: string, pan: string, dueAmount: bigint): Promise<void>;
-    updateStaffAccount(loginName: LoginName, newPassword: Password | null, canViewAllRecords: boolean | null, isDisabled: boolean | null): Promise<void>;
+    updateStaffAccount(loginName: string, canViewAllRecords: boolean | null, isDisabled: boolean | null): Promise<void>;
     validateAndGenerateNewPartyId(name: string, phone: string): Promise<string>;
 }
-import type { ExternalBlob as _ExternalBlob, IntConstraint as _IntConstraint, Location as _Location, LocationConstraint as _LocationConstraint, LoginName as _LoginName, Party as _Party, PartyId as _PartyId, PartyVisitRecord as _PartyVisitRecord, PartyVisitRecordFilter as _PartyVisitRecordFilter, Password as _Password, PaymentId as _PaymentId, ShopBranding as _ShopBranding, StaffAccountInfo as _StaffAccountInfo, TextConstraint as _TextConstraint, Time as _Time, TimeConstraint as _TimeConstraint, UpgradeData as _UpgradeData, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
+import type { ExternalBlob as _ExternalBlob, IntConstraint as _IntConstraint, Location as _Location, LocationConstraint as _LocationConstraint, Party as _Party, PartyId as _PartyId, PartyVisitRecord as _PartyVisitRecord, PartyVisitRecordFilter as _PartyVisitRecordFilter, PaymentId as _PaymentId, ShopBranding as _ShopBranding, StaffAccount as _StaffAccount, TextConstraint as _TextConstraint, Time as _Time, TimeConstraint as _TimeConstraint, UpgradeData as _UpgradeData, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _caffeineStorageBlobIsLive(arg0: Uint8Array): Promise<boolean> {
@@ -388,31 +385,31 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async authenticateStaff(arg0: LoginName, arg1: Password): Promise<boolean> {
+    async authenticateStaff(arg0: string): Promise<boolean> {
         if (this.processError) {
             try {
-                const result = await this.actor.authenticateStaff(arg0, arg1);
+                const result = await this.actor.authenticateStaff(arg0);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.authenticateStaff(arg0, arg1);
+            const result = await this.actor.authenticateStaff(arg0);
             return result;
         }
     }
-    async createStaffAccount(arg0: LoginName, arg1: Password, arg2: boolean): Promise<void> {
+    async createStaffAccount(arg0: string, arg1: boolean): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.createStaffAccount(arg0, arg1, arg2);
+                const result = await this.actor.createStaffAccount(arg0, arg1);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.createStaffAccount(arg0, arg1, arg2);
+            const result = await this.actor.createStaffAccount(arg0, arg1);
             return result;
         }
     }
@@ -430,7 +427,7 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async disableStaffAccount(arg0: LoginName): Promise<void> {
+    async disableStaffAccount(arg0: string): Promise<void> {
         if (this.processError) {
             try {
                 const result = await this.actor.disableStaffAccount(arg0);
@@ -650,7 +647,7 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async listStaffAccounts(): Promise<Array<StaffAccountInfo>> {
+    async listStaffAccounts(): Promise<Array<StaffAccount>> {
         if (this.processError) {
             try {
                 const result = await this.actor.listStaffAccounts();
@@ -708,20 +705,6 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async setAdminStaffPassword(arg0: string): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.setAdminStaffPassword(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.setAdminStaffPassword(arg0);
-            return result;
-        }
-    }
     async setShopBranding(arg0: string | null, arg1: ExternalBlob | null): Promise<void> {
         if (this.processError) {
             try {
@@ -750,17 +733,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async updateStaffAccount(arg0: LoginName, arg1: Password | null, arg2: boolean | null, arg3: boolean | null): Promise<void> {
+    async updateStaffAccount(arg0: string, arg1: boolean | null, arg2: boolean | null): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateStaffAccount(arg0, to_candid_opt_n59(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n60(this._uploadFile, this._downloadFile, arg2), to_candid_opt_n60(this._uploadFile, this._downloadFile, arg3));
+                const result = await this.actor.updateStaffAccount(arg0, to_candid_opt_n59(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n59(this._uploadFile, this._downloadFile, arg2));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateStaffAccount(arg0, to_candid_opt_n59(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n60(this._uploadFile, this._downloadFile, arg2), to_candid_opt_n60(this._uploadFile, this._downloadFile, arg3));
+            const result = await this.actor.updateStaffAccount(arg0, to_candid_opt_n59(this._uploadFile, this._downloadFile, arg1), to_candid_opt_n59(this._uploadFile, this._downloadFile, arg2));
             return result;
         }
     }
@@ -788,7 +771,7 @@ function from_candid_PartyVisitRecord_n15(_uploadFile: (file: ExternalBlob) => P
 async function from_candid_ShopBranding_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ShopBranding): Promise<ShopBranding> {
     return await from_candid_record_n21(_uploadFile, _downloadFile, value);
 }
-function from_candid_StaffAccountInfo_n52(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _StaffAccountInfo): StaffAccountInfo {
+function from_candid_StaffAccount_n52(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _StaffAccount): StaffAccount {
     return from_candid_record_n53(_uploadFile, _downloadFile, value);
 }
 async function from_candid_UpgradeData_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UpgradeData): Promise<UpgradeData> {
@@ -908,12 +891,12 @@ function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint
 }
 function from_candid_record_n53(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     boundPrincipal: [] | [Principal];
-    loginName: _LoginName;
+    loginName: string;
     canViewAllRecords: boolean;
     isDisabled: boolean;
 }): {
     boundPrincipal?: Principal;
-    loginName: LoginName;
+    loginName: string;
     canViewAllRecords: boolean;
     isDisabled: boolean;
 } {
@@ -954,8 +937,8 @@ function from_candid_vec_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 function from_candid_vec_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[_PaymentId, _PartyVisitRecord]>): Array<[PaymentId, PartyVisitRecord]> {
     return value.map((x)=>from_candid_tuple_n36(_uploadFile, _downloadFile, x));
 }
-function from_candid_vec_n51(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_StaffAccountInfo>): Array<StaffAccountInfo> {
-    return value.map((x)=>from_candid_StaffAccountInfo_n52(_uploadFile, _downloadFile, x));
+function from_candid_vec_n51(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_StaffAccount>): Array<StaffAccount> {
+    return value.map((x)=>from_candid_StaffAccount_n52(_uploadFile, _downloadFile, x));
 }
 async function to_candid_ExternalBlob_n50(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
     return await _uploadFile(value);
@@ -1005,10 +988,7 @@ function to_candid_opt_n57(_uploadFile: (file: ExternalBlob) => Promise<Uint8Arr
 async function to_candid_opt_n58(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob | null): Promise<[] | [_ExternalBlob]> {
     return value === null ? candid_none() : candid_some(await to_candid_ExternalBlob_n50(_uploadFile, _downloadFile, value));
 }
-function to_candid_opt_n59(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Password | null): [] | [_Password] {
-    return value === null ? candid_none() : candid_some(value);
-}
-function to_candid_opt_n60(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: boolean | null): [] | [boolean] {
+function to_candid_opt_n59(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: boolean | null): [] | [boolean] {
     return value === null ? candid_none() : candid_some(value);
 }
 function to_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {

@@ -24,7 +24,6 @@ export type LocationConstraint = { 'greaterLatitude' : number } |
   { 'withinRadius' : [number, number, number] } |
   { 'lessLatitude' : number } |
   { 'lessLongitude' : number };
-export type LoginName = string;
 export interface Party {
   'id' : PartyId,
   'pan' : string,
@@ -48,15 +47,14 @@ export interface PartyVisitRecordFilter {
   'locationFilter' : [] | [LocationConstraint],
   'amountFilter' : [] | [IntConstraint],
 }
-export type Password = string;
 export type PaymentId = string;
 export interface ShopBranding {
   'logo' : [] | [ExternalBlob],
   'name' : [] | [string],
 }
-export interface StaffAccountInfo {
+export interface StaffAccount {
   'boundPrincipal' : [] | [Principal],
-  'loginName' : LoginName,
+  'loginName' : string,
   'canViewAllRecords' : boolean,
   'isDisabled' : boolean,
 }
@@ -114,10 +112,10 @@ export interface _SERVICE {
     undefined
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'authenticateStaff' : ActorMethod<[LoginName, Password], boolean>,
-  'createStaffAccount' : ActorMethod<[LoginName, Password, boolean], undefined>,
+  'authenticateStaff' : ActorMethod<[string], boolean>,
+  'createStaffAccount' : ActorMethod<[string, boolean], undefined>,
   'deleteParty' : ActorMethod<[PartyId], undefined>,
-  'disableStaffAccount' : ActorMethod<[LoginName], undefined>,
+  'disableStaffAccount' : ActorMethod<[string], undefined>,
   'exportUpgradeData' : ActorMethod<[], UpgradeData>,
   'filterPartyVisitRecordMetadata' : ActorMethod<
     [PartyId, PartyVisitRecordFilter],
@@ -155,7 +153,7 @@ export interface _SERVICE {
   'getUserProfile' : ActorMethod<[Principal], [] | [{ 'name' : string }]>,
   'importUpgradeData' : ActorMethod<[UpgradeData], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'listStaffAccounts' : ActorMethod<[], Array<StaffAccountInfo>>,
+  'listStaffAccounts' : ActorMethod<[], Array<StaffAccount>>,
   'recordPartyVisit' : ActorMethod<
     [PartyId, bigint, string, Time, [] | [Time], [] | [Location]],
     string
@@ -165,7 +163,6 @@ export interface _SERVICE {
     string
   >,
   'saveCallerUserProfile' : ActorMethod<[{ 'name' : string }], undefined>,
-  'setAdminStaffPassword' : ActorMethod<[string], undefined>,
   'setShopBranding' : ActorMethod<
     [[] | [string], [] | [ExternalBlob]],
     undefined
@@ -175,7 +172,7 @@ export interface _SERVICE {
     undefined
   >,
   'updateStaffAccount' : ActorMethod<
-    [LoginName, [] | [Password], [] | [boolean], [] | [boolean]],
+    [string, [] | [boolean], [] | [boolean]],
     undefined
   >,
   'validateAndGenerateNewPartyId' : ActorMethod<[string, string], string>,

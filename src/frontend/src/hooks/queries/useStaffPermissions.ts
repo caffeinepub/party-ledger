@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { useActorSession } from '../../context/ActorSessionContext';
-import type { StaffAccountInfo } from '../../backend';
+import type { StaffAccount } from '../../backend';
 
 export function useGetStaffPermissions(staffLoginName: string | null) {
-  const { actor } = useActorSession();
+  const { actor, isLoading: actorLoading } = useActorSession();
 
-  return useQuery<StaffAccountInfo | null>({
+  return useQuery<StaffAccount | null>({
     queryKey: ['staffPermissions', staffLoginName],
     queryFn: async () => {
       if (!actor || !staffLoginName) return null;
@@ -27,7 +27,7 @@ export function useGetStaffPermissions(staffLoginName: string | null) {
         throw error;
       }
     },
-    enabled: !!actor && !!staffLoginName,
+    enabled: !!actor && !actorLoading && !!staffLoginName,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,

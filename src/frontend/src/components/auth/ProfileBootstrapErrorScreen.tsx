@@ -1,11 +1,15 @@
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 
 interface ProfileBootstrapErrorScreenProps {
   onRetry: () => void;
 }
 
 export default function ProfileBootstrapErrorScreen({ onRetry }: ProfileBootstrapErrorScreenProps) {
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="text-center max-w-md px-6">
@@ -18,9 +22,15 @@ export default function ProfileBootstrapErrorScreen({ onRetry }: ProfileBootstra
         <p className="text-muted-foreground mb-6">
           We couldn't load your profile. Please try again.
         </p>
-        <Button onClick={onRetry} size="lg">
-          Retry
-        </Button>
+        <div className="flex gap-3 justify-center">
+          <Button onClick={onRetry} size="lg" variant="default">
+            Retry
+          </Button>
+          <Button onClick={handleReload} size="lg" variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Reload Page
+          </Button>
+        </div>
       </div>
     </div>
   );

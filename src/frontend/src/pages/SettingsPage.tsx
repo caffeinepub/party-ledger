@@ -1,13 +1,13 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import BrandingSettingsCard from '../components/branding/BrandingSettingsCard';
 import ExcelPartyImportCard from '../components/import/ExcelPartyImportCard';
 import JsonTransferCard from '../components/transfer/JsonTransferCard';
-import StaffManagementPanel from '../components/admin/StaffManagementPanel';
-import { useStaffAuth } from '../hooks/useStaffAuth';
+import PrincipalDisplayCard from '../components/settings/PrincipalDisplayCard';
+import AdminPrincipalsPanel from '../components/admin/AdminPrincipalsPanel';
+import { useIsCallerAdmin } from '../hooks/queries/useAdminPrincipals';
 
 export default function SettingsPage() {
-  const { isAdmin } = useStaffAuth();
+  const { data: isAdmin, isLoading: isAdminLoading } = useIsCallerAdmin();
 
   return (
     <div className="space-y-6">
@@ -16,13 +16,18 @@ export default function SettingsPage() {
         <p className="text-muted-foreground">Manage your application settings</p>
       </div>
 
-      <Tabs defaultValue="branding" className="space-y-6">
+      <Tabs defaultValue="profile" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="branding">Branding</TabsTrigger>
           <TabsTrigger value="import">Import</TabsTrigger>
           <TabsTrigger value="transfer">Data Transfer</TabsTrigger>
-          {isAdmin && <TabsTrigger value="admin">Admin</TabsTrigger>}
+          {!isAdminLoading && isAdmin && <TabsTrigger value="admin">Admin</TabsTrigger>}
         </TabsList>
+
+        <TabsContent value="profile">
+          <PrincipalDisplayCard />
+        </TabsContent>
 
         <TabsContent value="branding">
           <BrandingSettingsCard />
@@ -36,9 +41,9 @@ export default function SettingsPage() {
           <JsonTransferCard />
         </TabsContent>
 
-        {isAdmin && (
+        {!isAdminLoading && isAdmin && (
           <TabsContent value="admin">
-            <StaffManagementPanel />
+            <AdminPrincipalsPanel />
           </TabsContent>
         )}
       </Tabs>

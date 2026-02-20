@@ -1,31 +1,31 @@
-import { Link, useRouterState } from '@tanstack/react-router';
-import { LayoutDashboard, Users, FileText, Settings, LogOut, MapPin } from 'lucide-react';
+import { ReactNode } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
+import { Home, Users, FileText, Settings, LogOut, MapPin } from 'lucide-react';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
-import { useStaffAuthContext } from '../../context/StaffAuthContext';
+import { useQueryClient } from '@tanstack/react-query';
 import BrandingHeader from '../branding/BrandingHeader';
 
 interface AppShellProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function AppShell({ children }: AppShellProps) {
+  const navigate = useNavigate();
   const { clear } = useInternetIdentity();
-  const { logout: staffLogout } = useStaffAuthContext();
-  const routerState = useRouterState();
-  const currentPath = routerState.location.pathname;
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
-    staffLogout();
     await clear();
+    queryClient.clear();
   };
 
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/parties', label: 'Parties', icon: Users },
-    { path: '/new-visit', label: 'New Party Visit', icon: MapPin },
-    { path: '/reports', label: 'Reports', icon: FileText },
-    { path: '/settings', label: 'Settings', icon: Settings },
+    { icon: Home, label: 'Dashboard', path: '/' },
+    { icon: Users, label: 'Parties', path: '/parties' },
+    { icon: MapPin, label: 'New Visit', path: '/new-visit' },
+    { icon: FileText, label: 'Reports', path: '/reports' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
   return (
@@ -35,25 +35,26 @@ export default function AppShell({ children }: AppShellProps) {
       <nav className="border-b bg-card">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-14">
-            <div className="flex space-x-1 overflow-x-auto">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path));
-                return (
-                  <Link key={item.path} to={item.path}>
-                    <Button
-                      variant={isActive ? 'default' : 'ghost'}
-                      size="sm"
-                      className="gap-2 whitespace-nowrap"
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="hidden sm:inline">{item.label}</span>
-                    </Button>
-                  </Link>
-                );
-              })}
+            <div className="flex items-center gap-1 overflow-x-auto">
+              {navItems.map((item) => (
+                <Button
+                  key={item.path}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate({ to: item.path })}
+                  className="gap-2 shrink-0"
+                >
+                  <item.icon className="h-4 w-4" />
+                  <span className="hidden sm:inline">{item.label}</span>
+                </Button>
+              ))}
             </div>
-            <Button variant="ghost" size="sm" onClick={handleLogout} className="gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLogout}
+              className="gap-2 shrink-0"
+            >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Logout</span>
             </Button>
@@ -61,13 +62,14 @@ export default function AppShell({ children }: AppShellProps) {
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-8">
         {children}
       </main>
 
-      <footer className="border-t mt-12 py-6 bg-card">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Built with ❤️ using{' '}
+      <footer className="border-t bg-card mt-auto">
+        <div className="container mx-auto px-4 py-6">
+          <p className="text-center text-sm text-muted-foreground">
+            © {new Date().getFullYear()} Built with love using{' '}
             <a
               href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(window.location.hostname)}`}
               target="_blank"
