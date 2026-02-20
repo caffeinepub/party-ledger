@@ -1,4 +1,26 @@
 {
   "kind": "feature_evidence_report",
-  "features": []
+  "features": [
+    {
+      "featureId": "feature-update-the-shop-branding-name-to-rk-brothers-lubricants-and-tyre-supplires-in-the-system-settings",
+      "featureTitle": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the system settings",
+      "files": [
+        "frontend/src/components/branding/BrandingHeader.tsx",
+        "frontend/src/components/branding/BrandingSettingsCard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    }
+  ]
 }

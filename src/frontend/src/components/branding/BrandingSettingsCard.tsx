@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,9 +12,16 @@ import { Progress } from '@/components/ui/progress';
 export default function BrandingSettingsCard() {
   const { data: branding } = useGetShopBranding();
   const { mutate: setBranding, isPending } = useSetShopBranding();
-  const [shopName, setShopName] = useState(branding?.name || '');
+  const [shopName, setShopName] = useState('');
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+
+  // Sync shopName state with fetched branding data
+  useEffect(() => {
+    if (branding?.name) {
+      setShopName(branding.name);
+    }
+  }, [branding?.name]);
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -87,6 +94,7 @@ export default function BrandingSettingsCard() {
               value={shopName}
               onChange={(e) => setShopName(e.target.value)}
               placeholder="Enter shop name"
+              className="flex-1"
             />
             <Button onClick={handleSaveName} disabled={isPending}>
               Save

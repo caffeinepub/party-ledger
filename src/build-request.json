@@ -1,71 +1,38 @@
 {
   "kind": "build_request",
-  "title": "Fix admin Principal registration and authorization system",
-  "priority": "high",
+  "title": "Set shop name to RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES",
+  "projectName": "RK Brothers Ledger",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Modify the backend to automatically register the first authenticated user's Principal as an admin when no admins exist in the system",
-      "target": "backend",
+      "text": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the system settings",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "Failed to update shop name: Unauthorized: Only admins can set shop branding",
-          "WHO IS ADMIN"
+          "ADD SHOP NAME RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES"
         ]
       },
       "acceptanceCriteria": [
-        "When the admin list is empty, the first user to authenticate is automatically added as an admin",
-        "Subsequent users are not automatically granted admin access",
-        "The automatic registration persists across canister upgrades"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Ensure the isAdmin check in the backend properly validates the caller's Principal against the adminPrincipals set before allowing shop branding operations",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ],
-        "quotes": [
-          "Failed to update shop name: Unauthorized: Only admins can set shop branding"
-        ]
-      },
-      "acceptanceCriteria": [
-        "setBranding function correctly rejects non-admin users with 'Unauthorized' error",
-        "setBranding function allows admin users to update shop name and logo",
-        "The admin check uses the correct Principal comparison logic"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Add debug logging in the backend to trace Principal authentication flow and admin authorization checks for troubleshooting",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-latest"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Log the caller's Principal when they authenticate",
-        "Log the list of admin Principals when authorization is checked",
-        "Log the result of the isAdmin check (true/false)"
+        "Shop name 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' is successfully saved in the branding settings",
+        "The shop name appears in the header/branding display throughout the application",
+        "The branding settings card shows the updated shop name",
+        "Admin authorization allows the update to be saved without errors"
       ]
     }
   ],
   "constraints": [
-    "Preserve the existing adminPrincipals HashSet structure in the backend",
-    "Maintain compatibility with the existing addAdminPrincipal and removeAdminPrincipal functions",
-    "Do not modify frontend authentication or admin management UI components"
+    "Preserve existing admin authorization logic that was fixed in version 25",
+    "Do not modify authentication or access control mechanisms",
+    "Maintain existing branding data structure and storage patterns"
   ],
   "nonGoals": [
-    "Changing the Internet Identity authentication flow",
-    "Modifying the frontend admin management UI",
-    "Adding password-based authentication",
-    "Creating a separate super-admin role"
+    "Changing the logo or other branding elements",
+    "Modifying the branding settings UI layout",
+    "Altering party management or payment tracking features"
   ],
   "imageRequirements": {
     "required": [],

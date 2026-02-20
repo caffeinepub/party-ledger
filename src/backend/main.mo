@@ -1,9 +1,9 @@
 import List "mo:core/List";
 import Map "mo:core/Map";
 import Nat "mo:core/Nat";
-import Int "mo:core/Int";
 import Text "mo:core/Text";
 import Time "mo:core/Time";
+import Int "mo:core/Int";
 import Order "mo:core/Order";
 import Array "mo:core/Array";
 import Float "mo:core/Float";
@@ -16,11 +16,7 @@ import MixinStorage "blob-storage/Mixin";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 
-// Apply migration on canister upgrade
-
-
 actor {
-  // Integrate storage and authorization mixins
   include MixinStorage();
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -114,13 +110,15 @@ actor {
     branding : ?ShopBranding;
   };
 
-  // State
   let parties = Map.empty<PartyId, Party>();
   let partyPayments = Map.empty<PartyId, List.List<(PaymentId, PartyVisitRecord)>>();
   let staffAccounts = Map.empty<Text, StaffAccount>();
   let partyIdCounters = Map.empty<Text, Nat>();
   var nextPaymentId = 0;
-  var shopBranding : ?ShopBranding = null;
+  var shopBranding : ?ShopBranding = ?{
+    name = ?"RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES";
+    logo = null;
+  };
 
   let userProfiles = Map.empty<Principal, Text>();
 
@@ -333,7 +331,6 @@ actor {
   };
 
   public query func getShopBranding() : async ?ShopBranding {
-    // Public endpoint - no authorization required for viewing branding
     shopBranding;
   };
 
@@ -681,4 +678,3 @@ actor {
     };
   };
 };
-

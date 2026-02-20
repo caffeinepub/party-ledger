@@ -1,46 +1,22 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "E-commerce shop application with Internet Identity authentication and Principal-based admin system",
-  "architectural_notes": [
-    "Uses Internet Identity for authentication with Principal-based access control",
-    "Admin privileges controlled by Principal ID registration",
-    "Shop branding settings require admin authorization"
-  ],
-  "known_issues": [
-    "Admin Principal system not properly configured - users cannot set shop branding",
-    "No Principal is currently registered as admin in the system",
-    "Admin check logic may need first-user auto-registration or manual Principal addition"
-  ],
-  "isFixRequest": true,
-  "existing_features": [],
-  "new_feature_requests": [
+  "summary": "Shop management system for RK Brothers Lubricants and Tyre Suppliers",
+  "architectural_notes": [],
+  "known_issues": [],
+  "isFixRequest": false,
+  "existing_features": [
     {
-      "id": "AR-1",
-      "summary": "Modify the backend to automatically register the first authenticated user's Principal as an admin when no admins exist in the system",
+      "id": "feature-update-the-shop-branding-name-to-rk-brothers-lubricants-and-tyre-supplires-in-the-system-settings",
+      "title": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the system settings",
       "reqIds": [
         "REQ-1"
       ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Ensure the isAdmin check in the backend properly validates the caller's Principal against the adminPrincipals set before allowing shop branding operations",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Add debug logging in the backend to trace Principal authentication flow and admin authorization checks for troubleshooting",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
+      "version": 1
     }
   ],
-  "projectName": "Fix admin Principal registration and authorization system",
+  "new_feature_requests": [],
+  "projectName": "RK Brothers Lubricants and Tyre Suppliers",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

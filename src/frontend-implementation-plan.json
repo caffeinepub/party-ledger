@@ -1,6 +1,34 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix admin Principal registration and authorization system",
-  "requirements": []
+  "title": "Set shop name to RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' throughout the application",
+      "acceptanceCriteria": [
+        "Shop name 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' is successfully saved in the branding settings",
+        "The shop name appears in the header/branding display throughout the application",
+        "The branding settings card shows the updated shop name",
+        "Admin authorization allows the update to be saved without errors"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/branding/BrandingSettingsCard.tsx",
+          "operation": "modify",
+          "description": "Update the BrandingSettingsCard component to set the default shop name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the name input field when loading the branding settings. Ensure the form handles this shop name correctly when saving via the setShopBranding mutation."
+        },
+        {
+          "path": "frontend/src/components/branding/BrandingHeader.tsx",
+          "operation": "modify",
+          "description": "Verify that the BrandingHeader component correctly displays the shop name 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' when retrieved from branding settings. Ensure proper text wrapping and responsive layout for this longer shop name in the header display."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "modify",
+          "description": "Update the AppShell component footer branding display to accommodate the longer shop name 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES'. Ensure the footer layout remains visually balanced and the branding text is properly styled for readability."
+        }
+      ]
+    }
+  ]
 }
