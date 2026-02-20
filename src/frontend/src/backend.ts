@@ -218,17 +218,20 @@ export interface backendInterface {
     addParty(partyId: PartyId, name: string, address: string, phone: string, pan: string, dueAmount: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     authenticateStaff(loginName: string): Promise<boolean>;
+    clearLogs(): Promise<void>;
     createStaffAccount(loginName: string, canViewAllRecords: boolean): Promise<void>;
     deleteParty(partyId: PartyId): Promise<void>;
     disableStaffAccount(loginName: string): Promise<void>;
     exportUpgradeData(): Promise<UpgradeData>;
     filterPartyVisitRecordMetadata(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<AggregateVisitRecordMetadata>;
     filterPartyVisitRecords(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<Array<[PaymentId, PartyVisitRecord]>>;
+    generatePartyId(_name: string, _phone: string): Promise<string>;
     getAllParties(): Promise<Array<[string, Party]>>;
     getCallerUserProfile(): Promise<{
         name: string;
     } | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getLogs(): Promise<Array<[Time, string]>>;
     getParty(_id: PartyId): Promise<{
         pan: string;
         name: string;
@@ -399,6 +402,20 @@ export class Backend implements backendInterface {
             return result;
         }
     }
+    async clearLogs(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.clearLogs();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.clearLogs();
+            return result;
+        }
+    }
     async createStaffAccount(arg0: string, arg1: boolean): Promise<void> {
         if (this.processError) {
             try {
@@ -483,6 +500,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n35(this._uploadFile, this._downloadFile, result);
         }
     }
+    async generatePartyId(arg0: string, arg1: string): Promise<string> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.generatePartyId(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.generatePartyId(arg0, arg1);
+            return result;
+        }
+    }
     async getAllParties(): Promise<Array<[string, Party]>> {
         if (this.processError) {
             try {
@@ -525,6 +556,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getCallerUserRole();
             return from_candid_UserRole_n38(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getLogs(): Promise<Array<[Time, string]>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getLogs();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getLogs();
+            return result;
         }
     }
     async getParty(arg0: PartyId): Promise<{

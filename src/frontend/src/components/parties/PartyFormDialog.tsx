@@ -104,6 +104,7 @@ export default function PartyFormDialog({ open, onClose, mode, partyId, initialD
             {mode === 'add' ? 'Enter party details to add a new record' : 'Update party information'}
           </DialogDescription>
         </DialogHeader>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Party Name *</Label>
@@ -163,7 +164,10 @@ export default function PartyFormDialog({ open, onClose, mode, partyId, initialD
             <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button 
+              type="submit" 
+              disabled={isPending}
+            >
               {isPending ? 'Saving...' : mode === 'add' ? 'Add Party' : 'Update Party'}
             </Button>
           </div>

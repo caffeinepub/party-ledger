@@ -23,7 +23,7 @@ export default function DueTodayDialog({ parties, open, onClose }: DueTodayDialo
 
   const handleViewParty = (partyId: PartyId) => {
     onClose();
-    navigate({ to: '/party/$partyId', params: { partyId } });
+    navigate({ to: '/parties/$partyId', params: { partyId } });
   };
 
   if (parties.length === 0) return null;

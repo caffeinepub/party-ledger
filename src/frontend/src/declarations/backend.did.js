@@ -137,6 +137,7 @@ export const idlService = IDL.Service({
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'authenticateStaff' : IDL.Func([IDL.Text], [IDL.Bool], []),
+  'clearLogs' : IDL.Func([], [], []),
   'createStaffAccount' : IDL.Func([IDL.Text, IDL.Bool], [], []),
   'deleteParty' : IDL.Func([PartyId], [], []),
   'disableStaffAccount' : IDL.Func([IDL.Text], [], []),
@@ -151,6 +152,7 @@ export const idlService = IDL.Service({
       [IDL.Vec(IDL.Tuple(PaymentId, PartyVisitRecord))],
       ['query'],
     ),
+  'generatePartyId' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
   'getAllParties' : IDL.Func(
       [],
       [IDL.Vec(IDL.Tuple(IDL.Text, Party))],
@@ -162,6 +164,7 @@ export const idlService = IDL.Service({
       ['query'],
     ),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getLogs' : IDL.Func([], [IDL.Vec(IDL.Tuple(Time, IDL.Text))], ['query']),
   'getParty' : IDL.Func(
       [PartyId],
       [
@@ -368,6 +371,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'authenticateStaff' : IDL.Func([IDL.Text], [IDL.Bool], []),
+    'clearLogs' : IDL.Func([], [], []),
     'createStaffAccount' : IDL.Func([IDL.Text, IDL.Bool], [], []),
     'deleteParty' : IDL.Func([PartyId], [], []),
     'disableStaffAccount' : IDL.Func([IDL.Text], [], []),
@@ -382,6 +386,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(PaymentId, PartyVisitRecord))],
         ['query'],
       ),
+    'generatePartyId' : IDL.Func([IDL.Text, IDL.Text], [IDL.Text], []),
     'getAllParties' : IDL.Func(
         [],
         [IDL.Vec(IDL.Tuple(IDL.Text, Party))],
@@ -393,6 +398,7 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getLogs' : IDL.Func([], [IDL.Vec(IDL.Tuple(Time, IDL.Text))], ['query']),
     'getParty' : IDL.Func(
         [PartyId],
         [

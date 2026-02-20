@@ -1,37 +1,39 @@
-import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile, useSaveCallerUserProfile } from './hooks/queries/useAuth';
-import { useActorSession, ActorSessionProvider } from './context/ActorSessionContext';
-import { ThemeProvider } from 'next-themes';
+import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider, createRouter, createRootRoute, createRoute, Outlet } from '@tanstack/react-router';
 import { Toaster } from '@/components/ui/sonner';
-import { TopLevelErrorBoundary } from './components/auth/TopLevelErrorBoundary';
+import { ThemeProvider } from 'next-themes';
+import { useInternetIdentity } from './hooks/useInternetIdentity';
+import { useGetCallerUserProfile } from './hooks/queries/useAuth';
+import { ActorSessionProvider } from './context/ActorSessionContext';
+import LoginScreen from './components/auth/LoginScreen';
+import ProfileSetupDialog from './components/auth/ProfileSetupDialog';
 import AppShell from './components/layout/AppShell';
 import DashboardPage from './pages/DashboardPage';
 import PartiesPage from './pages/PartiesPage';
 import PartyDetailsPage from './pages/PartyDetailsPage';
-import NewPartyVisitPage from './pages/NewPartyVisitPage';
-import VisitDetailsPage from './pages/VisitDetailsPage';
 import ReportsPage from './pages/ReportsPage';
 import SettingsPage from './pages/SettingsPage';
-import LoginScreen from './components/auth/LoginScreen';
+import NewPartyVisitPage from './pages/NewPartyVisitPage';
+import VisitDetailsPage from './pages/VisitDetailsPage';
 import StartupLoadingScreen from './components/auth/StartupLoadingScreen';
-import ProfileSetupDialog from './components/auth/ProfileSetupDialog';
-import BootstrapErrorScreen from './components/auth/BootstrapErrorScreen';
-import ProfileBootstrapErrorScreen from './components/auth/ProfileBootstrapErrorScreen';
-import DueTodayDialog from './components/alerts/DueTodayDialog';
-import { useDueTodayAlert } from './hooks/useDueTodayAlert';
-import { useState } from 'react';
+import { TopLevelErrorBoundary } from './components/auth/TopLevelErrorBoundary';
 
-function Layout() {
-  return (
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+const rootRoute = createRootRoute({
+  component: () => (
     <AppShell>
       <Outlet />
     </AppShell>
-  );
-}
-
-const rootRoute = createRootRoute({
-  component: Layout,
+  ),
 });
 
 const dashboardRoute = createRoute({
@@ -48,20 +50,8 @@ const partiesRoute = createRoute({
 
 const partyDetailsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/party/$partyId',
+  path: '/parties/$partyId',
   component: PartyDetailsPage,
-});
-
-const visitDetailsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/visit/$partyId/$paymentId',
-  component: VisitDetailsPage,
-});
-
-const newVisitRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/new-visit',
-  component: NewPartyVisitPage,
 });
 
 const reportsRoute = createRoute({
@@ -76,14 +66,26 @@ const settingsRoute = createRoute({
   component: SettingsPage,
 });
 
+const newPartyVisitRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/new-visit',
+  component: NewPartyVisitPage,
+});
+
+const visitDetailsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/visits/$visitId',
+  component: VisitDetailsPage,
+});
+
 const routeTree = rootRoute.addChildren([
   dashboardRoute,
   partiesRoute,
   partyDetailsRoute,
-  visitDetailsRoute,
-  newVisitRoute,
   reportsRoute,
   settingsRoute,
+  newPartyVisitRoute,
+  visitDetailsRoute,
 ]);
 
 const router = createRouter({ routeTree });
@@ -95,84 +97,42 @@ declare module '@tanstack/react-router' {
 }
 
 function AppContent() {
-  const { identity, loginStatus } = useInternetIdentity();
-  const { actor, isLoading: actorLoading, isError: actorError, refetch: retryActor } = useActorSession();
-  const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched, isError: profileError, refetch: retryProfile } = useGetCallerUserProfile();
-  const { mutate: saveProfile } = useSaveCallerUserProfile();
-  const [profileSetupOpen, setProfileSetupOpen] = useState(false);
+  const { identity, isInitializing } = useInternetIdentity();
+  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
 
   const isAuthenticated = !!identity;
-  const isInitializing = loginStatus === 'initializing';
 
-  // Show profile setup dialog when authenticated but no profile exists
-  const showProfileSetup = isAuthenticated && !profileLoading && profileFetched && userProfile === null && !profileSetupOpen;
-
-  const handleProfileSave = (name: string) => {
-    saveProfile({ name }, {
-      onSuccess: () => {
-        setProfileSetupOpen(false);
-      },
-    });
-  };
-
-  // Due today alert - only runs when authenticated and actor is ready
-  const { partiesDueToday, dismissAlert } = useDueTodayAlert();
-
-  // Bootstrap phase 1: Internet Identity initialization
   if (isInitializing) {
-    return <StartupLoadingScreen message="Loading..." />;
+    return <StartupLoadingScreen message="Initializing authentication..." />;
   }
 
-  // Bootstrap phase 2: Not authenticated - show login
   if (!isAuthenticated) {
     return <LoginScreen />;
   }
 
-  // Bootstrap phase 3: Actor initialization error
-  if (actorError) {
-    return <BootstrapErrorScreen onRetry={() => retryActor()} />;
+  const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
+
+  if (showProfileSetup) {
+    return <ProfileSetupDialog open={true} />;
   }
 
-  // Bootstrap phase 4: Actor loading
-  if (actorLoading || !actor) {
-    return <StartupLoadingScreen message="Initializing..." />;
+  if (profileLoading || !isFetched) {
+    return <StartupLoadingScreen message="Loading your profile..." />;
   }
 
-  // Bootstrap phase 5: Profile fetch error
-  if (profileError) {
-    return <ProfileBootstrapErrorScreen onRetry={() => retryProfile()} />;
-  }
-
-  // Bootstrap phase 6: Profile loading (only show if not yet fetched)
-  if (profileLoading && !profileFetched) {
-    return <StartupLoadingScreen message="Loading profile..." />;
-  }
-
-  // Bootstrap complete - render main app with router
-  return (
-    <>
-      <RouterProvider router={router} />
-      <ProfileSetupDialog
-        open={showProfileSetup || profileSetupOpen}
-        onSave={handleProfileSave}
-      />
-      <DueTodayDialog
-        parties={partiesDueToday}
-        open={partiesDueToday.length > 0}
-        onClose={dismissAlert}
-      />
-      <Toaster />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default function App() {
   return (
     <TopLevelErrorBoundary>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        <ActorSessionProvider>
-          <AppContent />
-        </ActorSessionProvider>
+        <QueryClientProvider client={queryClient}>
+          <ActorSessionProvider>
+            <AppContent />
+            <Toaster />
+          </ActorSessionProvider>
+        </QueryClientProvider>
       </ThemeProvider>
     </TopLevelErrorBoundary>
   );

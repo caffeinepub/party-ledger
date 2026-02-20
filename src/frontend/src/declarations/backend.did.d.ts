@@ -113,6 +113,7 @@ export interface _SERVICE {
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'authenticateStaff' : ActorMethod<[string], boolean>,
+  'clearLogs' : ActorMethod<[], undefined>,
   'createStaffAccount' : ActorMethod<[string, boolean], undefined>,
   'deleteParty' : ActorMethod<[PartyId], undefined>,
   'disableStaffAccount' : ActorMethod<[string], undefined>,
@@ -125,9 +126,11 @@ export interface _SERVICE {
     [PartyId, PartyVisitRecordFilter],
     Array<[PaymentId, PartyVisitRecord]>
   >,
+  'generatePartyId' : ActorMethod<[string, string], string>,
   'getAllParties' : ActorMethod<[], Array<[string, Party]>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [{ 'name' : string }]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getLogs' : ActorMethod<[], Array<[Time, string]>>,
   'getParty' : ActorMethod<
     [PartyId],
     [] | [

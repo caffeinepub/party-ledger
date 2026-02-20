@@ -1,32 +1,53 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Set shop name to RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES",
+  "title": "Remove authentication requirements from login and import functionality",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' throughout the application",
+      "summary": "Remove authentication check from PartyFormDialog when generating new party IDs, allowing unauthenticated users to create parties",
       "acceptanceCriteria": [
-        "Shop name 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' is successfully saved in the branding settings",
-        "The shop name appears in the header/branding display throughout the application",
-        "The branding settings card shows the updated shop name",
-        "Admin authorization allows the update to be saved without errors"
+        "PartyFormDialog allows party creation without authentication",
+        "Party ID generation works for unauthenticated users",
+        "No authentication errors appear when creating parties"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/branding/BrandingSettingsCard.tsx",
+          "path": "frontend/src/components/parties/PartyFormDialog.tsx",
           "operation": "modify",
-          "description": "Update the BrandingSettingsCard component to set the default shop name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the name input field when loading the branding settings. Ensure the form handles this shop name correctly when saving via the setShopBranding mutation."
-        },
+          "description": "Remove the authentication check that prevents unauthenticated users from generating party IDs. Modify the handleSubmit function to allow party creation without requiring the user to be authenticated. Update any conditional logic that gates party ID generation behind authentication state. Ensure the form submission flow works for both authenticated and unauthenticated users while preserving validation logic for party data fields (name, address, phone, PAN, due amount)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Remove authentication check from ExcelPartyImportCard, allowing unauthenticated users to import parties from Excel/CSV files",
+      "acceptanceCriteria": [
+        "Excel/CSV import works without authentication",
+        "Batch party imports succeed for unauthenticated users",
+        "No authentication errors during file import process"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/branding/BrandingHeader.tsx",
+          "path": "frontend/src/components/import/ExcelPartyImportCard.tsx",
           "operation": "modify",
-          "description": "Verify that the BrandingHeader component correctly displays the shop name 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' when retrieved from branding settings. Ensure proper text wrapping and responsive layout for this longer shop name in the header display."
-        },
+          "description": "Remove authentication requirement checks that prevent unauthenticated users from importing parties via Excel/CSV files. Update the file upload and batch processing flow to work without checking authentication state. Ensure the import functionality (file parsing, party ID validation, and batch party creation) works for all users while maintaining data validation, progress tracking, and error handling logic."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Remove authentication check from JsonTransferCard import functionality, allowing unauthenticated users to import JSON data",
+      "acceptanceCriteria": [
+        "JSON data import works without authentication",
+        "Both merge and overwrite modes function for unauthenticated users",
+        "No authentication errors during JSON import"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/components/layout/AppShell.tsx",
+          "path": "frontend/src/components/transfer/JsonTransferCard.tsx",
           "operation": "modify",
-          "description": "Update the AppShell component footer branding display to accommodate the longer shop name 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES'. Ensure the footer layout remains visually balanced and the branding text is properly styled for readability."
+          "description": "Remove authentication requirement checks that prevent unauthenticated users from importing JSON data. Update the import functionality to allow both merge and overwrite modes for all users. Ensure the JSON file parsing, data validation, and import operations (including cache invalidation) work without requiring authentication while preserving the data transfer logic and error handling."
         }
       ]
     }

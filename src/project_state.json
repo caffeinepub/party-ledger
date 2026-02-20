@@ -1,22 +1,45 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Shop management system for RK Brothers Lubricants and Tyre Suppliers",
+  "summary": "New project",
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-shop-branding-name-to-rk-brothers-lubricants-and-tyre-supplires-in-the-system-settings",
-      "title": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the system settings",
+      "id": "feature-remove-authentication-check-from-partyformdialog-when-generating-new-party-ids-allowing-unauthenticated-users-to-create-parties",
+      "title": "Remove authentication check from PartyFormDialog when generating new party IDs, allowing unauthenticated users to create parties",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-remove-authentication-check-from-excelpartyimportcard-allowing-unauthenticated-users-to-import-parties-from-excel-csv-files",
+      "title": "Remove authentication check from ExcelPartyImportCard, allowing unauthenticated users to import parties from Excel/CSV files",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-authentication-check-from-jsontransfercard-import-functionality-allowing-unauthenticated-users-to-import-json-data",
+      "title": "Remove authentication check from JsonTransferCard import functionality, allowing unauthenticated users to import JSON data",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "RK Brothers Lubricants and Tyre Suppliers",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Remove authentication requirements from login and import file functionality",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Remove authentication requirements from login and import functionality",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

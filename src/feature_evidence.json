@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-shop-branding-name-to-rk-brothers-lubricants-and-tyre-supplires-in-the-system-settings",
-      "featureTitle": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the system settings",
+      "featureId": "feature-remove-authentication-check-from-partyformdialog-when-generating-new-party-ids-allowing-unauthenticated-users-to-create-parties",
+      "featureTitle": "Remove authentication check from PartyFormDialog when generating new party IDs, allowing unauthenticated users to create parties",
       "files": [
-        "frontend/src/components/branding/BrandingHeader.tsx",
-        "frontend/src/components/branding/BrandingSettingsCard.tsx"
+        "frontend/src/components/parties/PartyFormDialog.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -19,6 +18,46 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-remove-authentication-check-from-excelpartyimportcard-allowing-unauthenticated-users-to-import-parties-from-excel-csv-files",
+      "featureTitle": "Remove authentication check from ExcelPartyImportCard, allowing unauthenticated users to import parties from Excel/CSV files",
+      "files": [
+        "frontend/src/components/import/ExcelPartyImportCard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-remove-authentication-check-from-jsontransfercard-import-functionality-allowing-unauthenticated-users-to-import-json-data",
+      "featureTitle": "Remove authentication check from JsonTransferCard import functionality, allowing unauthenticated users to import JSON data",
+      "files": [
+        "frontend/src/components/transfer/JsonTransferCard.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

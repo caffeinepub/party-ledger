@@ -1,10 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Update the shop branding name to "RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES" in the system settings.
+**Goal:** Remove authentication requirements from party creation and data import functionality to allow unauthenticated users to manage parties.
 
 **Planned changes:**
-- Set the shop name to "RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES" in the branding settings
-- Display the updated shop name in the header/branding throughout the application
+- Remove authentication check from PartyFormDialog to allow party creation without login
+- Remove authentication check from ExcelPartyImportCard to enable CSV/Excel imports without login
+- Remove authentication check from JsonTransferCard import to allow JSON data imports without login
 
-**User-visible outcome:** The shop name "RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES" appears in the branding settings and is displayed consistently across the application interface.
+**User-visible outcome:** Users can create parties, import Excel/CSV files, and import JSON data without needing to authenticate or log in.

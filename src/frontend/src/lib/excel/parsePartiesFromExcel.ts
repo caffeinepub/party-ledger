@@ -40,8 +40,11 @@ export async function parsePartiesFromExcel(file: File): Promise<ParseResult> {
   const parties: ParsedParty[] = [];
 
   try {
+    console.debug('[CSV Parser] Reading file:', file.name, 'Size:', file.size, 'bytes');
     const text = await file.text();
     const lines = text.split(/\r?\n/).filter(line => line.trim());
+
+    console.debug('[CSV Parser] Total lines (including header):', lines.length);
 
     if (lines.length === 0) {
       errors.push('File is empty');
@@ -50,6 +53,7 @@ export async function parsePartiesFromExcel(file: File): Promise<ParseResult> {
 
     // Parse header
     const headers = parseCSVLine(lines[0]).map(h => h.trim());
+    console.debug('[CSV Parser] Headers found:', headers);
     
     // Find column indices
     const nameIdx = headers.findIndex(h => h.toLowerCase() === 'party name');
@@ -57,6 +61,8 @@ export async function parsePartiesFromExcel(file: File): Promise<ParseResult> {
     const phoneIdx = headers.findIndex(h => h.toLowerCase() === 'phone');
     const panIdx = headers.findIndex(h => h.toLowerCase() === 'pan');
     const dueIdx = headers.findIndex(h => h.toLowerCase() === 'due amount');
+
+    console.debug('[CSV Parser] Column indices - Name:', nameIdx, 'Address:', addressIdx, 'Phone:', phoneIdx, 'PAN:', panIdx, 'Due:', dueIdx);
 
     if (nameIdx === -1) {
       errors.push('Missing required column: Party Name');
@@ -73,9 +79,13 @@ export async function parsePartiesFromExcel(file: File): Promise<ParseResult> {
     for (let i = 1; i < lines.length; i++) {
       const rowNum = i + 1;
       const line = lines[i].trim();
-      if (!line) continue;
+      if (!line) {
+        console.debug(`[CSV Parser] Row ${rowNum}: Empty line, skipping`);
+        continue;
+      }
 
       const values = parseCSVLine(line);
+      console.debug(`[CSV Parser] Row ${rowNum}: Parsed ${values.length} values`);
 
       const name = (values[nameIdx] || '').trim();
       const address = addressIdx !== -1 ? (values[addressIdx] || '').trim() : '';
@@ -85,11 +95,30 @@ export async function parsePartiesFromExcel(file: File): Promise<ParseResult> {
 
       // Validate required fields
       if (!name) {
-        errors.push(`Row ${rowNum}: Party Name is required`);
+        const error = `Row ${rowNum}: Party Name is required`;
+        console.debug(`[CSV Parser] ${error}`);
+        errors.push(error);
         continue;
       }
       if (!pan) {
-        errors.push(`Row ${rowNum}: PAN is required`);
+        const error = `Row ${rowNum}: PAN is required`;
+        console.debug(`[CSV Parser] ${error}`);
+        errors.push(error);
+        continue;
+      }
+
+      // Validate field lengths and formats
+      if (name.length > 200) {
+        const error = `Row ${rowNum}: Party Name too long (max 200 characters)`;
+        console.debug(`[CSV Parser] ${error}`);
+        errors.push(error);
+        continue;
+      }
+
+      if (address.length > 500) {
+        const error = `Row ${rowNum}: Address too long (max 500 characters)`;
+        console.debug(`[CSV Parser] ${error}`);
+        errors.push(error);
         continue;
       }
 
@@ -99,15 +128,21 @@ export async function parsePartiesFromExcel(file: File): Promise<ParseResult> {
         const cleaned = dueAmountStr.replace(/[₹,\s]/g, '');
         const num = parseFloat(cleaned);
         if (isNaN(num)) {
-          errors.push(`Row ${rowNum}: Invalid due amount`);
+          const error = `Row ${rowNum}: Invalid due amount "${dueAmountStr}"`;
+          console.debug(`[CSV Parser] ${error}`);
+          errors.push(error);
           continue;
         }
         dueAmount = BigInt(Math.floor(num));
+        console.debug(`[CSV Parser] Row ${rowNum}: Parsed due amount ${dueAmountStr} -> ${dueAmount}`);
       } catch (e) {
-        errors.push(`Row ${rowNum}: Invalid due amount`);
+        const error = `Row ${rowNum}: Invalid due amount "${dueAmountStr}"`;
+        console.debug(`[CSV Parser] ${error}`, e);
+        errors.push(error);
         continue;
       }
 
+      console.debug(`[CSV Parser] Row ${rowNum}: Valid party - ${name}`);
       parties.push({
         name,
         address,
@@ -116,8 +151,12 @@ export async function parsePartiesFromExcel(file: File): Promise<ParseResult> {
         dueAmount,
       });
     }
+
+    console.debug(`[CSV Parser] Parsing complete. Valid parties: ${parties.length}, Errors: ${errors.length}`);
   } catch (e) {
-    errors.push(`Failed to parse file: ${e instanceof Error ? e.message : 'Unknown error'}`);
+    const error = `Failed to parse file: ${e instanceof Error ? e.message : 'Unknown error'}`;
+    console.error('[CSV Parser]', error, e);
+    errors.push(error);
   }
 
   return { parties, errors };

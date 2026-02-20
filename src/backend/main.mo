@@ -64,6 +64,10 @@ actor {
     locationFilter : ?LocationConstraint;
   };
 
+  public type Logger = {
+    logs : List.List<Text>;
+  };
+
   type Party = {
     id : PartyId;
     name : Text;
@@ -119,7 +123,7 @@ actor {
     name = ?"RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES";
     logo = null;
   };
-
+  let logger : Logger = { logs = List.empty<Text>() };
   let userProfiles = Map.empty<Principal, Text>();
 
   module PartyVisitRecord {
@@ -173,6 +177,33 @@ actor {
         };
       };
     };
+  };
+
+  public query ({ caller }) func getLogs() : async [(Time.Time, Text)] {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Only admins can view logs");
+    };
+
+    let logsArray = logger.logs.toArray();
+    var timestampIdx = 0;
+    logsArray.map(
+      func(log) {
+        let entry : (Time.Time, Text) = (timestampIdx, log);
+        timestampIdx += 1;
+        entry;
+      }
+    );
+  };
+
+  public shared ({ caller }) func clearLogs() : async () {
+    if (not (AccessControl.isAdmin(accessControlState, caller))) {
+      Runtime.trap("Unauthorized: Only admins can clear logs");
+    };
+    logger.logs.clear();
+  };
+
+  func logError(message : Text) {
+    logger.logs.add("Error: " # message);
   };
 
   public shared ({ caller }) func createStaffAccount(
@@ -269,7 +300,6 @@ actor {
 
         switch (account.boundPrincipal) {
           case (null) {
-            // Only admins can bind new staff accounts to prevent unauthorized binding
             if (not (AccessControl.isAdmin(accessControlState, caller))) {
               Runtime.trap("Unauthorized: Only admins can bind unbound staff accounts");
             };
@@ -654,11 +684,15 @@ actor {
   };
 
   public query ({ caller }) func getPartyIdTest(name : Text, phone : Text) : async Text {
-    if (not isAuthenticatedStaff(caller)) {
-      Runtime.trap("Unauthorized: Only authenticated staff can test party ID generation");
-    };
-
     generatePartyIdFromNameAndPhone(name, phone);
+  };
+
+  public shared ({ caller }) func generatePartyId(_name : Text, _phone : Text) : async Text {
+    if (not isAuthenticatedStaff(caller)) {
+      logError("Unauthorized: generatePartyId called without authentication");
+      Runtime.trap("Unauthorized: Only authenticated staff can generate party ids");
+    };
+    generatePartyIdFromNameAndPhone(_name, _phone);
   };
 
   func generatePartyIdFromNameAndPhone(name : Text, _phone : Text) : Text {

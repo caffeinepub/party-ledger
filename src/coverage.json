@@ -1,39 +1,58 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T10:54:16.521Z",
+  "generatedAt": "2026-02-20T13:03:43.690Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the system settings",
+        "summary": "Remove authentication check from PartyFormDialog when generating new party IDs, allowing unauthenticated users to create parties",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/branding/BrandingSettingsCard.tsx",
-          "frontend/src/components/branding/BrandingHeader.tsx",
-          "frontend/src/components/layout/AppShell.tsx"
+          "frontend/src/components/parties/PartyFormDialog.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/branding/BrandingSettingsCard.tsx",
-          "frontend/src/components/branding/BrandingHeader.tsx"
+          "frontend/src/components/parties/PartyFormDialog.tsx"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Remove authentication check from ExcelPartyImportCard, allowing unauthenticated users to import parties from Excel/CSV files",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/import/ExcelPartyImportCard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/import/ExcelPartyImportCard.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Remove authentication check from JsonTransferCard import functionality, allowing unauthenticated users to import JSON data",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/transfer/JsonTransferCard.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/transfer/JsonTransferCard.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/branding/BrandingHeader.tsx",
-    "frontend/src/components/branding/BrandingSettingsCard.tsx",
+    "frontend/src/components/import/ExcelPartyImportCard.tsx",
+    "frontend/src/components/parties/PartyFormDialog.tsx",
+    "frontend/src/components/transfer/JsonTransferCard.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

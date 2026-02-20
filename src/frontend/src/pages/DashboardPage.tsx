@@ -101,9 +101,9 @@ export default function DashboardPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() => navigate({ to: '/visit/$partyId/$paymentId', params: { partyId: visit.partyId, paymentId: visit.paymentId } })}
+                          onClick={() => navigate({ to: '/parties/$partyId', params: { partyId: visit.partyId } })}
                         >
-                          Details
+                          View Party
                         </Button>
                         {visit.partyPhone && (
                           <Button

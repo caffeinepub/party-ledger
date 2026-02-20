@@ -1,38 +1,72 @@
 {
   "kind": "build_request",
-  "title": "Set shop name to RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES",
-  "projectName": "RK Brothers Ledger",
+  "title": "Remove authentication requirements from login and import functionality",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the shop branding name to 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' in the system settings",
-      "target": "both",
+      "text": "Remove authentication check from PartyFormDialog when generating new party IDs, allowing unauthenticated users to create parties",
+      "target": "frontend",
       "source": {
         "messageIds": [
           "msg-latest"
         ],
         "quotes": [
-          "ADD SHOP NAME RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES"
+          "remove all authenticated for login and import file"
         ]
       },
       "acceptanceCriteria": [
-        "Shop name 'RK BROTHERS LUBRICANTS AND TYRE SUPPLIRES' is successfully saved in the branding settings",
-        "The shop name appears in the header/branding display throughout the application",
-        "The branding settings card shows the updated shop name",
-        "Admin authorization allows the update to be saved without errors"
+        "PartyFormDialog allows party creation without authentication",
+        "Party ID generation works for unauthenticated users",
+        "No authentication errors appear when creating parties"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Remove authentication check from ExcelPartyImportCard, allowing unauthenticated users to import parties from Excel/CSV files",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "remove all authenticated for login and import file"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Excel/CSV import works without authentication",
+        "Batch party imports succeed for unauthenticated users",
+        "No authentication errors during file import process"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Remove authentication check from JsonTransferCard import functionality, allowing unauthenticated users to import JSON data",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "remove all authenticated for login and import file"
+        ]
+      },
+      "acceptanceCriteria": [
+        "JSON data import works without authentication",
+        "Both merge and overwrite modes function for unauthenticated users",
+        "No authentication errors during JSON import"
       ]
     }
   ],
   "constraints": [
-    "Preserve existing admin authorization logic that was fixed in version 25",
-    "Do not modify authentication or access control mechanisms",
-    "Maintain existing branding data structure and storage patterns"
+    "Do not modify backend authentication logic or actor methods",
+    "Preserve existing UI component structure and styling",
+    "Maintain data validation and error handling for imports"
   ],
   "nonGoals": [
-    "Changing the logo or other branding elements",
-    "Modifying the branding settings UI layout",
-    "Altering party management or payment tracking features"
+    "Removing authentication from other parts of the application",
+    "Modifying the Internet Identity integration",
+    "Changing the ProfileSetupDialog or login flow"
   ],
   "imageRequirements": {
     "required": [],

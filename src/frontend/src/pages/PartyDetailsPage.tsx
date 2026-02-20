@@ -25,7 +25,7 @@ import { toast } from 'sonner';
 
 export default function PartyDetailsPage() {
   const navigate = useNavigate();
-  const { partyId } = useParams({ from: '/party/$partyId' });
+  const { partyId } = useParams({ from: '/parties/$partyId' });
   const { data: party, isLoading } = useGetParty(partyId);
   const { data: payments = [] } = useGetPayments(partyId);
   const { mutate: deleteParty, isPending: isDeleting } = useDeleteParty();
@@ -38,7 +38,7 @@ export default function PartyDetailsPage() {
     deleteParty(partyId, {
       onSuccess: () => {
         toast.success('Party deleted successfully');
-        navigate({ to: '/' });
+        navigate({ to: '/parties' });
       },
       onError: (error) => {
         toast.error(`Failed to delete party: ${error.message}`);
@@ -61,7 +61,7 @@ export default function PartyDetailsPage() {
     return (
       <div className="text-center py-12">
         <p className="text-lg font-medium mb-2">Party not found</p>
-        <Button onClick={() => navigate({ to: '/' })}>
+        <Button onClick={() => navigate({ to: '/parties' })}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Parties
         </Button>
@@ -72,81 +72,85 @@ export default function PartyDetailsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: '/' })} className="mt-1">
+        <Button variant="ghost" size="icon" onClick={() => navigate({ to: '/parties' })} className="mt-1">
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div className="flex-1 min-w-0">
-          <h1 className="text-3xl font-bold">{party.name}</h1>
-          <p className="text-muted-foreground">Party Details</p>
-        </div>
-        <div className="flex flex-wrap gap-2 justify-end">
-          {party.phone && (
-            <Button variant="outline" asChild>
-              <a href={createTelLink(party.phone)} className="gap-2">
-                <Phone className="h-4 w-4" />
-                Call
-              </a>
-            </Button>
-          )}
-          <Button variant="default" onClick={() => setShowVisitDialog(true)}>
-            <MapPin className="h-4 w-4 mr-2" />
-            Party Visit
-          </Button>
-          <Button variant="outline" onClick={() => setShowEditDialog(true)}>
-            <Edit className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-          <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
-            <Trash2 className="h-4 w-4 mr-2" />
-            Delete
-          </Button>
+          <h1 className="text-3xl font-bold break-words">{party.name}</h1>
+          <p className="text-muted-foreground">Party details and payment history</p>
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Party Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
+      <Card>
+        <CardHeader>
+          <CardTitle>Party Information</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <span className="text-sm text-muted-foreground">Name</span>
+              <p className="text-sm text-muted-foreground mb-1">Name</p>
               <p className="font-medium">{party.name}</p>
             </div>
             <div>
-              <span className="text-sm text-muted-foreground">Address</span>
+              <p className="text-sm text-muted-foreground mb-1">Phone</p>
+              <div className="flex items-center gap-2">
+                <p className="font-medium">{formatPhone(party.phone)}</p>
+                {party.phone && (
+                  <Button variant="ghost" size="sm" asChild>
+                    <a href={createTelLink(party.phone)}>
+                      <Phone className="h-4 w-4" />
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Address</p>
               <p className="font-medium">{party.address || 'N/A'}</p>
             </div>
             <div>
-              <span className="text-sm text-muted-foreground">Phone</span>
-              <p className="font-medium">{formatPhone(party.phone)}</p>
-            </div>
-            <div>
-              <span className="text-sm text-muted-foreground">PAN</span>
+              <p className="text-sm text-muted-foreground mb-1">PAN</p>
               <p className="font-medium">{formatPAN(party.pan)}</p>
             </div>
             <div>
-              <span className="text-sm text-muted-foreground">Due Amount</span>
+              <p className="text-sm text-muted-foreground mb-1">Due Amount</p>
               <p className="text-xl font-bold text-primary">{formatMoney(party.dueAmount)}</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>Payment History</CardTitle>
-              <Button size="sm" onClick={() => setShowPaymentDialog(true)} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Record Payment
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <PaymentHistory payments={payments} />
-          </CardContent>
-        </Card>
-      </div>
+          <div className="flex flex-wrap gap-2 pt-4">
+            <Button onClick={() => setShowEditDialog(true)} variant="outline" className="gap-2">
+              <Edit className="h-4 w-4" />
+              Edit
+            </Button>
+            <Button onClick={() => setShowPaymentDialog(true)} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Record Payment
+            </Button>
+            <Button onClick={() => setShowVisitDialog(true)} variant="secondary" className="gap-2">
+              <MapPin className="h-4 w-4" />
+              Party Visit
+            </Button>
+            <Button
+              onClick={() => setShowDeleteDialog(true)}
+              variant="destructive"
+              className="gap-2"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PaymentHistory payments={payments} />
+        </CardContent>
+      </Card>
 
       <PartyFormDialog
         open={showEditDialog}
@@ -172,9 +176,10 @@ export default function PartyDetailsPage() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Party</AlertDialogTitle>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete {party.name}? This action cannot be undone and will also delete all payment records.
+              This will permanently delete the party "{party.name}" and all associated payment records.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

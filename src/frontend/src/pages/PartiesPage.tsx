@@ -24,7 +24,7 @@ export default function PartiesPage() {
   });
 
   const handlePartyClick = (partyId: string) => {
-    navigate({ to: '/party/$partyId', params: { partyId } });
+    navigate({ to: '/parties/$partyId', params: { partyId } });
   };
 
   if (isLoading) {

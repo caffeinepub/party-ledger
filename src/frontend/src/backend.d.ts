@@ -125,17 +125,20 @@ export interface backendInterface {
     addParty(partyId: PartyId, name: string, address: string, phone: string, pan: string, dueAmount: bigint): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     authenticateStaff(loginName: string): Promise<boolean>;
+    clearLogs(): Promise<void>;
     createStaffAccount(loginName: string, canViewAllRecords: boolean): Promise<void>;
     deleteParty(partyId: PartyId): Promise<void>;
     disableStaffAccount(loginName: string): Promise<void>;
     exportUpgradeData(): Promise<UpgradeData>;
     filterPartyVisitRecordMetadata(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<AggregateVisitRecordMetadata>;
     filterPartyVisitRecords(partyId: PartyId, _filter: PartyVisitRecordFilter): Promise<Array<[PaymentId, PartyVisitRecord]>>;
+    generatePartyId(_name: string, _phone: string): Promise<string>;
     getAllParties(): Promise<Array<[string, Party]>>;
     getCallerUserProfile(): Promise<{
         name: string;
     } | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getLogs(): Promise<Array<[Time, string]>>;
     getParty(_id: PartyId): Promise<{
         pan: string;
         name: string;
