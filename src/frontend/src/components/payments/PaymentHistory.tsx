@@ -1,7 +1,7 @@
 import { formatMoney } from '../../lib/format';
 import { formatDateTime, formatDate } from '../../lib/time';
 import { Calendar, IndianRupee, MapPin } from 'lucide-react';
-import type { VisitRecordMetadata, PaymentId } from '../../backend';
+import type { VisitRecordMetadata } from '../../backend';
 
 interface PaymentHistoryProps {
   payments: Array<VisitRecordMetadata>;
@@ -19,11 +19,11 @@ export default function PaymentHistory({ payments }: PaymentHistoryProps) {
   return (
     <div className="space-y-3">
       {payments.map((payment) => (
-        <div key={payment.paymentId} className="border rounded-lg p-4 space-y-2">
+        <div key={payment.paymentId} className="border rounded-lg p-4 space-y-2 hover:bg-accent/30 transition-colors">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <IndianRupee className="h-4 w-4 text-primary" />
-              <span className="text-sm text-muted-foreground">Payment ID: {payment.paymentId}</span>
+              <span className="text-sm font-medium">Payment ID: {payment.paymentId}</span>
             </div>
           </div>
           
@@ -38,7 +38,7 @@ export default function PaymentHistory({ payments }: PaymentHistoryProps) {
             {payment.hasLocation && (
               <div className="flex items-center gap-1 text-sm text-green-600">
                 <MapPin className="h-4 w-4" />
-                <span>Location saved</span>
+                <span>Location data saved</span>
               </div>
             )}
           </div>

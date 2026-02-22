@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-set-the-map-date-range-filter-to-default-to-today-s-date-both-from-and-to-set-to-current-date-when-the-mappage-initially-loads",
-      "featureTitle": "Set the map date range filter to default to today's date (both 'from' and 'to' set to current date) when the MapPage initially loads",
+      "featureId": "feature-update-project-state-json-to-reflect-completion-set-new-feature-requests-to-empty-array-update-summary-to-admin-management-system-with-internet-identity-principal-based-access-control-fully-migrated-and-add-backend-features-to-existing-features-if-desired",
+      "featureTitle": "Update project_state.json to reflect completion: set new_feature_requests to empty array, update summary to 'Admin Management System with Internet Identity Principal-based access control – FULLY MIGRATED', and add backend features to existing_features if desired",
       "files": [
-        "frontend/src/pages/MapPage.tsx"
+        "project_state.json"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,15 +17,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-9"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-search-button-next-to-the-date-range-inputs-that-triggers-the-map-data-filter-when-clicked",
-      "featureTitle": "Add a search button next to the date range inputs that triggers the map data filter when clicked",
+      "featureId": "feature-regenerate-frontend-file-summaries-txt-to-remove-all-old-password-related-descriptions",
+      "featureTitle": "Regenerate frontend-file-summaries.txt to remove all old password-related descriptions",
       "files": [
-        "frontend/src/pages/MapPage.tsx"
+        "frontend-file-summaries.txt"
       ],
       "components": [
         "authorization@4.0.0",
@@ -37,7 +37,27 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-2"
+        "REQ-11"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-a-visual-note-in-adminprincipalspanel-tsx-displaying-at-least-one-admin-is-required-when-only-one-admin-principal-remains",
+      "featureTitle": "Add a visual note in AdminPrincipalsPanel.tsx displaying 'At least one admin is required' when only one admin principal remains",
+      "files": [
+        "frontend/src/components/admin/AdminPrincipalsPanel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-13"
       ],
       "confidence": "high"
     }

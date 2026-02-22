@@ -14,9 +14,14 @@ export function useUpcomingPayments(selectedDate?: Date) {
   return useQuery<PartyWithNextPayment[]>({
     queryKey: ['upcomingPayments', selectedDate?.toISOString().split('T')[0]],
     queryFn: async () => {
-      if (!actor) return [];
+      if (!actor) {
+        console.log('[UpcomingPayments] Actor not available');
+        return [];
+      }
 
+      console.log('[UpcomingPayments] Fetching all parties with visit records...');
       const allPartiesWithVisits = await actor.getAllPartiesWithVisitRecords();
+      console.log('[UpcomingPayments] Parties with visits fetched:', allPartiesWithVisits.length);
 
       // Use today if no date is selected
       const targetDate = selectedDate || new Date();
@@ -26,6 +31,8 @@ export function useUpcomingPayments(selectedDate?: Date) {
       const partiesForDate: PartyWithNextPayment[] = [];
 
       for (const [partyId, party, visitRecords] of allPartiesWithVisits) {
+        console.log(`[UpcomingPayments] Processing party: ${party.name} (${partyId})`);
+        
         // Find the most recent visit with a next payment date
         let latestNextPaymentDate: bigint | null = null;
         
@@ -48,6 +55,7 @@ export function useUpcomingPayments(selectedDate?: Date) {
 
           // Only include parties with payments due on the selected date
           if (dateKey === targetDateKey) {
+            console.log(`[UpcomingPayments] Party ${party.name} has payment due on ${dateKey}`);
             partiesForDate.push({
               partyId,
               partyName: party.name,
@@ -58,6 +66,7 @@ export function useUpcomingPayments(selectedDate?: Date) {
         }
       }
 
+      console.log('[UpcomingPayments] Parties for date:', partiesForDate.length);
       // Sort by party name
       return partiesForDate.sort((a, b) => a.partyName.localeCompare(b.partyName));
     },

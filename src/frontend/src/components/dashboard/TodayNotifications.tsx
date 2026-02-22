@@ -1,13 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Phone, Bell, Loader2 } from 'lucide-react';
+import { Phone, Bell, Loader2, ArrowRight } from 'lucide-react';
 import { useTodayNotifications } from '../../hooks/queries/useTodayNotifications';
-import { useGetAllParties } from '../../hooks/queries/useParties';
 import { createTelLink } from '../../lib/phone';
+import { useNavigate } from '@tanstack/react-router';
 
 export default function TodayNotifications() {
   const { data: notifications = [], isLoading } = useTodayNotifications();
-  const { data: parties = [] } = useGetAllParties();
+  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -52,7 +52,7 @@ export default function TodayNotifications() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Bell className="h-5 w-5 text-primary" />
-          Payment Reminders
+          Payment Reminders - Fast Action Required
         </CardTitle>
         <CardDescription>
           {notifications.length} {notifications.length === 1 ? 'party has' : 'parties have'} payments due today
@@ -60,37 +60,59 @@ export default function TodayNotifications() {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {notifications.map(([partyId, records]) => {
-            const party = parties.find(([id]) => id === partyId)?.[1];
-            if (!party) return null;
+          {notifications.slice(0, 5).map((notification) => {
+            console.log('[TodayNotifications Render]', {
+              partyId: notification.partyId,
+              partyName: notification.partyName,
+              partyPhone: notification.partyPhone,
+              recordsCount: notification.records.length,
+            });
 
             return (
               <div
-                key={partyId}
+                key={notification.partyId}
                 className="flex items-center justify-between gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
               >
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold truncate">{party.name}</h3>
+                  <h3 className="font-semibold truncate">
+                    {notification.partyName || notification.partyId}
+                  </h3>
                   <p className="text-sm text-muted-foreground">
-                    {records.length} payment{records.length !== 1 ? 's' : ''} due
+                    {notification.records.length} payment{notification.records.length !== 1 ? 's' : ''} due
                   </p>
                 </div>
-                {party.phone && (
+                <div className="flex items-center gap-2">
+                  {notification.partyPhone && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      asChild
+                      className="shrink-0"
+                    >
+                      <a href={createTelLink(notification.partyPhone)}>
+                        <Phone className="h-4 w-4 mr-2" />
+                        Call
+                      </a>
+                    </Button>
+                  )}
                   <Button
                     size="sm"
-                    variant="default"
-                    asChild
-                    className="shrink-0"
+                    variant="outline"
+                    onClick={() => navigate({ to: '/parties/$partyId', params: { partyId: notification.partyId } })}
                   >
-                    <a href={createTelLink(party.phone)}>
-                      <Phone className="h-4 w-4 mr-2" />
-                      Call
-                    </a>
+                    <ArrowRight className="h-4 w-4" />
                   </Button>
-                )}
+                </div>
               </div>
             );
           })}
+          {notifications.length > 5 && (
+            <div className="text-center pt-2">
+              <Button variant="link" onClick={() => navigate({ to: '/reports' })}>
+                View all {notifications.length} parties in Advanced Reports
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

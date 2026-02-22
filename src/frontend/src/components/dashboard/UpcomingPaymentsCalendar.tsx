@@ -129,37 +129,47 @@ export default function UpcomingPaymentsCalendar() {
             </p>
           ) : (
             <div className="space-y-2">
-              {parties.map((party) => (
-                <div
-                  key={party.partyId}
-                  className="flex items-center justify-between gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
-                  onClick={() => navigate({ to: '/parties/$partyId', params: { partyId: party.partyId } })}
-                >
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium truncate">{party.partyName}</h4>
-                    {party.partyPhone && (
-                      <p className="text-sm text-muted-foreground">{party.partyPhone}</p>
-                    )}
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Next Payment: {new Date(Number(party.nextPaymentDate / BigInt(1_000_000))).toLocaleDateString('en-IN')}
-                    </p>
+              {parties.map((party) => {
+                console.log('[UpcomingPaymentsCalendar Render]', {
+                  partyId: party.partyId,
+                  partyName: party.partyName,
+                  partyPhone: party.partyPhone,
+                });
+
+                return (
+                  <div
+                    key={party.partyId}
+                    className="flex items-center justify-between gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors cursor-pointer"
+                    onClick={() => navigate({ to: '/parties/$partyId', params: { partyId: party.partyId } })}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium truncate">
+                        {party.partyName || party.partyId}
+                      </h4>
+                      {party.partyPhone && (
+                        <p className="text-sm text-muted-foreground">{party.partyPhone}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Next Payment: {new Date(Number(party.nextPaymentDate / BigInt(1_000_000))).toLocaleDateString('en-IN')}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {party.partyPhone && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          asChild
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <a href={createTelLink(party.partyPhone)}>
+                            <Phone className="h-4 w-4" />
+                          </a>
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {party.partyPhone && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        asChild
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <a href={createTelLink(party.partyPhone)}>
-                          <Phone className="h-4 w-4" />
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

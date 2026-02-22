@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Calendar, DollarSign, Phone } from 'lucide-react';
+import { Loader2, Calendar, DollarSign, Phone, TrendingUp } from 'lucide-react';
 import { useTodayDashboard } from '../hooks/queries/useTodayDashboard';
 import { formatMoney } from '../lib/format';
 import { formatDateTime } from '../lib/time';
@@ -25,18 +25,24 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Today's Dashboard</h1>
-        <p className="text-muted-foreground">Overview of today's visits and payments</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Fast View Dashboard</h1>
+          <p className="text-muted-foreground">Quick overview of today's activities</p>
+        </div>
+        <Button variant="outline" onClick={() => navigate({ to: '/reports' })}>
+          <TrendingUp className="h-4 w-4 mr-2" />
+          Advanced Reports
+        </Button>
       </div>
 
-      {/* Today's Notifications */}
+      {/* Today's Notifications - Priority Section */}
       <TodayNotifications />
 
       {/* Upcoming Payments Calendar */}
       <UpcomingPaymentsCalendar />
 
-      {/* Summary Cards */}
+      {/* Summary Cards - Quick Stats */}
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -65,7 +71,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Visits List */}
+      {/* Visits List - Simplified for Fast View */}
       <Card>
         <CardHeader>
           <CardTitle>Today's Visits</CardTitle>
@@ -80,7 +86,7 @@ export default function DashboardPage() {
             </p>
           ) : (
             <div className="space-y-3">
-              {visits.map((visit) => (
+              {visits.slice(0, 10).map((visit) => (
                 <Card key={`${visit.partyId}-${visit.paymentId}`} className="cursor-pointer hover:bg-accent/50 transition-colors">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-4">
@@ -111,7 +117,7 @@ export default function DashboardPage() {
                           variant="outline"
                           onClick={() => navigate({ to: '/parties/$partyId', params: { partyId: visit.partyId } })}
                         >
-                          View Party
+                          View
                         </Button>
                         {visit.partyPhone && (
                           <Button
@@ -129,6 +135,13 @@ export default function DashboardPage() {
                   </CardContent>
                 </Card>
               ))}
+              {visits.length > 10 && (
+                <div className="text-center pt-2">
+                  <Button variant="link" onClick={() => navigate({ to: '/reports' })}>
+                    View all {visits.length} visits in Advanced Reports
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </CardContent>

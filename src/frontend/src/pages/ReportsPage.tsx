@@ -2,13 +2,14 @@ import { useState, useMemo } from 'react';
 import { useGetAllParties } from '../hooks/queries/useParties';
 import { useActorSafe } from '../hooks/useActorSafe';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { formatMoney } from '../lib/format';
 import { formatDateTime, formatDate } from '../lib/time';
-import { Calendar, IndianRupee, MapPin, Search, X } from 'lucide-react';
+import { Calendar, IndianRupee, MapPin, Search, X, Filter, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import type { PartyId, PartyVisitRecord, PaymentId } from '../backend';
 
 export default function ReportsPage() {
@@ -31,7 +32,7 @@ export default function ReportsPage() {
     });
   }, [parties, searchQuery]);
 
-  // Fetch full visit records instead of just metadata
+  // Fetch full visit records for advanced view
   const { data: payments = [] } = useQuery<Array<[PaymentId, PartyVisitRecord]>>({
     queryKey: ['fullPayments', selectedPartyId],
     queryFn: async () => {
@@ -44,16 +45,44 @@ export default function ReportsPage() {
   const selectedParty = parties.find(([id]) => id === selectedPartyId)?.[1];
   const latestPayment = payments.length > 0 ? payments[payments.length - 1][1] : null;
 
+  // Calculate advanced analytics
+  const analytics = useMemo(() => {
+    if (payments.length === 0) return null;
+
+    const totalPaid = payments.reduce((sum, [_, p]) => sum + p.amount, BigInt(0));
+    const paymentsWithLocation = payments.filter(([_, p]) => p.location).length;
+    const paymentsWithNextDate = payments.filter(([_, p]) => p.nextPaymentDate).length;
+    const averagePayment = payments.length > 0 ? Number(totalPaid) / payments.length : 0;
+
+    return {
+      totalPaid,
+      paymentsWithLocation,
+      paymentsWithNextDate,
+      averagePayment,
+      totalPayments: payments.length,
+    };
+  }, [payments]);
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Reports</h1>
-        <p className="text-muted-foreground">View payment history and analytics</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <TrendingUp className="h-8 w-8" />
+            Advanced Reports
+          </h1>
+          <p className="text-muted-foreground">Detailed payment history and comprehensive analytics</p>
+        </div>
+        <Badge variant="secondary" className="text-sm">
+          <Filter className="h-3 w-3 mr-1" />
+          Advanced View
+        </Badge>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Select Party</CardTitle>
+          <CardTitle>Select Party for Detailed Analysis</CardTitle>
+          <CardDescription>Search and filter parties to view comprehensive payment history</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Search Input */}
@@ -80,7 +109,7 @@ export default function ReportsPage() {
           {/* Party Selector */}
           <Select value={selectedPartyId || ''} onValueChange={setSelectedPartyId}>
             <SelectTrigger>
-              <SelectValue placeholder="Choose a party to view reports" />
+              <SelectValue placeholder="Choose a party to view detailed reports" />
             </SelectTrigger>
             <SelectContent>
               {partiesLoading ? (
@@ -94,7 +123,7 @@ export default function ReportsPage() {
               ) : (
                 filteredParties.map(([id, party]) => (
                   <SelectItem key={id} value={id}>
-                    {party.name}
+                    {party.name} - {party.phone}
                   </SelectItem>
                 ))
               )}
@@ -105,7 +134,8 @@ export default function ReportsPage() {
 
       {selectedParty && (
         <>
-          <div className="grid gap-6 md:grid-cols-2">
+          {/* Advanced Analytics Cards */}
+          <div className="grid gap-6 md:grid-cols-3">
             <Card>
               <CardHeader>
                 <CardTitle>Party Summary</CardTitle>
@@ -116,60 +146,116 @@ export default function ReportsPage() {
                   <p className="font-medium">{selectedParty.name}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-muted-foreground">Due Amount</span>
-                  <p className="text-xl font-bold text-primary">{formatMoney(selectedParty.dueAmount)}</p>
+                  <span className="text-sm text-muted-foreground">Phone</span>
+                  <p className="font-medium">{selectedParty.phone}</p>
                 </div>
                 <div>
-                  <span className="text-sm text-muted-foreground">Total Payments</span>
-                  <p className="font-medium">{payments.length}</p>
+                  <span className="text-sm text-muted-foreground">Address</span>
+                  <p className="font-medium text-sm">{selectedParty.address || 'N/A'}</p>
+                </div>
+                <div>
+                  <span className="text-sm text-muted-foreground">PAN</span>
+                  <p className="font-medium">{selectedParty.pan || 'N/A'}</p>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle>Latest Payment</CardTitle>
+                <CardTitle>Financial Overview</CardTitle>
               </CardHeader>
-              <CardContent>
-                {latestPayment ? (
-                  <div className="space-y-3">
+              <CardContent className="space-y-3">
+                <div>
+                  <span className="text-sm text-muted-foreground">Current Due Amount</span>
+                  <p className="text-xl font-bold text-primary">{formatMoney(selectedParty.dueAmount)}</p>
+                </div>
+                {analytics && (
+                  <>
                     <div>
-                      <span className="text-sm text-muted-foreground">Amount</span>
-                      <p className="text-xl font-bold text-primary">{formatMoney(latestPayment.amount)}</p>
+                      <span className="text-sm text-muted-foreground">Total Paid (All Time)</span>
+                      <p className="text-lg font-bold text-green-600">{formatMoney(analytics.totalPaid)}</p>
                     </div>
                     <div>
-                      <span className="text-sm text-muted-foreground">Date</span>
-                      <p className="font-medium">{formatDateTime(latestPayment.paymentDate)}</p>
+                      <span className="text-sm text-muted-foreground">Average Payment</span>
+                      <p className="font-medium">{formatMoney(BigInt(Math.round(analytics.averagePayment)))}</p>
                     </div>
-                    {latestPayment.nextPaymentDate && (
-                      <div>
-                        <span className="text-sm text-muted-foreground">Next Payment</span>
-                        <p className="font-medium">{formatDate(latestPayment.nextPaymentDate)}</p>
-                      </div>
-                    )}
-                    {latestPayment.comment && latestPayment.comment.trim() !== '' && (
-                      <div>
-                        <span className="text-sm text-muted-foreground">Comment</span>
-                        <p className="font-medium italic">{latestPayment.comment}</p>
-                      </div>
-                    )}
-                    {latestPayment.location && (
-                      <div className="flex items-center gap-1 text-sm text-green-600">
-                        <MapPin className="h-4 w-4" />
-                        <span>Location saved</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-muted-foreground">No payments recorded yet</p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Statistics</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div>
+                  <span className="text-sm text-muted-foreground">Total Payments</span>
+                  <p className="text-xl font-bold">{payments.length}</p>
+                </div>
+                {analytics && (
+                  <>
+                    <div>
+                      <span className="text-sm text-muted-foreground">With Location Data</span>
+                      <p className="font-medium">{analytics.paymentsWithLocation} ({Math.round((analytics.paymentsWithLocation / analytics.totalPayments) * 100)}%)</p>
+                    </div>
+                    <div>
+                      <span className="text-sm text-muted-foreground">With Next Payment Date</span>
+                      <p className="font-medium">{analytics.paymentsWithNextDate} ({Math.round((analytics.paymentsWithNextDate / analytics.totalPayments) * 100)}%)</p>
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>
           </div>
 
+          {/* Latest Payment Details */}
+          {latestPayment && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Latest Payment Details</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <span className="text-sm text-muted-foreground">Amount</span>
+                    <p className="text-2xl font-bold text-primary">{formatMoney(latestPayment.amount)}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-muted-foreground">Payment Date</span>
+                    <p className="font-medium">{formatDateTime(latestPayment.paymentDate)}</p>
+                  </div>
+                  {latestPayment.nextPaymentDate && (
+                    <div>
+                      <span className="text-sm text-muted-foreground">Next Payment Scheduled</span>
+                      <p className="font-medium">{formatDate(latestPayment.nextPaymentDate)}</p>
+                    </div>
+                  )}
+                  {latestPayment.comment && latestPayment.comment.trim() !== '' && (
+                    <div>
+                      <span className="text-sm text-muted-foreground">Comment</span>
+                      <p className="font-medium italic">{latestPayment.comment}</p>
+                    </div>
+                  )}
+                  {latestPayment.location && (
+                    <div>
+                      <span className="text-sm text-muted-foreground">Location</span>
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <MapPin className="h-4 w-4" />
+                        <span>Lat: {latestPayment.location.latitude.toFixed(6)}, Lng: {latestPayment.location.longitude.toFixed(6)}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Complete Payment History */}
           <Card>
             <CardHeader>
-              <CardTitle>Payment History</CardTitle>
+              <CardTitle>Complete Payment History</CardTitle>
+              <CardDescription>All {payments.length} payment records with full details</CardDescription>
             </CardHeader>
             <CardContent>
               {payments.length === 0 ? (
@@ -179,20 +265,22 @@ export default function ReportsPage() {
               ) : (
                 <div className="space-y-3">
                   {payments.map(([paymentId, payment]) => (
-                    <div key={paymentId} className="border rounded-lg p-4 space-y-2">
+                    <div key={paymentId} className="border rounded-lg p-4 space-y-3 hover:bg-accent/30 transition-colors">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <IndianRupee className="h-4 w-4 text-primary" />
+                          <IndianRupee className="h-5 w-5 text-primary" />
                           <span className="font-bold text-lg">{formatMoney(payment.amount)}</span>
                         </div>
-                        <span className="text-sm text-muted-foreground">
-                          {formatDateTime(payment.paymentDate)}
-                        </span>
+                        <div className="text-right">
+                          <p className="text-sm font-medium">{formatDateTime(payment.paymentDate)}</p>
+                          <p className="text-xs text-muted-foreground">ID: {paymentId}</p>
+                        </div>
                       </div>
                       
                       {payment.comment && payment.comment.trim() !== '' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p className="italic">{payment.comment}</p>
+                        <div className="text-sm">
+                          <span className="text-muted-foreground">Comment: </span>
+                          <span className="italic">{payment.comment}</span>
                         </div>
                       )}
                       
@@ -206,9 +294,9 @@ export default function ReportsPage() {
                         )}
                         
                         {payment.location && (
-                          <div className="flex items-center gap-1 text-sm text-green-600">
+                          <div className="flex items-center gap-2 text-sm text-green-600">
                             <MapPin className="h-4 w-4" />
-                            <span>Location saved</span>
+                            <span>Location: {payment.location.latitude.toFixed(4)}, {payment.location.longitude.toFixed(4)}</span>
                           </div>
                         )}
                       </div>

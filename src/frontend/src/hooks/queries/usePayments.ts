@@ -43,9 +43,12 @@ export function useRecordPayment() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['payments', variables.partyId] });
+      queryClient.invalidateQueries({ queryKey: ['party', variables.partyId] });
       queryClient.invalidateQueries({ queryKey: ['parties'] });
       queryClient.invalidateQueries({ queryKey: ['todayDashboard'] });
       queryClient.invalidateQueries({ queryKey: ['mapLocationData'] });
+      queryClient.invalidateQueries({ queryKey: ['todayNotifications'] });
+      queryClient.invalidateQueries({ queryKey: ['upcomingPayments'] });
     },
   });
 }
@@ -75,9 +78,12 @@ export function useRecordPartyVisit() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['payments', variables.partyId] });
+      queryClient.invalidateQueries({ queryKey: ['party', variables.partyId] });
       queryClient.invalidateQueries({ queryKey: ['parties'] });
       queryClient.invalidateQueries({ queryKey: ['todayDashboard'] });
       queryClient.invalidateQueries({ queryKey: ['mapLocationData'] });
+      queryClient.invalidateQueries({ queryKey: ['todayNotifications'] });
+      queryClient.invalidateQueries({ queryKey: ['upcomingPayments'] });
     },
   });
 }

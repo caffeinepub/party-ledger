@@ -15,8 +15,6 @@ import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-
-
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -261,7 +259,13 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view parties");
     };
-    parties.toArray();
+    let partiesArray = parties.toArray();
+    let sortedParties = partiesArray.sort(
+      func(a, b) {
+        return Text.compare(a.0, b.0);
+      }
+    );
+    sortedParties;
   };
 
   public query ({ caller }) func getAllPartiesWithVisitRecords() : async [(Text, Party, [PartyVisitRecord])] {
@@ -636,4 +640,3 @@ actor {
     resultList.toArray();
   };
 };
-

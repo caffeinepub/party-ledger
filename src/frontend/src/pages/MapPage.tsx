@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState, useMemo, memo } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { useMapLocationData } from '../hooks/queries/useMapLocationData';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Loader2, MapPin, AlertCircle, RefreshCw, Calendar, X, Search } from 'lucide-react';
+import { Loader2, MapPin, AlertCircle, RefreshCw, Calendar, X, Search, Filter, Map } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { dateToTime, dateToDatetimeLocal } from '../lib/time';
 
 // Leaflet types
@@ -165,22 +166,25 @@ const MapPage = memo(function MapPage() {
 
     const bounds: any[] = [];
 
-    // Add markers to cluster group
+    // Add markers to cluster group with enhanced popup information
     markerData.forEach((location) => {
       const marker = L.marker([location.latitude, location.longitude], { icon: customIcon });
 
-      // Lazy load popup content
+      // Lazy load popup content with advanced details
       marker.on('click', () => {
         const popupContent = `
-          <div style="min-width: 200px;">
+          <div style="min-width: 220px;">
             <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600;">${location.partyName}</h3>
-            <p style="margin: 4px 0; font-size: 14px; color: #666;">${location.address}</p>
-            <p style="margin: 4px 0; font-size: 14px;"><strong>Visits:</strong> ${location.visitCount}</p>
+            <p style="margin: 4px 0; font-size: 13px; color: #666;">${location.address}</p>
+            <div style="margin: 8px 0; padding: 8px; background: #f5f5f5; border-radius: 4px;">
+              <p style="margin: 2px 0; font-size: 13px;"><strong>Total Visits:</strong> ${location.visitCount}</p>
+              <p style="margin: 2px 0; font-size: 12px; color: #666;">Coordinates: ${location.latitude.toFixed(4)}, ${location.longitude.toFixed(4)}</p>
+            </div>
             <button 
               id="view-party-${location.partyId}" 
               style="
                 margin-top: 8px;
-                padding: 6px 12px;
+                padding: 8px 12px;
                 background-color: oklch(0.55 0.15 250);
                 color: white;
                 border: none;
@@ -188,9 +192,10 @@ const MapPage = memo(function MapPage() {
                 cursor: pointer;
                 font-size: 14px;
                 width: 100%;
+                font-weight: 500;
               "
             >
-              View Party Details
+              View Full Party Details
             </button>
           </div>
         `;
@@ -298,7 +303,7 @@ const MapPage = memo(function MapPage() {
             <div className="w-full h-[600px] rounded-lg border border-border overflow-hidden bg-muted flex items-center justify-center">
               <div className="text-center">
                 <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-                <p className="text-muted-foreground">Loading party locations...</p>
+                <p className="text-muted-foreground">Loading advanced map view...</p>
               </div>
             </div>
           </CardContent>
@@ -336,18 +341,26 @@ const MapPage = memo(function MapPage() {
       <div className="container mx-auto px-4 py-8">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              Visit Map
-            </CardTitle>
-            <CardDescription>
-              {hasActiveFilters 
-                ? 'No party visits with location data found for the selected date range'
-                : 'No party visits with location data found'}
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Map className="h-5 w-5" />
+                  Advanced Visit Map
+                </CardTitle>
+                <CardDescription>
+                  {hasActiveFilters 
+                    ? 'No party visits with location data found for the selected date range'
+                    : 'No party visits with location data found'}
+                </CardDescription>
+              </div>
+              <Badge variant="secondary">
+                <Filter className="h-3 w-3 mr-1" />
+                Advanced View
+              </Badge>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Date Filter Controls */}
+            {/* Advanced Date Filter Controls */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
               <div className="space-y-2">
                 <Label htmlFor="startDate" className="flex items-center gap-2">
@@ -416,22 +429,30 @@ const MapPage = memo(function MapPage() {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 justify-between">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5" />
-              Visit Map
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Map className="h-5 w-5" />
+                Advanced Visit Map
+              </CardTitle>
+              <CardDescription>
+                {dateRangeDisplay} • {locationData.length} {locationData.length === 1 ? 'location' : 'locations'} with recorded visits
+              </CardDescription>
             </div>
-            <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-          </CardTitle>
-          <CardDescription>
-            {dateRangeDisplay} • {locationData.length} {locationData.length === 1 ? 'location' : 'locations'} with recorded visits
-          </CardDescription>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary">
+                <Filter className="h-3 w-3 mr-1" />
+                Advanced View
+              </Badge>
+              <Button variant="outline" size="sm" onClick={() => refetch()} disabled={isFetching}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Date Filter Controls */}
+          {/* Advanced Date Filter Controls */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
             <div className="space-y-2">
               <Label htmlFor="startDate" className="flex items-center gap-2">

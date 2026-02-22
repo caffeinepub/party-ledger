@@ -1,45 +1,152 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-22T06:35:17.282Z",
+  "generatedAt": "2026-02-22T08:28:29.058Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 13,
+    "implemented": 4,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Set the map date range filter to default to today's date (both 'from' and 'to' set to current date) when the MapPage initially loads",
+        "summary": "Remove all password-related types from backend/migration.mo: delete OldStaffAccount type containing password field, delete OldActor type containing adminPassword and secondaryAdminLogin fields, and remove stable var oldStaffAccounts if still present",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-10",
+        "summary": "Update coverage.json and feature_evidence.json to reflect all 7 requirements as implemented by re-running the build process",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/MapPage.tsx"
+          "coverage.json",
+          "feature_evidence.json"
         ],
         "matchedFiles": [
-          "frontend/src/pages/MapPage.tsx"
+          "feature_evidence.json"
+        ]
+      },
+      {
+        "id": "REQ-11",
+        "summary": "Regenerate frontend-file-summaries.txt to remove all old password-related descriptions",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend-file-summaries.txt"
+        ],
+        "matchedFiles": [
+          "frontend-file-summaries.txt"
+        ]
+      },
+      {
+        "id": "REQ-12",
+        "summary": "Update SettingsPage.tsx to ensure the Admin tab only displays AdminPrincipalsPanel with no leftover staff panel references",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/pages/SettingsPage.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-13",
+        "summary": "Add a visual note in AdminPrincipalsPanel.tsx displaying 'At least one admin is required' when only one admin principal remains",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/admin/AdminPrincipalsPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/admin/AdminPrincipalsPanel.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Add a search button next to the date range inputs that triggers the map data filter when clicked",
+        "summary": "Make migration function in backend/migration.mo aggressive in wiping password data: when migrating staff accounts, copy only principal and name fields to newStaff, explicitly excluding any password field",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Confirm and remove all password-related code from backend/main.mo: verify there are no references to adminPassword, staffPasswords, verifyAdminPassword, or any password-related stable variables or actor state; ensure access control mixin with isAdmin(caller) is the only mechanism guarding admin endpoints",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Delete password-related frontend files entirely: frontend/src/components/auth/StaffLoginScreen.tsx, frontend/src/components/auth/ResetAdminPasswordDialog.tsx, frontend/src/context/StaffAuthContext.tsx, frontend/src/hooks/useStaffAuth.ts, frontend/src/utils/staffSession.ts",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/auth/StaffLoginScreen.tsx",
+          "frontend/src/components/auth/ResetAdminPasswordDialog.tsx",
+          "frontend/src/context/StaffAuthContext.tsx",
+          "frontend/src/hooks/useStaffAuth.ts",
+          "frontend/src/utils/staffSession.ts"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Clean or delete frontend/src/hooks/queries/useStaffAdmin.ts by removing all reset-password functions; if file becomes empty after cleanup, delete it entirely",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/hooks/queries/useStaffAdmin.ts"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Delete frontend/src/components/admin/StaffManagementPanel.tsx as admin management is now handled by AdminPrincipalsPanel.tsx",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/admin/StaffManagementPanel.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Remove all imports and references to deleted password-related files across the frontend codebase: search and update App.tsx, main.tsx, SettingsPage.tsx, AppShell.tsx, and AppReadinessContext.tsx to remove imports of staffAuth, useStaffAuth, StaffAuthProvider, StaffLoginScreen, ResetAdminPasswordDialog, StaffAuthContext, and staffSession utilities",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/App.tsx",
+          "frontend/src/main.tsx",
+          "frontend/src/pages/SettingsPage.tsx",
+          "frontend/src/components/layout/AppShell.tsx",
+          "frontend/src/context/AppReadinessContext.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Regenerate frontend bindings by running dfx generate and remove temporary type casts (as any) from frontend/src/hooks/queries/useAdminPrincipals.ts",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/hooks/queries/useAdminPrincipals.ts"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-9",
+        "summary": "Update project_state.json to reflect completion: set new_feature_requests to empty array, update summary to 'Admin Management System with Internet Identity Principal-based access control – FULLY MIGRATED', and add backend features to existing_features if desired",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/MapPage.tsx"
+          "project_state.json"
         ],
         "matchedFiles": [
-          "frontend/src/pages/MapPage.tsx"
+          "project_state.json"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/MapPage.tsx",
+    "frontend/src/components/admin/AdminPrincipalsPanel.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

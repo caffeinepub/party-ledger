@@ -3,7 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Plus, Trash2, Shield } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Plus, Trash2, Shield, AlertCircle } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -94,7 +95,16 @@ export default function AdminPrincipalsPanel() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          {!canRemove && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                At least one admin is required. You cannot remove the last admin Principal from the system.
+              </AlertDescription>
+            </Alert>
+          )}
+
           {!adminPrincipals || adminPrincipals.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
               No admin principals found.
@@ -141,11 +151,6 @@ export default function AdminPrincipalsPanel() {
                 </TableBody>
               </Table>
             </div>
-          )}
-          {!canRemove && (
-            <p className="text-xs text-muted-foreground mt-4">
-              At least one admin Principal must remain in the system.
-            </p>
           )}
         </CardContent>
       </Card>
