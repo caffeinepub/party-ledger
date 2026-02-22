@@ -1,51 +1,37 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Add dashboard notifications and report search",
+  "title": "Default map to today's data with search button",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Display notifications on the dashboard for parties whose next visit day is today, showing the party name and a clickable call button that initiates a direct phone call",
+      "summary": "Set the map date range filter to default to today's date when MapPage initially loads",
       "acceptanceCriteria": [
-        "Dashboard shows a notification section listing all parties where the next payment date equals today's date",
-        "Each notification entry displays the party name",
-        "Each notification includes a call button/icon that uses the tel: link format to initiate a phone call",
-        "Notifications are visible immediately when the dashboard loads",
-        "Empty state is shown when no parties have next visit date scheduled for today"
+        "When MapPage loads, the date range inputs show today's date",
+        "Map displays only parties with visits from today by default",
+        "No user interaction required to see today's data"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/queries/useTodayNotifications.ts",
-          "operation": "create",
-          "description": "Create a React Query hook that fetches parties with today's due payments using the backend method getPartiesWithTodayDuePayments(). Returns an array of parties with their visit records where the next payment date matches today. Configure auto-refresh every minute to keep notifications current. Handle loading and error states appropriately."
-        },
-        {
-          "path": "frontend/src/components/dashboard/TodayNotifications.tsx",
-          "operation": "create",
-          "description": "Create a notification component that displays parties with payments due today. Use the useTodayNotifications hook to fetch data. For each party, display the party name and a phone icon button that uses the tel: link format from frontend/src/lib/phone.ts (createTelLink function). Show an empty state message when no notifications exist. Style consistently with existing dashboard components using shadcn/ui Card components."
-        },
-        {
-          "path": "frontend/src/pages/DashboardPage.tsx",
+          "path": "frontend/src/pages/MapPage.tsx",
           "operation": "modify",
-          "description": "Add the TodayNotifications component at the top of the dashboard, above the existing summary cards. Import and render the component to display notifications for parties with payments due today. Ensure the notifications section is prominently visible when the page loads."
+          "description": "Initialize the startDate and endDate state variables to today's date using new Date() instead of null values. This ensures the date inputs display today's date on initial load and the useMapLocationData hook fetches only today's visit data by default."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Add a search box to the Reports page that filters the party dropdown by party name, phone number, or PAN",
+      "summary": "Add a search button next to the date range inputs that triggers the map data filter when clicked",
       "acceptanceCriteria": [
-        "Search box is placed above or integrated with the party selector dropdown on the Reports page",
-        "Search filters parties by matching text against party name, phone number, or PAN",
-        "Search is case-insensitive",
-        "Filtered results update in real-time as the user types",
-        "Search box has a clear/reset button to remove the filter"
+        "A search button appears in the MapPage date filter controls",
+        "Clicking the search button updates the map with the selected date range",
+        "Map data only updates when the search button is clicked, not automatically on date input change"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/ReportsPage.tsx",
+          "path": "frontend/src/pages/MapPage.tsx",
           "operation": "modify",
-          "description": "Add a search input field above the party selector dropdown. Implement local state for the search query using useState. Filter the parties array client-side by checking if the search query (case-insensitive) matches any of: party name, phone number, or PAN. Use the filtered array to populate the party selector dropdown. Add a clear button (X icon) that appears when text is entered to reset the search query. Use shadcn/ui Input component with proper spacing and styling consistent with the existing page layout."
+          "description": "Add a search button to the date filter UI controls section. Introduce a separate internal state for the pending date selections (pendingStartDate and pendingEndDate) that updates as the user changes the date inputs. The actual startDate and endDate state variables (used by useMapLocationData) should only update when the search button is clicked. This decouples the input changes from the map data fetching, ensuring the map only refreshes on explicit search button click. Position the search button next to the date inputs in the existing filter controls layout."
         }
       ]
     }

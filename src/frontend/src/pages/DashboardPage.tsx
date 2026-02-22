@@ -7,6 +7,7 @@ import { formatDateTime } from '../lib/time';
 import { createTelLink } from '../lib/phone';
 import { useNavigate } from '@tanstack/react-router';
 import TodayNotifications from '../components/dashboard/TodayNotifications';
+import UpcomingPaymentsCalendar from '../components/dashboard/UpcomingPaymentsCalendar';
 
 export default function DashboardPage() {
   const { data, isLoading } = useTodayDashboard();
@@ -31,6 +32,9 @@ export default function DashboardPage() {
 
       {/* Today's Notifications */}
       <TodayNotifications />
+
+      {/* Upcoming Payments Calendar */}
+      <UpcomingPaymentsCalendar />
 
       {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2">

@@ -167,6 +167,11 @@ export const idlService = IDL.Service({
       [IDL.Vec(IDL.Tuple(PartyId, IDL.Vec(PartyVisitRecord)))],
       ['query'],
     ),
+  'getPartiesWithVisits' : IDL.Func(
+      [IDL.Opt(Time), IDL.Opt(Time), IDL.Bool],
+      [IDL.Vec(IDL.Tuple(PartyId, IDL.Vec(PartyVisitRecord)))],
+      ['query'],
+    ),
   'getParty' : IDL.Func(
       [PartyId],
       [
@@ -397,6 +402,11 @@ export const idlFactory = ({ IDL }) => {
     'getLogs' : IDL.Func([], [IDL.Vec(IDL.Tuple(Time, IDL.Text))], ['query']),
     'getPartiesWithTodayDuePayments' : IDL.Func(
         [],
+        [IDL.Vec(IDL.Tuple(PartyId, IDL.Vec(PartyVisitRecord)))],
+        ['query'],
+      ),
+    'getPartiesWithVisits' : IDL.Func(
+        [IDL.Opt(Time), IDL.Opt(Time), IDL.Bool],
         [IDL.Vec(IDL.Tuple(PartyId, IDL.Vec(PartyVisitRecord)))],
         ['query'],
       ),

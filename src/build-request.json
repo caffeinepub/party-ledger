@@ -1,81 +1,53 @@
 {
   "kind": "build_request",
-  "title": "Add dashboard notifications and report search",
-  "projectName": "Party Ledger",
+  "title": "Default map to today's data with search button",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Display notifications on the dashboard for parties whose next visit day is today, showing the party name and a clickable call button that initiates a direct phone call",
+      "text": "Set the map date range filter to default to today's date (both 'from' and 'to' set to current date) when the MapPage initially loads",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-latest"
+          "msg-latest"
         ],
         "quotes": [
-          "Need notifications in dashboard next visit day is today show and give call sign for direct call"
+          "in map show by default today"
         ]
       },
       "acceptanceCriteria": [
-        "Dashboard shows a notification section listing all parties where the next payment date equals today's date",
-        "Each notification entry displays the party name",
-        "Each notification includes a call button/icon that uses the tel: link format to initiate a phone call",
-        "Notifications are visible immediately when the dashboard loads",
-        "Empty state is shown when no parties have next visit date scheduled for today"
+        "When MapPage loads, the date range inputs show today's date",
+        "Map displays only parties with visits from today by default",
+        "No user interaction required to see today's data"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Add a search box to the Reports page that filters the party dropdown by party name, phone number, or PAN",
+      "text": "Add a search button next to the date range inputs that triggers the map data filter when clicked",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-latest"
+          "msg-latest"
         ],
         "quotes": [
-          "select party in report add search box"
+          "if choose 1 date and click on search button then show data"
         ]
       },
       "acceptanceCriteria": [
-        "Search box is placed above or integrated with the party selector dropdown on the Reports page",
-        "Search filters parties by matching text against party name, phone number, or PAN",
-        "Search is case-insensitive",
-        "Filtered results update in real-time as the user types",
-        "Search box has a clear/reset button to remove the filter"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Implement a backend query to fetch parties whose next payment date matches today's date for dashboard notifications",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-user-latest"
-        ],
-        "quotes": [
-          "Need notifications in dashboard next visit day is today show"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend provides a query function that returns parties filtered by next payment date equal to current date",
-        "Query returns party ID, name, phone number, and next payment date",
-        "Function efficiently filters through payment records to find the most recent next payment date for each party",
-        "Date comparison accounts for timezone and compares only the date portion (year, month, day)"
+        "A search button appears in the MapPage date filter controls",
+        "Clicking the search button updates the map with the selected date range",
+        "Map data only updates when the search button is clicked, not automatically on date input change"
       ]
     }
   ],
   "constraints": [
-    "Do not modify immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui",
-    "Maintain single-actor architecture with all Motoko logic in backend/main.mo",
-    "Use existing phone formatting utilities from frontend/src/lib/phone.ts for call links",
-    "Follow existing date/time handling patterns from frontend/src/lib/time.ts"
+    "Preserve existing date range filter UI components in MapPage",
+    "Maintain compatibility with existing useMapLocationData hook"
   ],
   "nonGoals": [
-    "Push notifications or browser notifications",
-    "SMS or email notification delivery",
-    "Notification scheduling or reminder system",
-    "Advanced search with filters beyond text matching",
-    "Notification read/unread status tracking"
+    "Changing the map marker clustering behavior",
+    "Modifying backend visit data structure",
+    "Adding date validation beyond what already exists"
   ],
   "imageRequirements": {
     "required": [],

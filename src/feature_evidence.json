@@ -2,12 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-display-notifications-on-the-dashboard-for-parties-whose-next-visit-day-is-today-showing-the-party-name-and-a-clickable-call-button-that-initiates-a-direct-phone-call",
-      "featureTitle": "Display notifications on the dashboard for parties whose next visit day is today, showing the party name and a clickable call button that initiates a direct phone call",
+      "featureId": "feature-set-the-map-date-range-filter-to-default-to-today-s-date-both-from-and-to-set-to-current-date-when-the-mappage-initially-loads",
+      "featureTitle": "Set the map date range filter to default to today's date (both 'from' and 'to' set to current date) when the MapPage initially loads",
       "files": [
-        "frontend/src/components/dashboard/TodayNotifications.tsx",
-        "frontend/src/hooks/queries/useTodayNotifications.ts",
-        "frontend/src/pages/DashboardPage.tsx"
+        "frontend/src/pages/MapPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -24,10 +22,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-add-a-search-box-to-the-reports-page-that-filters-the-party-dropdown-by-party-name-phone-number-or-pan",
-      "featureTitle": "Add a search box to the Reports page that filters the party dropdown by party name, phone number, or PAN",
+      "featureId": "feature-add-a-search-button-next-to-the-date-range-inputs-that-triggers-the-map-data-filter-when-clicked",
+      "featureTitle": "Add a search button next to the date range inputs that triggers the map data filter when clicked",
       "files": [
-        "frontend/src/pages/ReportsPage.tsx"
+        "frontend/src/pages/MapPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",

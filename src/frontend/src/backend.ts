@@ -230,6 +230,7 @@ export interface backendInterface {
     getCallerUserRole(): Promise<UserRole>;
     getLogs(): Promise<Array<[Time, string]>>;
     getPartiesWithTodayDuePayments(): Promise<Array<[PartyId, Array<PartyVisitRecord>]>>;
+    getPartiesWithVisits(startDate: Time | null, endDate: Time | null, includeLocation: boolean): Promise<Array<[PartyId, Array<PartyVisitRecord>]>>;
     getParty(_id: PartyId): Promise<{
         pan: string;
         name: string;
@@ -537,6 +538,20 @@ export class Backend implements backendInterface {
             return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
         }
     }
+    async getPartiesWithVisits(arg0: Time | null, arg1: Time | null, arg2: boolean): Promise<Array<[PartyId, Array<PartyVisitRecord>]>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPartiesWithVisits(to_candid_opt_n42(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n42(this._uploadFile, this._downloadFile, arg1), arg2);
+                return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPartiesWithVisits(to_candid_opt_n42(this._uploadFile, this._downloadFile, arg0), to_candid_opt_n42(this._uploadFile, this._downloadFile, arg1), arg2);
+            return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
+        }
+    }
     async getParty(arg0: PartyId): Promise<{
         pan: string;
         name: string;
@@ -547,14 +562,14 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.getParty(arg0);
-                return from_candid_opt_n42(this._uploadFile, this._downloadFile, result);
+                return from_candid_opt_n43(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.getParty(arg0);
-            return from_candid_opt_n42(this._uploadFile, this._downloadFile, result);
+            return from_candid_opt_n43(this._uploadFile, this._downloadFile, result);
         }
     }
     async getPartyIdTest(arg0: string, arg1: string): Promise<string> {
@@ -630,14 +645,14 @@ export class Backend implements backendInterface {
     async importUpgradeData(arg0: UpgradeData): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.importUpgradeData(await to_candid_UpgradeData_n43(this._uploadFile, this._downloadFile, arg0));
+                const result = await this.actor.importUpgradeData(await to_candid_UpgradeData_n44(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.importUpgradeData(await to_candid_UpgradeData_n43(this._uploadFile, this._downloadFile, arg0));
+            const result = await this.actor.importUpgradeData(await to_candid_UpgradeData_n44(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
@@ -673,41 +688,41 @@ export class Backend implements backendInterface {
         if (this.processError) {
             try {
                 const result = await this.actor.paginatedPartyVisitRecords(arg0, arg1, arg2);
-                return from_candid_PaginatedPartyVisitRecordResponse_n53(this._uploadFile, this._downloadFile, result);
+                return from_candid_PaginatedPartyVisitRecordResponse_n54(this._uploadFile, this._downloadFile, result);
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
             const result = await this.actor.paginatedPartyVisitRecords(arg0, arg1, arg2);
-            return from_candid_PaginatedPartyVisitRecordResponse_n53(this._uploadFile, this._downloadFile, result);
+            return from_candid_PaginatedPartyVisitRecordResponse_n54(this._uploadFile, this._downloadFile, result);
         }
     }
     async recordPartyVisit(arg0: PartyId, arg1: bigint, arg2: string, arg3: Time, arg4: Time | null, arg5: Location | null): Promise<string> {
         if (this.processError) {
             try {
-                const result = await this.actor.recordPartyVisit(arg0, arg1, arg2, arg3, to_candid_opt_n57(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n58(this._uploadFile, this._downloadFile, arg5));
+                const result = await this.actor.recordPartyVisit(arg0, arg1, arg2, arg3, to_candid_opt_n42(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n58(this._uploadFile, this._downloadFile, arg5));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.recordPartyVisit(arg0, arg1, arg2, arg3, to_candid_opt_n57(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n58(this._uploadFile, this._downloadFile, arg5));
+            const result = await this.actor.recordPartyVisit(arg0, arg1, arg2, arg3, to_candid_opt_n42(this._uploadFile, this._downloadFile, arg4), to_candid_opt_n58(this._uploadFile, this._downloadFile, arg5));
             return result;
         }
     }
     async recordPayment(arg0: PartyId, arg1: bigint, arg2: string, arg3: Time, arg4: Time | null): Promise<string> {
         if (this.processError) {
             try {
-                const result = await this.actor.recordPayment(arg0, arg1, arg2, arg3, to_candid_opt_n57(this._uploadFile, this._downloadFile, arg4));
+                const result = await this.actor.recordPayment(arg0, arg1, arg2, arg3, to_candid_opt_n42(this._uploadFile, this._downloadFile, arg4));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.recordPayment(arg0, arg1, arg2, arg3, to_candid_opt_n57(this._uploadFile, this._downloadFile, arg4));
+            const result = await this.actor.recordPayment(arg0, arg1, arg2, arg3, to_candid_opt_n42(this._uploadFile, this._downloadFile, arg4));
             return result;
         }
     }
@@ -785,8 +800,8 @@ export class Backend implements backendInterface {
 async function from_candid_ExternalBlob_n23(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _ExternalBlob): Promise<ExternalBlob> {
     return await _downloadFile(value);
 }
-function from_candid_PaginatedPartyVisitRecordResponse_n53(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PaginatedPartyVisitRecordResponse): PaginatedPartyVisitRecordResponse {
-    return from_candid_record_n54(_uploadFile, _downloadFile, value);
+function from_candid_PaginatedPartyVisitRecordResponse_n54(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PaginatedPartyVisitRecordResponse): PaginatedPartyVisitRecordResponse {
+    return from_candid_record_n55(_uploadFile, _downloadFile, value);
 }
 function from_candid_PartyVisitRecord_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _PartyVisitRecord): PartyVisitRecord {
     return from_candid_record_n16(_uploadFile, _downloadFile, value);
@@ -821,7 +836,7 @@ function from_candid_opt_n24(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 function from_candid_opt_n39(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_UserProfile]): UserProfile | null {
     return value.length === 0 ? null : value[0];
 }
-function from_candid_opt_n42(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [{
+function from_candid_opt_n43(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [{
         pan: string;
         name: string;
         address: string;
@@ -902,7 +917,7 @@ function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint
         topped_up_amount: record_opt_to_undefined(from_candid_opt_n7(_uploadFile, _downloadFile, value.topped_up_amount))
     };
 }
-function from_candid_record_n54(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function from_candid_record_n55(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     nextOffset: bigint;
     records: Array<[string, _PartyVisitRecord]>;
     totalRecords: bigint;
@@ -913,7 +928,7 @@ function from_candid_record_n54(_uploadFile: (file: ExternalBlob) => Promise<Uin
 } {
     return {
         nextOffset: value.nextOffset,
-        records: from_candid_vec_n55(_uploadFile, _downloadFile, value.records),
+        records: from_candid_vec_n56(_uploadFile, _downloadFile, value.records),
         totalRecords: value.totalRecords
     };
 }
@@ -936,7 +951,7 @@ function from_candid_tuple_n38(_uploadFile: (file: ExternalBlob) => Promise<Uint
         from_candid_vec_n14(_uploadFile, _downloadFile, value[2])
     ];
 }
-function from_candid_tuple_n56(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [string, _PartyVisitRecord]): [string, PartyVisitRecord] {
+function from_candid_tuple_n57(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [string, _PartyVisitRecord]): [string, PartyVisitRecord] {
     return [
         value[0],
         from_candid_PartyVisitRecord_n15(_uploadFile, _downloadFile, value[1])
@@ -963,10 +978,10 @@ function from_candid_vec_n35(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
 function from_candid_vec_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[string, _Party, Array<_PartyVisitRecord>]>): Array<[string, Party, Array<PartyVisitRecord>]> {
     return value.map((x)=>from_candid_tuple_n38(_uploadFile, _downloadFile, x));
 }
-function from_candid_vec_n55(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[string, _PartyVisitRecord]>): Array<[string, PartyVisitRecord]> {
-    return value.map((x)=>from_candid_tuple_n56(_uploadFile, _downloadFile, x));
+function from_candid_vec_n56(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[string, _PartyVisitRecord]>): Array<[string, PartyVisitRecord]> {
+    return value.map((x)=>from_candid_tuple_n57(_uploadFile, _downloadFile, x));
 }
-async function to_candid_ExternalBlob_n52(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
+async function to_candid_ExternalBlob_n53(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob): Promise<_ExternalBlob> {
     return await _uploadFile(value);
 }
 function to_candid_IntConstraint_n33(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: IntConstraint): _IntConstraint {
@@ -978,11 +993,11 @@ function to_candid_LocationConstraint_n31(_uploadFile: (file: ExternalBlob) => P
 function to_candid_PartyVisitRecordFilter_n25(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PartyVisitRecordFilter): _PartyVisitRecordFilter {
     return to_candid_record_n26(_uploadFile, _downloadFile, value);
 }
-function to_candid_PartyVisitRecord_n48(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PartyVisitRecord): _PartyVisitRecord {
-    return to_candid_record_n49(_uploadFile, _downloadFile, value);
+function to_candid_PartyVisitRecord_n49(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PartyVisitRecord): _PartyVisitRecord {
+    return to_candid_record_n50(_uploadFile, _downloadFile, value);
 }
-async function to_candid_ShopBranding_n50(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ShopBranding): Promise<_ShopBranding> {
-    return await to_candid_record_n51(_uploadFile, _downloadFile, value);
+async function to_candid_ShopBranding_n51(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ShopBranding): Promise<_ShopBranding> {
+    return await to_candid_record_n52(_uploadFile, _downloadFile, value);
 }
 function to_candid_TextConstraint_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TextConstraint): _TextConstraint {
     return to_candid_variant_n30(_uploadFile, _downloadFile, value);
@@ -990,8 +1005,8 @@ function to_candid_TextConstraint_n29(_uploadFile: (file: ExternalBlob) => Promi
 function to_candid_TimeConstraint_n27(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TimeConstraint): _TimeConstraint {
     return to_candid_variant_n28(_uploadFile, _downloadFile, value);
 }
-async function to_candid_UpgradeData_n43(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UpgradeData): Promise<_UpgradeData> {
-    return await to_candid_record_n44(_uploadFile, _downloadFile, value);
+async function to_candid_UpgradeData_n44(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UpgradeData): Promise<_UpgradeData> {
+    return await to_candid_record_n45(_uploadFile, _downloadFile, value);
 }
 function to_candid_UserRole_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
     return to_candid_variant_n9(_uploadFile, _downloadFile, value);
@@ -1002,7 +1017,7 @@ function to_candid__CaffeineStorageRefillInformation_n2(_uploadFile: (file: Exte
 function to_candid_opt_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _CaffeineStorageRefillInformation | null): [] | [__CaffeineStorageRefillInformation] {
     return value === null ? candid_none() : candid_some(to_candid__CaffeineStorageRefillInformation_n2(_uploadFile, _downloadFile, value));
 }
-function to_candid_opt_n57(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Time | null): [] | [_Time] {
+function to_candid_opt_n42(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Time | null): [] | [_Time] {
     return value === null ? candid_none() : candid_some(value);
 }
 function to_candid_opt_n58(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Location | null): [] | [_Location] {
@@ -1012,7 +1027,7 @@ function to_candid_opt_n59(_uploadFile: (file: ExternalBlob) => Promise<Uint8Arr
     return value === null ? candid_none() : candid_some(value);
 }
 async function to_candid_opt_n60(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: ExternalBlob | null): Promise<[] | [_ExternalBlob]> {
-    return value === null ? candid_none() : candid_some(await to_candid_ExternalBlob_n52(_uploadFile, _downloadFile, value));
+    return value === null ? candid_none() : candid_some(await to_candid_ExternalBlob_n53(_uploadFile, _downloadFile, value));
 }
 function to_candid_record_n26(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     paymentDateFilter?: TimeConstraint;
@@ -1044,7 +1059,7 @@ function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8A
         proposed_top_up_amount: value.proposed_top_up_amount ? candid_some(value.proposed_top_up_amount) : candid_none()
     };
 }
-async function to_candid_record_n44(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+async function to_candid_record_n45(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     partyVisitRecords: Array<[PartyId, Array<PartyVisitRecord>]>;
     branding?: ShopBranding;
     parties: Array<[PartyId, Party]>;
@@ -1054,12 +1069,12 @@ async function to_candid_record_n44(_uploadFile: (file: ExternalBlob) => Promise
     parties: Array<[_PartyId, _Party]>;
 }> {
     return {
-        partyVisitRecords: to_candid_vec_n45(_uploadFile, _downloadFile, value.partyVisitRecords),
-        branding: value.branding ? candid_some(await to_candid_ShopBranding_n50(_uploadFile, _downloadFile, value.branding)) : candid_none(),
+        partyVisitRecords: to_candid_vec_n46(_uploadFile, _downloadFile, value.partyVisitRecords),
+        branding: value.branding ? candid_some(await to_candid_ShopBranding_n51(_uploadFile, _downloadFile, value.branding)) : candid_none(),
         parties: value.parties
     };
 }
-function to_candid_record_n49(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+function to_candid_record_n50(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     comment: string;
     paymentDate: Time;
     amount: bigint;
@@ -1080,7 +1095,7 @@ function to_candid_record_n49(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         location: value.location ? candid_some(value.location) : candid_none()
     };
 }
-async function to_candid_record_n51(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+async function to_candid_record_n52(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     logo?: ExternalBlob;
     name?: string;
 }): Promise<{
@@ -1088,14 +1103,14 @@ async function to_candid_record_n51(_uploadFile: (file: ExternalBlob) => Promise
     name: [] | [string];
 }> {
     return {
-        logo: value.logo ? candid_some(await to_candid_ExternalBlob_n52(_uploadFile, _downloadFile, value.logo)) : candid_none(),
+        logo: value.logo ? candid_some(await to_candid_ExternalBlob_n53(_uploadFile, _downloadFile, value.logo)) : candid_none(),
         name: value.name ? candid_some(value.name) : candid_none()
     };
 }
-function to_candid_tuple_n46(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [PartyId, Array<PartyVisitRecord>]): [_PartyId, Array<_PartyVisitRecord>] {
+function to_candid_tuple_n47(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [PartyId, Array<PartyVisitRecord>]): [_PartyId, Array<_PartyVisitRecord>] {
     return [
         value[0],
-        to_candid_vec_n47(_uploadFile, _downloadFile, value[1])
+        to_candid_vec_n48(_uploadFile, _downloadFile, value[1])
     ];
 }
 function to_candid_variant_n28(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -1230,11 +1245,11 @@ function to_candid_variant_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         guest: null
     } : value;
 }
-function to_candid_vec_n45(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[PartyId, Array<PartyVisitRecord>]>): Array<[_PartyId, Array<_PartyVisitRecord>]> {
-    return value.map((x)=>to_candid_tuple_n46(_uploadFile, _downloadFile, x));
+function to_candid_vec_n46(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<[PartyId, Array<PartyVisitRecord>]>): Array<[_PartyId, Array<_PartyVisitRecord>]> {
+    return value.map((x)=>to_candid_tuple_n47(_uploadFile, _downloadFile, x));
 }
-function to_candid_vec_n47(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<PartyVisitRecord>): Array<_PartyVisitRecord> {
-    return value.map((x)=>to_candid_PartyVisitRecord_n48(_uploadFile, _downloadFile, x));
+function to_candid_vec_n48(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<PartyVisitRecord>): Array<_PartyVisitRecord> {
+    return value.map((x)=>to_candid_PartyVisitRecord_n49(_uploadFile, _downloadFile, x));
 }
 export interface CreateActorOptions {
     agent?: Agent;

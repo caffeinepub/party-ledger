@@ -15,6 +15,8 @@ import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
+
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -73,7 +75,7 @@ actor {
     logs : List.List<Text>;
   };
 
-  type Party = {
+  public type Party = {
     id : PartyId;
     name : Text;
     address : Text;
@@ -568,6 +570,45 @@ actor {
     diff <= oneDay;
   };
 
+  public query ({ caller }) func getPartiesWithVisits(
+    startDate : ?Time.Time,
+    endDate : ?Time.Time,
+    includeLocation : Bool,
+  ) : async [(PartyId, [PartyVisitRecord])] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized");
+    };
+
+    let filteredResultList = List.empty<(PartyId, [PartyVisitRecord])>();
+
+    for ((partyId, recordsList) in partyPayments.entries()) {
+      let filteredRecords = List.empty<PartyVisitRecord>();
+
+      for ((_, record) in recordsList.values()) {
+        let isWithinRange = switch (startDate, endDate) {
+          case (?start, ?end) { record.paymentDate >= start and record.paymentDate <= end };
+          case (?start, null) { record.paymentDate >= start };
+          case (null, ?end) { record.paymentDate <= end };
+          case (null, null) { true };
+        };
+
+        if (isWithinRange) {
+          if (not includeLocation or record.location != null) {
+            filteredRecords.add(record);
+          };
+        };
+      };
+
+      if (filteredRecords.size() > 0) {
+        filteredResultList.add(
+          (partyId, filteredRecords.toArray())
+        );
+      };
+    };
+
+    filteredResultList.toArray();
+  };
+
   public query ({ caller }) func getPartiesWithTodayDuePayments() : async [(PartyId, [PartyVisitRecord])] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized");
@@ -595,3 +636,4 @@ actor {
     resultList.toArray();
   };
 };
+

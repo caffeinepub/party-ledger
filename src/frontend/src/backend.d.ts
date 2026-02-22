@@ -137,6 +137,7 @@ export interface backendInterface {
     getCallerUserRole(): Promise<UserRole>;
     getLogs(): Promise<Array<[Time, string]>>;
     getPartiesWithTodayDuePayments(): Promise<Array<[PartyId, Array<PartyVisitRecord>]>>;
+    getPartiesWithVisits(startDate: Time | null, endDate: Time | null, includeLocation: boolean): Promise<Array<[PartyId, Array<PartyVisitRecord>]>>;
     getParty(_id: PartyId): Promise<{
         pan: string;
         name: string;

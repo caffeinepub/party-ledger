@@ -135,6 +135,10 @@ export interface _SERVICE {
     [],
     Array<[PartyId, Array<PartyVisitRecord>]>
   >,
+  'getPartiesWithVisits' : ActorMethod<
+    [[] | [Time], [] | [Time], boolean],
+    Array<[PartyId, Array<PartyVisitRecord>]>
+  >,
   'getParty' : ActorMethod<
     [PartyId],
     [] | [

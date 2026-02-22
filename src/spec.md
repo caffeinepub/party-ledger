@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add dashboard notifications for parties with visits due today and enable party search in reports.
+**Goal:** Update the map page to default to today's date and add a search button to filter data.
 
 **Planned changes:**
-- Display notifications on the dashboard for parties whose next visit day is today with party name and clickable call button
-- Add a search box to the Reports page that filters the party dropdown by name, phone number, or PAN
-- Implement backend query to fetch parties with next payment date matching today's date
+- Set date range filter to default to today's date (both 'from' and 'to') when MapPage loads
+- Add a search button next to the date range inputs
+- Map data updates only when the search button is clicked, not automatically on date input change
 
-**User-visible outcome:** Users can see which parties are due for visits today on the dashboard and quickly call them. In the Reports page, users can search and filter parties by name, phone, or PAN to find records faster.
+**User-visible outcome:** Users see today's party visit data on the map by default. They can select different date ranges and click the search button to update the map with filtered data.
