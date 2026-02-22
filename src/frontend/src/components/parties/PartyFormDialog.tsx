@@ -10,11 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useAddParty, useUpdateParty, useValidateAndGeneratePartyId } from '../../hooks/queries/useParties';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import { parseMoney } from '../../lib/format';
 import { toast } from 'sonner';
 import type { Party, PartyId } from '../../backend';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, ShieldAlert } from 'lucide-react';
 
 interface PartyFormDialogProps {
   open: boolean;
@@ -25,6 +27,7 @@ interface PartyFormDialogProps {
 }
 
 export default function PartyFormDialog({ open, onClose, mode, partyId, initialData }: PartyFormDialogProps) {
+  const { isAdmin } = useAdminAuth();
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [phone, setPhone] = useState('');
@@ -53,6 +56,30 @@ export default function PartyFormDialog({ open, onClose, mode, partyId, initialD
     setGenerationError(null);
   }, [mode, initialData, open]);
 
+  if (!isAdmin) {
+    return (
+      <Dialog open={open} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-destructive" />
+              Access Denied
+            </DialogTitle>
+          </DialogHeader>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Admin access is required to {mode === 'add' ? 'add' : 'edit'} parties. Please log in with admin credentials.
+            </AlertDescription>
+          </Alert>
+          <div className="flex justify-end">
+            <Button onClick={onClose}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   const handleGenerateId = async () => {
     if (!name.trim()) {
       setGenerationError('Party name is required to generate ID');
@@ -60,21 +87,11 @@ export default function PartyFormDialog({ open, onClose, mode, partyId, initialD
     }
 
     setGenerationError(null);
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] 🟢 Form: Starting ID generation from form`, {
-      name: name.trim(),
-      phone: phone.trim(),
-    });
 
     try {
       const newPartyId = await generatePartyId({ name: name.trim(), phone: phone.trim() });
-      console.log(`[${timestamp}] 🟢 Form: ID generation successful`, { newPartyId });
       return newPartyId;
     } catch (error: any) {
-      console.error(`[${timestamp}] 🔴 Form: ID generation failed`, {
-        errorMessage: error?.message,
-        fullError: error,
-      });
       const errorMessage = error?.message || 'Failed to generate party ID';
       setGenerationError(errorMessage);
       toast.error(errorMessage);
@@ -85,14 +102,6 @@ export default function PartyFormDialog({ open, onClose, mode, partyId, initialD
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const timestamp = new Date().toISOString();
-    console.log(`[${timestamp}] 🟡 Form: Submit triggered`, {
-      mode,
-      name: name.trim(),
-      phone: phone.trim(),
-      pan: pan.trim(),
-    });
-
     if (!name.trim() || !pan.trim()) {
       toast.error('Name and PAN are required');
       return;
@@ -102,15 +111,12 @@ export default function PartyFormDialog({ open, onClose, mode, partyId, initialD
 
     if (mode === 'add') {
       try {
-        console.log(`[${timestamp}] 🟡 Form: Generating party ID...`);
         const newPartyId = await handleGenerateId();
         
         if (!newPartyId) {
-          console.error(`[${timestamp}] 🔴 Form: Party ID generation returned null/undefined`);
           return;
         }
 
-        console.log(`[${timestamp}] 🟡 Form: Adding party with ID: ${newPartyId}`);
         await addParty({
           partyId: newPartyId,
           name: name.trim(),
@@ -120,28 +126,20 @@ export default function PartyFormDialog({ open, onClose, mode, partyId, initialD
           dueAmount: dueAmountBigInt,
         });
         
-        console.log(`[${timestamp}] ✅ Form: Party added successfully`);
         toast.success('Party added successfully');
         onClose();
       } catch (error: any) {
-        console.error(`[${timestamp}] 🔴 Form: Failed to add party`, {
-          errorMessage: error?.message,
-          fullError: error,
-        });
         toast.error(`Failed to add party: ${error.message}`);
       }
     } else if (mode === 'edit' && partyId) {
-      console.log(`[${timestamp}] 🟡 Form: Updating party ${partyId}`);
       updateParty(
         { partyId, name: name.trim(), address: address.trim(), phone: phone.trim(), pan: pan.trim(), dueAmount: dueAmountBigInt },
         {
           onSuccess: () => {
-            console.log(`[${timestamp}] ✅ Form: Party updated successfully`);
             toast.success('Party updated successfully');
             onClose();
           },
           onError: (error) => {
-            console.error(`[${timestamp}] 🔴 Form: Failed to update party`, error);
             toast.error(`Failed to update party: ${error.message}`);
           },
         }

@@ -2,12 +2,15 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-new-page-or-section-that-displays-a-comprehensive-list-of-all-party-names-in-the-system-showing-each-unique-party-entry-with-their-name-prominently-displayed",
-      "featureTitle": "Create a new page or section that displays a comprehensive list of all party names in the system, showing each unique party entry with their name prominently displayed",
+      "featureId": "feature-implement-hybrid-authentication-system-after-internet-identity-login-prompt-users-to-enter-admin-credentials-username-rajan-password-admin-123-only-users-who-provide-correct-credentials-gain-admin-access-to-create-and-manage-parties-events-store-admin-session-state-in-react-context",
+      "featureTitle": "Implement hybrid authentication system: After Internet Identity login, prompt users to enter admin credentials (username: 'rajan', password: 'Admin@123'). Only users who provide correct credentials gain admin access to create and manage parties/events. Store admin session state in React context.",
       "files": [
         "frontend/src/App.tsx",
+        "frontend/src/components/auth/AdminCredentialDialog.tsx",
         "frontend/src/components/layout/AppShell.tsx",
-        "frontend/src/pages/AllPartiesListPage.tsx"
+        "frontend/src/components/parties/PartyFormDialog.tsx",
+        "frontend/src/context/AdminAuthContext.tsx",
+        "frontend/src/pages/PartiesPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -24,13 +27,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-based-on-the-uploaded-screenshot-showing-abc-auto-parts-bangesimal-appearing-three-times-with-identical-details-phone-n-a-pan-0-due-34-920-investigate-and-resolve-any-data-duplication-issues-in-the-party-records-to-ensure-each-party-exists-only-once-in-the-system",
-      "featureTitle": "Based on the uploaded screenshot showing 'ABC AUTO PARTS Bangesimal' appearing three times with identical details (Phone: N/A, PAN: 0, Due: ₹34,920), investigate and resolve any data duplication issues in the party records to ensure each party exists only once in the system",
+      "featureId": "feature-add-comprehensive-search-functionality-for-both-parties-and-events-that-searches-across-party-names-event-names-and-event-descriptions-include-a-search-input-field-with-real-time-filtering-that-updates-results-as-the-user-types",
+      "featureTitle": "Add comprehensive search functionality for both parties and events that searches across party names, event names, and event descriptions. Include a search input field with real-time filtering that updates results as the user types.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/layout/AppShell.tsx",
-        "frontend/src/pages/DuplicatePartiesPage.tsx",
-        "frontend/src/pages/SettingsPage.tsx"
+        "frontend/src/pages/PartiesPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -43,6 +43,122 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-event-categories-and-tags-system-with-predefined-categories-birthday-wedding-corporate-social-charity-other-that-admins-can-assign-to-events-support-multiple-categories-per-event-and-display-category-badges-on-event-cards",
+      "featureTitle": "Create event categories and tags system with predefined categories (Birthday, Wedding, Corporate, Social, Charity, Other) that admins can assign to events. Support multiple categories per event and display category badges on event cards.",
+      "files": [
+        "frontend/src/lib/categories.ts",
+        "frontend/src/lib/categoryParser.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-build-in-app-notification-center-that-displays-notifications-for-upcoming-events-24-hours-before-new-events-added-and-event-updates-changes-notifications-appear-when-users-are-logged-in-and-persist-until-dismissed-include-notification-badge-count-in-navigation",
+      "featureTitle": "Build in-app notification center that displays notifications for: upcoming events (24 hours before), new events added, and event updates/changes. Notifications appear when users are logged in and persist until dismissed. Include notification badge count in navigation.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/components/notifications/NotificationBell.tsx",
+        "frontend/src/components/notifications/NotificationCenter.tsx",
+        "frontend/src/context/NotificationContext.tsx",
+        "frontend/src/hooks/useUpcomingEventChecker.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-reporting-and-analytics-dashboard-with-metrics-including-total-parties-count-total-events-count-events-by-category-breakdown-upcoming-events-timeline-and-party-engagement-statistics-display-data-using-charts-bar-pie-line-and-summary-cards",
+      "featureTitle": "Create reporting and analytics dashboard with metrics including: total parties count, total events count, events by category breakdown, upcoming events timeline, and party engagement statistics. Display data using charts (bar, pie, line) and summary cards.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/analytics/CategoryPieChart.tsx",
+        "frontend/src/components/analytics/MetricsSummaryCards.tsx",
+        "frontend/src/components/analytics/PartyEngagementChart.tsx",
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/pages/AnalyticsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-export-functionality-to-generate-csv-files-containing-party-data-name-contact-events-and-event-data-name-date-description-categories-party-include-export-to-pdf-functionality-for-reports-with-formatted-tables-and-charts",
+      "featureTitle": "Implement export functionality to generate CSV files containing party data (name, contact, events) and event data (name, date, description, categories, party). Include export to PDF functionality for reports with formatted tables and charts.",
+      "files": [
+        "frontend/src/lib/export/csvExport.ts",
+        "frontend/src/pages/AnalyticsPage.tsx",
+        "frontend/src/pages/PartiesPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-the-party-id-generation-authorization-error-by-ensuring-the-new-hybrid-authentication-system-properly-authorizes-users-with-valid-admin-credentials-to-generate-party-ids-and-perform-all-admin-operations",
+      "featureTitle": "Fix the Party ID generation authorization error by ensuring the new hybrid authentication system properly authorizes users with valid admin credentials to generate party IDs and perform all admin operations.",
+      "files": [
+        "frontend/src/components/auth/AdminCredentialDialog.tsx",
+        "frontend/src/components/parties/PartyFormDialog.tsx",
+        "frontend/src/context/AdminAuthContext.tsx",
+        "frontend/src/hooks/queries/useParties.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
       ],
       "confidence": "high"
     }

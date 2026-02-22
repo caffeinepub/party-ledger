@@ -1,62 +1,370 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Display all party names in the system",
+  "title": "Add hybrid authentication with admin credentials and comprehensive feature enhancements",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Create a new page or section that displays a comprehensive list of all party names in the system",
+      "summary": "Implement hybrid authentication system with admin credential prompt after Internet Identity login, storing admin session state in React context",
       "acceptanceCriteria": [
-        "All party names are displayed in a clear, readable format",
-        "Each party appears exactly once in the list",
-        "The list is accessible from the main navigation or a dedicated route"
+        "After Internet Identity login, user sees admin credential prompt",
+        "Correct credentials (rajan/Admin@123) grant admin access",
+        "Incorrect credentials deny admin privileges but allow basic viewing",
+        "Admin status persists during session",
+        "Backend validates admin status for protected operations"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AllPartiesListPage.tsx",
+          "path": "frontend/src/context/AdminAuthContext.tsx",
           "operation": "create",
-          "description": "Create a new page component that displays all party names in a simple list format. Fetch all parties using the existing useGetAllParties hook from frontend/src/hooks/queries/useParties.ts. Display each party name prominently with basic styling. Include loading and error states. Ensure each party appears exactly once by using the party ID as the key."
+          "description": "Create React context for managing admin authentication state. Track admin credential validation status (validated/not-validated/failed), store admin username, and provide methods to prompt for credentials, validate them, clear admin session, and check if user has admin access. This context wraps the admin credential layer on top of Internet Identity."
+        },
+        {
+          "path": "frontend/src/components/auth/AdminCredentialDialog.tsx",
+          "operation": "create",
+          "description": "Create dialog component that prompts authenticated users to enter admin credentials (username and password fields). Shows after Internet Identity login for users who haven't validated admin credentials in current session. Validates credentials against hardcoded values (rajan/Admin@123) and updates AdminAuthContext state. Includes error messages for incorrect credentials and option to skip (continuing as non-admin viewer)."
+        },
+        {
+          "path": "frontend/src/hooks/useAdminAuth.ts",
+          "operation": "create",
+          "description": "Create hook to access AdminAuthContext, providing: isAdmin boolean, isAdminValidated status, promptForCredentials function, validateCredentials function, and clearAdminSession function. Simplifies admin authentication checks throughout the application."
         },
         {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add a new route for the AllPartiesListPage at path '/all-parties' in the router configuration. Import the AllPartiesListPage component and register it alongside existing routes like '/parties' and '/dashboard'."
+          "description": "Wrap the application in AdminAuthProvider (below InternetIdentityProvider) so admin authentication context is available throughout the app. Ensure AdminCredentialDialog is rendered conditionally when user is authenticated via Internet Identity but hasn't validated admin credentials yet."
         },
         {
           "path": "frontend/src/components/layout/AppShell.tsx",
           "operation": "modify",
-          "description": "Add a navigation link to 'All Parties' in the main navigation menu, positioned after the existing 'Parties' link. The link should navigate to '/all-parties' route. Use consistent styling with other navigation items."
+          "description": "Update logout functionality to clear both Internet Identity session and admin session state (call clearAdminSession from AdminAuthContext). Update navigation to conditionally show admin-only links (Settings with admin panel, party management) based on isAdmin status from useAdminAuth hook."
+        },
+        {
+          "path": "frontend/src/pages/PartiesPage.tsx",
+          "operation": "modify",
+          "description": "Add admin access check using useAdminAuth hook. Show 'Add Party' button only when isAdmin is true. Display informational message for non-admin users explaining they have view-only access."
+        },
+        {
+          "path": "frontend/src/pages/PartyDetailsPage.tsx",
+          "operation": "modify",
+          "description": "Add admin access check using useAdminAuth hook. Show edit, delete, add payment, and record visit action buttons only when isAdmin is true. Display read-only view for non-admin users."
+        },
+        {
+          "path": "frontend/src/pages/SettingsPage.tsx",
+          "operation": "modify",
+          "description": "Add admin access check for admin-specific tabs (Admin Panel, Data Transfer, Import). Show these tabs only when isAdmin is true. Display access denied message if non-admin user navigates to admin-only settings."
+        },
+        {
+          "path": "frontend/src/components/parties/PartyFormDialog.tsx",
+          "operation": "modify",
+          "description": "Add admin check before allowing party creation or editing. Show error message if non-admin user somehow accesses the form. This provides defense-in-depth alongside UI-level access controls."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Investigate and display duplicate party records to help identify data duplication issues",
+      "summary": "Add comprehensive search functionality for parties and events with real-time filtering across party names, event names, and event descriptions",
       "acceptanceCriteria": [
-        "Duplicate party records are identified and deduplicated",
-        "Each unique party appears only once in the database",
-        "Payment history and visit records are preserved and correctly associated with the consolidated party record"
+        "Search input field appears on parties and events pages",
+        "Search works across party names, event names, and event descriptions",
+        "Results update in real-time as user types",
+        "Search is case-insensitive",
+        "Clear search button resets results"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/DuplicatePartiesPage.tsx",
-          "operation": "create",
-          "description": "Create a page that identifies and displays potential duplicate parties based on matching names. Fetch all parties using useGetAllParties and group them by name (case-insensitive). Display groups where more than one party shares the same name. For each duplicate group, show all party details (name, phone, PAN, address, due amount, ID) side-by-side for comparison. Include a clear warning message about the duplicate data issue. This is a diagnostic page to visualize the problem described in the screenshot showing 'ABC AUTO PARTS Bangesimal' appearing three times."
+          "path": "frontend/src/pages/PartiesPage.tsx",
+          "operation": "modify",
+          "description": "Add search input field above party cards grid using shadcn/ui Input component. Implement real-time search state that filters displayed parties by name (case-insensitive substring match). Include clear button (X icon) that resets search term. Debounce search input by 300ms to optimize performance."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/pages/ReportsPage.tsx",
           "operation": "modify",
-          "description": "Add a new route for the DuplicatePartiesPage at path '/duplicates' in the router configuration. Import the DuplicatePartiesPage component and register it."
+          "description": "Enhance existing search functionality to support searching across party names and visit record comments (treating comments as event descriptions). Update filter logic to perform case-insensitive substring matching. Add clear search button if not already present."
+        },
+        {
+          "path": "frontend/src/hooks/useSearchFilter.ts",
+          "operation": "create",
+          "description": "Create reusable hook for search/filter functionality that accepts data array and search configuration (fields to search). Returns filtered results, search term state, setSearchTerm function, and clearSearch function. Implements debouncing and case-insensitive matching logic."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Implement filtering system for parties and events with date range, associated party filters, active filter chips, and clear all option",
+      "acceptanceCriteria": [
+        "Filter panel displays available filter options",
+        "Date range filter for events",
+        "Party association filter for events",
+        "Active filters shown as removable chips",
+        "Clear all filters button resets to unfiltered view",
+        "Filters combine with search functionality"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/filters/FilterPanel.tsx",
+          "operation": "create",
+          "description": "Create collapsible filter panel component using shadcn/ui Collapsible and Card components. Include date range picker for filtering events by payment date and next payment date, party selector dropdown for filtering events by associated party, and clear all filters button. Display active filters as removable Badge chips below filter inputs."
+        },
+        {
+          "path": "frontend/src/pages/ReportsPage.tsx",
+          "operation": "modify",
+          "description": "Integrate FilterPanel component above the reports data display. Wire up filter state (date range, selected party) and pass to data fetching/filtering logic. Combine filter results with existing search functionality so both work together. Update display to show active filter chips that can be individually removed."
+        },
+        {
+          "path": "frontend/src/hooks/useFilterState.ts",
+          "operation": "create",
+          "description": "Create hook to manage filter state including date range (start/end), selected party IDs, and active filter tags. Provide functions to add/remove filters, clear all filters, and generate filter chip data for display. Include logic to combine multiple filter criteria using AND logic."
+        },
+        {
+          "path": "frontend/src/pages/VisitDetailsPage.tsx",
+          "operation": "modify",
+          "description": "Add quick filter links that navigate to ReportsPage with pre-applied filters (e.g., 'View all visits for this party', 'View visits on this date'). Use URL parameters to pass filter state to ReportsPage."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Create event categories system with predefined categories (Birthday, Wedding, Corporate, Social, Charity, Other) that admins can assign, supporting multiple categories per event with category badges on event cards",
+      "acceptanceCriteria": [
+        "Backend stores event categories in event data model",
+        "Predefined categories: Birthday, Wedding, Corporate, Social, Charity, Other",
+        "Events can have multiple categories",
+        "Category selector in event creation/edit forms",
+        "Category badges displayed on event cards",
+        "Filter events by category"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/categories.ts",
+          "operation": "create",
+          "description": "Define predefined event categories as a constant array: ['Birthday', 'Wedding', 'Corporate', 'Social', 'Charity', 'Other']. Export category type, color mapping for badges (using Tailwind color classes), and utility functions for category validation and formatting."
+        },
+        {
+          "path": "frontend/src/components/payments/PaymentFormDialog.tsx",
+          "operation": "modify",
+          "description": "Add multi-select category picker using shadcn/ui Select or Checkbox components for the predefined categories. Store selected categories as part of the payment/visit comment field using a structured format (e.g., JSON prefix or hashtag syntax) until backend schema is updated to store categories separately. Admin-only control."
+        },
+        {
+          "path": "frontend/src/components/visits/PartyVisitFormDialog.tsx",
+          "operation": "modify",
+          "description": "Add multi-select category picker using shadcn/ui components for the predefined categories. Store selected categories within the comment field using structured format. Admin-only control. Display selected categories as badges below the selector."
+        },
+        {
+          "path": "frontend/src/components/payments/PaymentHistory.tsx",
+          "operation": "modify",
+          "description": "Parse category data from payment comment fields and display as small colored Badge components next to each payment record. Use color mapping from lib/categories.ts for consistent badge styling."
+        },
+        {
+          "path": "frontend/src/components/filters/FilterPanel.tsx",
+          "operation": "modify",
+          "description": "Add category filter section with checkboxes for each predefined category. Allow multiple category selection. Update filter state to include selected categories and pass to parent components for filtering logic."
+        },
+        {
+          "path": "frontend/src/pages/ReportsPage.tsx",
+          "operation": "modify",
+          "description": "Implement category filtering logic that parses categories from visit record comments and filters results based on selected categories in FilterPanel. Display category distribution summary (count per category) in reports view."
+        },
+        {
+          "path": "frontend/src/lib/categoryParser.ts",
+          "operation": "create",
+          "description": "Create utility functions to encode categories into comment strings (structured format like '##CATEGORIES:Birthday,Corporate##') and parse categories back out from comment strings. Handle backwards compatibility with comments that don't have category metadata."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Build in-app notification center displaying notifications for upcoming events (24 hours before), new events, and event updates, with notification badge count in navigation",
+      "acceptanceCriteria": [
+        "Notification center icon in navigation with unread count badge",
+        "Notifications for events happening within 24 hours",
+        "Notifications for newly created events",
+        "Notifications for event updates",
+        "Click notification to view event details",
+        "Dismiss individual notifications or clear all",
+        "Notifications persist across sessions until dismissed"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/context/NotificationContext.tsx",
+          "operation": "create",
+          "description": "Create React context for managing in-app notifications. Store notifications in state with structure: { id, type ('upcoming'|'new'|'updated'), partyId, paymentId, message, timestamp, isRead, isDismissed }. Provide functions to add notification, mark as read, dismiss notification, clear all notifications, and get unread count. Persist notifications in localStorage for session persistence."
+        },
+        {
+          "path": "frontend/src/hooks/useNotifications.ts",
+          "operation": "create",
+          "description": "Create hook to access NotificationContext and provide convenience methods: getUnreadCount(), getAllNotifications(), getUnreadNotifications(), addNotification(), markAsRead(), dismissNotification(), dismissAll(). Include logic to check upcoming payments (next 24 hours) on mount and periodically (every 5 minutes) to generate upcoming event notifications."
+        },
+        {
+          "path": "frontend/src/components/notifications/NotificationCenter.tsx",
+          "operation": "create",
+          "description": "Create popover/dropdown component triggered by bell icon that displays list of notifications. Show notification message, timestamp, and type icon. Include mark as read button, dismiss button per notification, and clear all button at bottom. Clicking notification navigates to relevant party/visit details page and marks as read."
+        },
+        {
+          "path": "frontend/src/components/notifications/NotificationBell.tsx",
+          "operation": "create",
+          "description": "Create notification bell icon component with unread count badge overlay. Use shadcn/ui Badge component for count display. On click, open NotificationCenter popover. Display bell with distinctive color (e.g., blue or red) when unread notifications exist."
         },
         {
           "path": "frontend/src/components/layout/AppShell.tsx",
           "operation": "modify",
-          "description": "Add a temporary navigation link to 'Find Duplicates' in the Settings section or as a separate debug/admin menu item. This link should navigate to '/duplicates' route for investigating duplicate party records."
+          "description": "Add NotificationBell component to the navigation bar between the main navigation links and logout button. Wrap app in NotificationProvider (in App.tsx context hierarchy) to make notification context available."
         },
         {
-          "path": "frontend/src/pages/SettingsPage.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add a new tab or section to the Settings page titled 'Data Health' that includes a link or button to navigate to the DuplicatePartiesPage. This provides easy access to the duplicate detection tool from the settings interface where data management tasks are typically performed."
+          "description": "Add NotificationProvider to the context provider hierarchy, ensuring it wraps the router and has access to actor/authentication contexts. Initialize notification checking logic on app load."
+        },
+        {
+          "path": "frontend/src/hooks/queries/usePayments.ts",
+          "operation": "modify",
+          "description": "Update recordPayment and recordPartyVisit mutations to trigger notification generation for new events. Call addNotification from useNotifications hook in mutation onSuccess callbacks to create 'new event' notifications."
+        },
+        {
+          "path": "frontend/src/hooks/useUpcomingEventChecker.ts",
+          "operation": "create",
+          "description": "Create hook that checks for upcoming payments (within 24 hours) by querying all party visit records and comparing nextPaymentDate against current time. Runs on mount and sets up interval (every 5 minutes) to check continuously. Generates 'upcoming' notifications for payments due soon. Uses useNotifications to add notifications."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Create reporting and analytics dashboard with metrics including total parties/events counts, events by category breakdown, upcoming events timeline, and party engagement statistics with charts",
+      "acceptanceCriteria": [
+        "Dedicated Reports/Analytics page in navigation",
+        "Summary cards showing total parties, total events, upcoming events count",
+        "Pie chart showing events by category distribution",
+        "Timeline chart showing events over time",
+        "Bar chart showing party engagement metrics",
+        "Date range selector for reports",
+        "Export report data button"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/AnalyticsPage.tsx",
+          "operation": "create",
+          "description": "Create comprehensive analytics dashboard page. Display summary cards at top showing: total parties count, total events/visits count, upcoming payments count (next 7 days), total outstanding due amount. Include date range selector using shadcn/ui DateRangePicker for filtering analytics data. Add export button to download current analytics as PDF (integrated with REQ-7)."
+        },
+        {
+          "path": "frontend/src/components/analytics/MetricsSummaryCards.tsx",
+          "operation": "create",
+          "description": "Create grid of metric summary cards using shadcn/ui Card components. Each card displays: large numeric value, metric label, optional trend indicator or comparison to previous period. Cards for: Total Parties, Total Events, Upcoming Payments, Total Due Amount. Use icons from lucide-react for visual enhancement."
+        },
+        {
+          "path": "frontend/src/components/analytics/CategoryPieChart.tsx",
+          "operation": "create",
+          "description": "Create pie chart component displaying event distribution by category using Recharts library. Parse categories from all visit records, calculate count per category, render PieChart with legend showing category names and percentages. Use color mapping from lib/categories.ts for consistent category colors."
+        },
+        {
+          "path": "frontend/src/components/analytics/EventsTimelineChart.tsx",
+          "operation": "create",
+          "description": "Create timeline line/area chart showing events over time using Recharts library. Group visit records by date (day, week, or month granularity based on selected date range). Display count of events per time period. Include axes labels, tooltip with detailed information, and responsive sizing."
+        },
+        {
+          "path": "frontend/src/components/analytics/PartyEngagementChart.tsx",
+          "operation": "create",
+          "description": "Create bar chart showing party engagement metrics using Recharts library. Display top 10 parties by visit count, showing party name on Y-axis and visit count on X-axis. Include tooltip showing additional details (total amount received, last visit date). Use horizontal bar chart for better label readability."
+        },
+        {
+          "path": "frontend/src/hooks/queries/useAnalyticsData.ts",
+          "operation": "create",
+          "description": "Create React Query hook to fetch and compute analytics data. Query all parties and all visit records, then compute: party count, event count, upcoming events (next 7 days), category distribution, events timeline (grouped by date), party engagement scores (visit counts per party). Accept date range filter parameters and filter data accordingly. Return computed analytics in structured format for chart components."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "modify",
+          "description": "Add 'Analytics' navigation link to the main navigation menu between 'Reports' and 'Settings'. Route to /analytics path. Icon: BarChart3 from lucide-react."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Add route for AnalyticsPage at path '/analytics' in TanStack Router configuration. Ensure route is accessible to all authenticated users (not admin-only)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Implement export functionality to generate CSV files for party/event data and PDF files for reports with formatted tables and charts",
+      "acceptanceCriteria": [
+        "Export buttons on parties and events pages",
+        "CSV export includes all relevant party/event data",
+        "CSV files download with descriptive filenames including timestamp",
+        "PDF export for reports with formatted layout",
+        "PDF includes charts and summary statistics",
+        "Export respects current filters/search if active"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/export/csvExport.ts",
+          "operation": "create",
+          "description": "Create utility functions for CSV export. Implement exportPartiesToCSV(parties) that converts party data array to CSV string with columns: Party ID, Name, Address, Phone, PAN, Due Amount. Implement exportEventsToCSV(events, parties) that converts visit records to CSV with columns: Payment ID, Party Name, Amount, Comment, Payment Date, Next Payment Date, Location Status, Categories. Include helper to trigger browser download of CSV blob with timestamped filename (e.g., 'parties_export_2024-01-15_143022.csv')."
+        },
+        {
+          "path": "frontend/src/lib/export/pdfExport.ts",
+          "operation": "create",
+          "description": "Create utility functions for PDF export using jsPDF library. Implement exportAnalyticsToPDF(analyticsData, charts) that generates formatted PDF report including: header with shop branding, summary metrics table, category distribution table, embedded chart images (convert canvas/SVG charts to images), footer with export timestamp. Use jsPDF autoTable plugin for formatted tables. Return PDF blob for download."
+        },
+        {
+          "path": "frontend/src/components/export/ExportButton.tsx",
+          "operation": "create",
+          "description": "Create reusable export button component that accepts export type ('csv' | 'pdf'), data payload, and optional filename. Renders button with download icon using shadcn/ui Button component. On click, calls appropriate export utility function and triggers browser download. Shows loading state during export generation."
+        },
+        {
+          "path": "frontend/src/pages/PartiesPage.tsx",
+          "operation": "modify",
+          "description": "Add ExportButton component above party cards grid with type='csv' for exporting filtered/searched parties list. Pass currently displayed parties (after search/filter) to export function. Button labeled 'Export Parties (CSV)' with Download icon."
+        },
+        {
+          "path": "frontend/src/pages/ReportsPage.tsx",
+          "operation": "modify",
+          "description": "Add ExportButton component with type='csv' for exporting current filtered visit records/events. Pass displayed events data to export function. Button labeled 'Export Events (CSV)' with Download icon. Place near filter controls."
+        },
+        {
+          "path": "frontend/src/pages/AnalyticsPage.tsx",
+          "operation": "modify",
+          "description": "Add ExportButton component with type='pdf' for exporting analytics report. Pass analytics data and chart canvas elements to export function. Button labeled 'Export Report (PDF)' with FileDown icon. Use React refs to capture chart canvases for PDF embedding."
+        },
+        {
+          "path": "frontend/src/hooks/useChartExport.ts",
+          "operation": "create",
+          "description": "Create hook to facilitate chart-to-image conversion for PDF export. Provide function to capture Recharts chart components as PNG images using html2canvas library. Return image data URLs that can be embedded in PDF. Handle async image generation with loading states."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Fix Party ID generation authorization error by ensuring hybrid authentication system properly authorizes users with admin credentials for party ID generation and admin operations",
+      "acceptanceCriteria": [
+        "Users with admin credentials can generate party IDs without errors",
+        "Backend validates admin session for party creation",
+        "Clear error messages if admin credentials not provided",
+        "No authorization errors for authenticated admin users"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/queries/useParties.ts",
+          "operation": "modify",
+          "description": "Update addParty and validateAndGeneratePartyId mutations to check admin authentication state from useAdminAuth before making backend calls. If user is not admin, show friendly error toast message explaining admin access is required. On backend authorization errors, check if admin session expired and prompt user to re-validate admin credentials via AdminCredentialDialog."
+        },
+        {
+          "path": "frontend/src/components/parties/PartyFormDialog.tsx",
+          "operation": "modify",
+          "description": "Add early validation check using useAdminAuth to ensure user is admin before showing party form or attempting to generate party ID. Display error alert if non-admin user somehow accesses form. Show loading state during admin credential validation if needed."
+        },
+        {
+          "path": "frontend/src/lib/errorHandling.ts",
+          "operation": "create",
+          "description": "Create centralized error handling utilities for authorization errors. Implement parseAuthorizationError(error) that detects backend authorization trap messages and returns structured error info. Implement showAuthorizationError(error, adminContext) that displays appropriate toast message and optionally triggers admin credential re-prompt if admin session appears invalid."
+        },
+        {
+          "path": "frontend/src/context/AdminAuthContext.tsx",
+          "operation": "modify",
+          "description": "Add method to handle authorization failures: onAuthorizationError(). When called, clear admin validation state and show AdminCredentialDialog again for re-validation. This handles cases where admin session becomes invalid (e.g., backend state cleared) and user needs to re-enter credentials."
+        },
+        {
+          "path": "frontend/src/components/auth/AdminCredentialDialog.tsx",
+          "operation": "modify",
+          "description": "Add prop to control dialog visibility from outside (not just internal state). Allow parent components or context to trigger dialog display when authorization errors occur. Include explanatory message when re-prompting due to authorization failure (e.g., 'Your admin session expired. Please re-enter credentials.')."
         }
       ]
     }

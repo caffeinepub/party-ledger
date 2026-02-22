@@ -1,55 +1,199 @@
 {
   "kind": "build_request",
-  "title": "Display all party names in the system",
-  "projectName": "Party Ledger",
-  "priority": "normal",
+  "title": "Add hybrid authentication with admin credentials and comprehensive feature enhancements",
+  "projectName": "Party Management Pro",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Create a new page or section that displays a comprehensive list of all party names in the system, showing each unique party entry with their name prominently displayed",
-      "target": "frontend",
+      "text": "Implement hybrid authentication system: After Internet Identity login, prompt users to enter admin credentials (username: 'rajan', password: 'Admin@123'). Only users who provide correct credentials gain admin access to create and manage parties/events. Store admin session state in React context.",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-17",
+          "msg-18",
+          "msg-19"
         ],
         "quotes": [
-          "all parties name"
+          "ok complete remove internet identity, only make admin='rajan' and password='Admin@123'",
+          "Anyone who logs in with these credentials gets admin access"
         ]
       },
       "acceptanceCriteria": [
-        "All party names are displayed in a clear, readable format",
-        "Each party appears exactly once in the list",
-        "The list is accessible from the main navigation or a dedicated route"
+        "After Internet Identity login, user sees admin credential prompt",
+        "Correct credentials (rajan/Admin@123) grant admin access",
+        "Incorrect credentials deny admin privileges but allow basic viewing",
+        "Admin status persists during session",
+        "Backend validates admin status for protected operations"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Based on the uploaded screenshot showing 'ABC AUTO PARTS Bangesimal' appearing three times with identical details (Phone: N/A, PAN: 0, Due: ₹34,920), investigate and resolve any data duplication issues in the party records to ensure each party exists only once in the system",
-      "target": "both",
+      "text": "Add comprehensive search functionality for both parties and events that searches across party names, event names, and event descriptions. Include a search input field with real-time filtering that updates results as the user types.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-latest"
+          "msg-13",
+          "msg-14"
         ],
         "quotes": [
-          "all parties name"
+          "Add search and filtering for parties/events?"
         ]
       },
       "acceptanceCriteria": [
-        "Duplicate party records are identified and deduplicated",
-        "Each unique party appears only once in the database",
-        "Payment history and visit records are preserved and correctly associated with the consolidated party record"
+        "Search input field appears on parties and events pages",
+        "Search works across party names, event names, and event descriptions",
+        "Results update in real-time as user types",
+        "Search is case-insensitive",
+        "Clear search button resets results"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Implement filtering system for parties and events with filters for: date range (for events), associated party (for events), and any other relevant criteria. Display active filters as removable chips and provide a clear all filters option.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-13",
+          "msg-14"
+        ],
+        "quotes": [
+          "Add search and filtering for parties/events?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Filter panel displays available filter options",
+        "Date range filter for events",
+        "Party association filter for events",
+        "Active filters shown as removable chips",
+        "Clear all filters button resets to unfiltered view",
+        "Filters combine with search functionality"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Create event categories and tags system with predefined categories (Birthday, Wedding, Corporate, Social, Charity, Other) that admins can assign to events. Support multiple categories per event and display category badges on event cards.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-13",
+          "msg-14"
+        ],
+        "quotes": [
+          "Implement event categories or tags?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend stores event categories in event data model",
+        "Predefined categories: Birthday, Wedding, Corporate, Social, Charity, Other",
+        "Events can have multiple categories",
+        "Category selector in event creation/edit forms",
+        "Category badges displayed on event cards",
+        "Filter events by category"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Build in-app notification center that displays notifications for: upcoming events (24 hours before), new events added, and event updates/changes. Notifications appear when users are logged in and persist until dismissed. Include notification badge count in navigation.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-13",
+          "msg-14"
+        ],
+        "quotes": [
+          "Add user notifications or reminders?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Notification center icon in navigation with unread count badge",
+        "Notifications for events happening within 24 hours",
+        "Notifications for newly created events",
+        "Notifications for event updates",
+        "Click notification to view event details",
+        "Dismiss individual notifications or clear all",
+        "Notifications persist across sessions until dismissed"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Create reporting and analytics dashboard with metrics including: total parties count, total events count, events by category breakdown, upcoming events timeline, and party engagement statistics. Display data using charts (bar, pie, line) and summary cards.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-13",
+          "msg-14"
+        ],
+        "quotes": [
+          "Create reporting/analytics dashboards?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Dedicated Reports/Analytics page in navigation",
+        "Summary cards showing total parties, total events, upcoming events count",
+        "Pie chart showing events by category distribution",
+        "Timeline chart showing events over time",
+        "Bar chart showing party engagement metrics",
+        "Date range selector for reports",
+        "Export report data button"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Implement export functionality to generate CSV files containing party data (name, contact, events) and event data (name, date, description, categories, party). Include export to PDF functionality for reports with formatted tables and charts.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-13",
+          "msg-14"
+        ],
+        "quotes": [
+          "Build export functionality (CSV, PDF)?"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Export buttons on parties and events pages",
+        "CSV export includes all relevant party/event data",
+        "CSV files download with descriptive filenames including timestamp",
+        "PDF export for reports with formatted layout",
+        "PDF includes charts and summary statistics",
+        "Export respects current filters/search if active"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Fix the Party ID generation authorization error by ensuring the new hybrid authentication system properly authorizes users with valid admin credentials to generate party IDs and perform all admin operations.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-15"
+        ],
+        "quotes": [
+          "Party ID Generation Error",
+          "Unauthorized: Only users can generate party IDs"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users with admin credentials can generate party IDs without errors",
+        "Backend validates admin session for party creation",
+        "Clear error messages if admin credentials not provided",
+        "No authorization errors for authenticated admin users"
       ]
     }
   ],
   "constraints": [
-    "Maintain single-actor backend architecture in backend/main.mo",
-    "Do not modify immutable frontend paths including useInternetIdentity, useActor, main.tsx, and UI components",
-    "Preserve all existing payment and visit history data during any deduplication process"
+    "Must maintain Internet Identity as the primary login mechanism per Internet Computer requirements",
+    "Cannot implement real-time push notifications, SMS, or email - only in-app notifications",
+    "PDF generation must use client-side libraries compatible with React",
+    "Backend must remain single-actor architecture in Motoko",
+    "Admin password must be stored securely in backend, not hardcoded in frontend"
   ],
   "nonGoals": [
-    "Adding new party fields or metadata beyond name display",
-    "Implementing advanced filtering or search beyond existing PartiesPage functionality",
-    "Creating data export features for party names"
+    "Replacing Internet Identity entirely with username/password",
+    "External notification services (email, SMS, push)",
+    "Real-time WebSocket notifications",
+    "Multi-tenant architecture with separate admin accounts",
+    "Social media integrations or third-party APIs"
   ],
   "imageRequirements": {
     "required": [],

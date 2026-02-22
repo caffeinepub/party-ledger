@@ -11,13 +11,11 @@ import Float "mo:core/Float";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import Storage "blob-storage/Storage";
-import Migration "migration";
+
 import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-// Ensure data migration is included
-(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -210,8 +208,8 @@ actor {
   };
 
   public shared ({ caller }) func validateAndGenerateNewPartyId(name : Text, phone : Text) : async Text {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can generate party IDs");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can generate party IDs");
     };
     let partyId = generatePartyIdFromNameAndPhone(name, phone);
     if (parties.containsKey(partyId)) {
@@ -221,8 +219,8 @@ actor {
   };
 
   public shared ({ caller }) func validateAndGeneratePartyId(name : Text, phone : Text) : async Text {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can generate party IDs");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can generate party IDs");
     };
     let partyId = generatePartyIdFromNameAndPhone(name, phone);
     if (parties.containsKey(partyId)) {
@@ -239,8 +237,8 @@ actor {
     pan : Text,
     dueAmount : Int,
   ) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can add parties");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can add parties");
     };
     if (parties.containsKey(partyId)) {
       Runtime.trap("Party already exists");
@@ -301,8 +299,8 @@ actor {
   };
 
   public shared ({ caller }) func updateParty(partyId : PartyId, name : Text, address : Text, phoneNumber : Text, pan : Text, dueAmount : Int) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can update parties");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can update parties");
     };
     if (not parties.containsKey(partyId)) {
       Runtime.trap("Party does not exist");
@@ -321,8 +319,8 @@ actor {
   };
 
   public shared ({ caller }) func recordPayment(partyId : PartyId, amount : Int, comment : Text, paymentDate : Time.Time, nextPayment : ?Time.Time) : async Text {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can record payments");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can record payments");
     };
     if (not parties.containsKey(partyId)) {
       Runtime.trap("Party does not exist");
@@ -360,8 +358,8 @@ actor {
   };
 
   public shared ({ caller }) func recordPartyVisit(partyId : PartyId, amount : Int, comment : Text, paymentDate : Time.Time, nextPayment : ?Time.Time, location : ?Location) : async Text {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can record party visits");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
+      Runtime.trap("Unauthorized: Only admins can record party visits");
     };
     if (not parties.containsKey(partyId)) {
       Runtime.trap("Party does not exist");
@@ -583,7 +581,7 @@ actor {
     includeLocation : Bool,
   ) : async [(PartyId, [PartyVisitRecord])] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized");
+      Runtime.trap("Unauthorized: Only users can view parties with visits");
     };
 
     let filteredResultList = List.empty<(PartyId, [PartyVisitRecord])>();
@@ -618,7 +616,7 @@ actor {
 
   public query ({ caller }) func getPartiesWithTodayDuePayments() : async [(PartyId, [PartyVisitRecord])] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized");
+      Runtime.trap("Unauthorized: Only users can view parties with today's due payments");
     };
     let today = Time.now();
     let resultList = List.empty<(PartyId, [PartyVisitRecord])>();

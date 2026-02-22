@@ -4,6 +4,8 @@ import { RouterProvider, createRouter, createRootRoute, createRoute, Outlet } fr
 import { Toaster } from '@/components/ui/sonner';
 import { ThemeProvider } from 'next-themes';
 import { ActorSessionProvider } from './context/ActorSessionContext';
+import { AdminAuthProvider } from './context/AdminAuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import AppShell from './components/layout/AppShell';
 import DashboardPage from './pages/DashboardPage';
 import PartiesPage from './pages/PartiesPage';
@@ -15,7 +17,13 @@ import VisitDetailsPage from './pages/VisitDetailsPage';
 import MapPage from './pages/MapPage';
 import AllPartiesListPage from './pages/AllPartiesListPage';
 import DuplicatePartiesPage from './pages/DuplicatePartiesPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 import { TopLevelErrorBoundary } from './components/auth/TopLevelErrorBoundary';
+import AdminCredentialDialog from './components/auth/AdminCredentialDialog';
+import { useInternetIdentity } from './hooks/useInternetIdentity';
+import { useAdminAuth } from './context/AdminAuthContext';
+import { useEffect } from 'react';
+import { useUpcomingEventChecker } from './hooks/useUpcomingEventChecker';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,6 +33,30 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+function AppContent() {
+  const { identity } = useInternetIdentity();
+  const { isAdminValidated, promptForCredentials } = useAdminAuth();
+
+  useUpcomingEventChecker();
+
+  useEffect(() => {
+    if (identity && !isAdminValidated) {
+      const timer = setTimeout(() => {
+        promptForCredentials();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [identity, isAdminValidated, promptForCredentials]);
+
+  return (
+    <>
+      <RouterProvider router={router} />
+      <AdminCredentialDialog />
+      <Toaster />
+    </>
+  );
+}
 
 const rootRoute = createRootRoute({
   component: () => (
@@ -56,6 +88,12 @@ const reportsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/reports',
   component: ReportsPage,
+});
+
+const analyticsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/analytics',
+  component: AnalyticsPage,
 });
 
 const settingsRoute = createRoute({
@@ -99,6 +137,7 @@ const routeTree = rootRoute.addChildren([
   partiesRoute,
   partyDetailsRoute,
   reportsRoute,
+  analyticsRoute,
   settingsRoute,
   newPartyVisitRoute,
   visitDetailsRoute,
@@ -121,8 +160,11 @@ export default function App() {
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <QueryClientProvider client={queryClient}>
           <ActorSessionProvider>
-            <RouterProvider router={router} />
-            <Toaster />
+            <AdminAuthProvider>
+              <NotificationProvider>
+                <AppContent />
+              </NotificationProvider>
+            </AdminAuthProvider>
           </ActorSessionProvider>
         </QueryClientProvider>
       </ThemeProvider>

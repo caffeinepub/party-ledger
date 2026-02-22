@@ -1,10 +1,12 @@
 import { ReactNode } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Home, Users, FileText, Settings, LogOut, MapPin, Map, List } from 'lucide-react';
+import { Home, Users, FileText, Settings, LogOut, MapPin, Map, List, BarChart3 } from 'lucide-react';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
+import { useAdminAuth } from '../../context/AdminAuthContext';
 import BrandingHeader from '../branding/BrandingHeader';
+import NotificationBell from '../notifications/NotificationBell';
 
 interface AppShellProps {
   children: ReactNode;
@@ -13,9 +15,11 @@ interface AppShellProps {
 export default function AppShell({ children }: AppShellProps) {
   const navigate = useNavigate();
   const { clear } = useInternetIdentity();
+  const { clearAdminSession } = useAdminAuth();
   const queryClient = useQueryClient();
 
   const handleLogout = async () => {
+    clearAdminSession();
     await clear();
     queryClient.clear();
   };
@@ -27,6 +31,7 @@ export default function AppShell({ children }: AppShellProps) {
     { icon: MapPin, label: 'New Visit', path: '/new-visit' },
     { icon: Map, label: 'Map', path: '/map' },
     { icon: FileText, label: 'Reports', path: '/reports' },
+    { icon: BarChart3, label: 'Analytics', path: '/analytics' },
     { icon: Settings, label: 'Settings', path: '/settings' },
   ];
 
@@ -51,15 +56,18 @@ export default function AppShell({ children }: AppShellProps) {
                 </Button>
               ))}
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              className="gap-2 shrink-0"
-            >
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
+            <div className="flex items-center gap-2">
+              <NotificationBell />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleLogout}
+                className="gap-2 shrink-0"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </Button>
+            </div>
           </div>
         </div>
       </nav>

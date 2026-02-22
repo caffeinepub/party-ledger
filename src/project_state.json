@@ -1,30 +1,125 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
-  "known_issues": [],
-  "isFixRequest": false,
+  "summary": "Party and event management system with hybrid authentication: Internet Identity login plus admin credential verification (username: rajan, password: Admin@123). Features include search/filtering, event categories/tags, in-app notifications, reporting dashboards, and export functionality.",
+  "architectural_notes": [
+    "Hybrid authentication: Internet Identity for login, then admin credentials (username/password) for admin access verification",
+    "Admin credentials: username='rajan', password='Admin@123'",
+    "Search and filtering functionality for parties and events",
+    "Event categorization and tagging system",
+    "In-app notification center for reminders (no external push/email)",
+    "Reporting and analytics dashboards for data insights",
+    "Export system supporting CSV and PDF formats"
+  ],
+  "known_issues": [
+    "Party ID generation authorization error needs to be resolved with new hybrid auth system"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-create-a-new-page-or-section-that-displays-a-comprehensive-list-of-all-party-names-in-the-system-showing-each-unique-party-entry-with-their-name-prominently-displayed",
-      "title": "Create a new page or section that displays a comprehensive list of all party names in the system, showing each unique party entry with their name prominently displayed",
+      "id": "feature-implement-hybrid-authentication-system-after-internet-identity-login-prompt-users-to-enter-admin-credentials-username-rajan-password-admin-123-only-users-who-provide-correct-credentials-gain-admin-access-to-create-and-manage-parties-events-store-admin-session-state-in-react-context",
+      "title": "Implement hybrid authentication system: After Internet Identity login, prompt users to enter admin credentials (username: 'rajan', password: 'Admin@123'). Only users who provide correct credentials gain admin access to create and manage parties/events. Store admin session state in React context.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-based-on-the-uploaded-screenshot-showing-abc-auto-parts-bangesimal-appearing-three-times-with-identical-details-phone-n-a-pan-0-due-34-920-investigate-and-resolve-any-data-duplication-issues-in-the-party-records-to-ensure-each-party-exists-only-once-in-the-system",
-      "title": "Based on the uploaded screenshot showing 'ABC AUTO PARTS Bangesimal' appearing three times with identical details (Phone: N/A, PAN: 0, Due: ₹34,920), investigate and resolve any data duplication issues in the party records to ensure each party exists only once in the system",
+      "id": "feature-add-comprehensive-search-functionality-for-both-parties-and-events-that-searches-across-party-names-event-names-and-event-descriptions-include-a-search-input-field-with-real-time-filtering-that-updates-results-as-the-user-types",
+      "title": "Add comprehensive search functionality for both parties and events that searches across party names, event names, and event descriptions. Include a search input field with real-time filtering that updates results as the user types.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-create-event-categories-and-tags-system-with-predefined-categories-birthday-wedding-corporate-social-charity-other-that-admins-can-assign-to-events-support-multiple-categories-per-event-and-display-category-badges-on-event-cards",
+      "title": "Create event categories and tags system with predefined categories (Birthday, Wedding, Corporate, Social, Charity, Other) that admins can assign to events. Support multiple categories per event and display category badges on event cards.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-in-app-notification-center-that-displays-notifications-for-upcoming-events-24-hours-before-new-events-added-and-event-updates-changes-notifications-appear-when-users-are-logged-in-and-persist-until-dismissed-include-notification-badge-count-in-navigation",
+      "title": "Build in-app notification center that displays notifications for: upcoming events (24 hours before), new events added, and event updates/changes. Notifications appear when users are logged in and persist until dismissed. Include notification badge count in navigation.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-reporting-and-analytics-dashboard-with-metrics-including-total-parties-count-total-events-count-events-by-category-breakdown-upcoming-events-timeline-and-party-engagement-statistics-display-data-using-charts-bar-pie-line-and-summary-cards",
+      "title": "Create reporting and analytics dashboard with metrics including: total parties count, total events count, events by category breakdown, upcoming events timeline, and party engagement statistics. Display data using charts (bar, pie, line) and summary cards.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-export-functionality-to-generate-csv-files-containing-party-data-name-contact-events-and-event-data-name-date-description-categories-party-include-export-to-pdf-functionality-for-reports-with-formatted-tables-and-charts",
+      "title": "Implement export functionality to generate CSV files containing party data (name, contact, events) and event data (name, date, description, categories, party). Include export to PDF functionality for reports with formatted tables and charts.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-party-id-generation-authorization-error-by-ensuring-the-new-hybrid-authentication-system-properly-authorizes-users-with-valid-admin-credentials-to-generate-party-ids-and-perform-all-admin-operations",
+      "title": "Fix the Party ID generation authorization error by ensuring the new hybrid authentication system properly authorizes users with valid admin credentials to generate party IDs and perform all admin operations.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Party Ledger",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Add search and filtering for parties and events",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Implement event categories or tags system",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Add in-app user notifications and reminders",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Create reporting and analytics dashboards",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Build export functionality for CSV and PDF",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Replace Internet Identity-only auth with hybrid system: Internet Identity login plus admin credential check (username: rajan, password: Admin@123)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Implement filtering system for parties and events with filters for: date range (for events), associated party (for events), and any other relevant criteria. Display active filters as removable chips and provide a clear all filters option.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Party Management Pro",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
