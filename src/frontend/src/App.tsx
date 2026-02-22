@@ -13,6 +13,8 @@ import SettingsPage from './pages/SettingsPage';
 import NewPartyVisitPage from './pages/NewPartyVisitPage';
 import VisitDetailsPage from './pages/VisitDetailsPage';
 import MapPage from './pages/MapPage';
+import AllPartiesListPage from './pages/AllPartiesListPage';
+import DuplicatePartiesPage from './pages/DuplicatePartiesPage';
 import { TopLevelErrorBoundary } from './components/auth/TopLevelErrorBoundary';
 
 const queryClient = new QueryClient({
@@ -80,6 +82,18 @@ const mapRoute = createRoute({
   component: MapPage,
 });
 
+const allPartiesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/all-parties',
+  component: AllPartiesListPage,
+});
+
+const duplicatesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/duplicates',
+  component: DuplicatePartiesPage,
+});
+
 const routeTree = rootRoute.addChildren([
   dashboardRoute,
   partiesRoute,
@@ -89,6 +103,8 @@ const routeTree = rootRoute.addChildren([
   newPartyVisitRoute,
   visitDetailsRoute,
   mapRoute,
+  allPartiesRoute,
+  duplicatesRoute,
 ]);
 
 const router = createRouter({ routeTree });

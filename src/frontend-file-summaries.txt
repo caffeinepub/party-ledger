@@ -1,5 +1,5 @@
 {
-  "frontend/src/App.tsx": "Main application component with routing configuration including dashboard, parties, reports, settings, visits, and map routes with proper provider setup.",
+  "frontend/src/App.tsx": "Main application component with routing configuration including new routes for all-parties and duplicates pages.",
   "frontend/src/hooks/queries/useAuth.ts": "React Query hooks for user profile management using shared actor from ActorSessionContext with conservative refetch settings to prevent bootstrap churn.",
   "frontend/src/hooks/queries/useParties.ts": "React Query hooks for party CRUD operations with optimized cache settings (5 min staleTime, 10 min gcTime) to improve navigation speed and reduce backend load.",
   "frontend/src/hooks/queries/usePayments.ts": "React Query hooks for payment and visit operations with proper cache invalidation including individual party details query, ensuring party information updates correctly after recording payments or visits.",
@@ -11,7 +11,7 @@
   "frontend/src/lib/phone.ts": "Utility functions for normalizing phone numbers and creating tel: links.",
   "frontend/src/lib/excel/parsePartiesFromExcel.ts": "CSV file parser that extracts party data from comma-separated values with proper quote handling, column validation, field length validation, and comprehensive console.debug logging for each parsing step to aid in debugging import issues.",
   "frontend/src/lib/transfer/jsonTransfer.ts": "JSON export/import utilities using UpgradeData type with bigint serialization and merge logic.",
-  "frontend/src/components/layout/AppShell.tsx": "Main layout component with navigation, Internet Identity logout functionality, and responsive header/footer.",
+  "frontend/src/components/layout/AppShell.tsx": "Main layout component with navigation including new \"All Parties\" link, Internet Identity logout functionality, and responsive header/footer.",
   "frontend/src/components/branding/BrandingHeader.tsx": "Persistent header displaying shop name and logo with fallback to default icon, now with improved responsive layout and text wrapping for longer shop names.",
   "frontend/src/components/branding/BrandingSettingsCard.tsx": "Settings card for updating shop name and uploading logo with progress tracking, now properly syncing the shop name input field with fetched branding data using useEffect.",
   "frontend/src/components/auth/LoginScreen.tsx": "Login screen with Internet Identity authentication.",
@@ -20,7 +20,7 @@
   "frontend/src/pages/PartiesPage.tsx": "Party list page with memoized search filtering and skeleton loading states for improved perceived performance during data fetching.",
   "frontend/src/pages/PartyDetailsPage.tsx": "Party details page with full information, edit/delete actions, payment recording, and party visit functionality, correctly passing partyId and initialData props to PartyFormDialog and only payments prop to PaymentHistory.",
   "frontend/src/pages/ReportsPage.tsx": "Advanced view reports page with comprehensive analytics including financial overview, payment statistics, detailed party information, and complete payment history with full details for all records.",
-  "frontend/src/pages/SettingsPage.tsx": "Settings page with tabs for profile, branding, import, data transfer, and admin management (visible only to admins).",
+  "frontend/src/pages/SettingsPage.tsx": "Settings page with tabs for profile, branding, import, data transfer, new data health tab with link to duplicate detection, and admin management (visible only to admins).",
   "frontend/src/components/parties/PartyFormDialog.tsx": "Reusable dialog form for adding and editing parties with enhanced error handling, improved error UI with icons and borders, and comprehensive console logging throughout the form submission flow.",
   "frontend/src/components/payments/PaymentFormDialog.tsx": "Dialog form for recording payments with amount, comment, and next payment date validation.",
   "frontend/src/components/payments/PaymentHistory.tsx": "Payment history component displaying metadata for visit records with payment IDs and indicator badges for location and next payment date, simplified to show only essential information without redundant party context.",
@@ -61,5 +61,7 @@
   "frontend/src/components/dashboard/TodayNotifications.tsx": "Fast view notification component displaying up to 5 parties with payments due today, showing each party name once with consolidated payment count and action buttons, removed debug logging.",
   "frontend/src/hooks/queries/useUpcomingPayments.ts": "React Query hook that fetches parties with payments due on a specific date, filtering by the selected date and returning a flat list of parties with their next payment information, includes comprehensive logging for debugging.",
   "frontend/src/components/dashboard/UpcomingPaymentsCalendar.tsx": "Calendar-style component with date picker that displays payment reminders for a selected date, showing each party name once per entry with phone number below, removed redundant next payment date display and debug logging.",
-  "frontend/index.html": "HTML entry point with Leaflet and Leaflet.markercluster CDN links for map functionality with marker clustering support."
+  "frontend/index.html": "HTML entry point with Leaflet and Leaflet.markercluster CDN links for map functionality with marker clustering support.",
+  "frontend/src/pages/AllPartiesListPage.tsx": "New page component that displays all party names in a simple, sorted list format with loading and error states.",
+  "frontend/src/pages/DuplicatePartiesPage.tsx": "Diagnostic page that identifies and displays potential duplicate parties by grouping them by name (case-insensitive) and showing detailed comparison information for each duplicate group with proper TypeScript types."
 }

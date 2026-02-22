@@ -1,5 +1,6 @@
-import List "mo:core/List";
+import Iter "mo:core/Iter";
 import Map "mo:core/Map";
+import List "mo:core/List";
 import Nat "mo:core/Nat";
 import Text "mo:core/Text";
 import Time "mo:core/Time";
@@ -7,14 +8,16 @@ import Int "mo:core/Int";
 import Order "mo:core/Order";
 import Array "mo:core/Array";
 import Float "mo:core/Float";
-import Iter "mo:core/Iter";
 import Principal "mo:core/Principal";
 import Runtime "mo:core/Runtime";
 import Storage "blob-storage/Storage";
+import Migration "migration";
 import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
+// Ensure data migration is included
+(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);

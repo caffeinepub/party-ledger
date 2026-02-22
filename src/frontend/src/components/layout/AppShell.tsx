@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useNavigate } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Home, Users, FileText, Settings, LogOut, MapPin, Map } from 'lucide-react';
+import { Home, Users, FileText, Settings, LogOut, MapPin, Map, List } from 'lucide-react';
 import { useInternetIdentity } from '../../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import BrandingHeader from '../branding/BrandingHeader';
@@ -23,6 +23,7 @@ export default function AppShell({ children }: AppShellProps) {
   const navItems = [
     { icon: Home, label: 'Dashboard', path: '/' },
     { icon: Users, label: 'Parties', path: '/parties' },
+    { icon: List, label: 'All Parties', path: '/all-parties' },
     { icon: MapPin, label: 'New Visit', path: '/new-visit' },
     { icon: Map, label: 'Map', path: '/map' },
     { icon: FileText, label: 'Reports', path: '/reports' },

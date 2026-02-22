@@ -1,36 +1,62 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Remove duplicate party name display",
+  "title": "Display all party names in the system",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Remove duplicate display of party names in the user interface where the same party name appears multiple times in a single view or component",
+      "summary": "Create a new page or section that displays a comprehensive list of all party names in the system",
       "acceptanceCriteria": [
-        "Party names are displayed only once per logical grouping in all UI components",
-        "No visual duplication of party names occurs in lists, cards, or detail views",
-        "The change maintains clarity and does not reduce necessary information"
+        "All party names are displayed in a clear, readable format",
+        "Each party appears exactly once in the list",
+        "The list is accessible from the main navigation or a dedicated route"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/dashboard/TodayNotifications.tsx",
-          "operation": "modify",
-          "description": "Review and eliminate duplicate party name displays in the today's notifications table. Ensure each party is shown once per row with consolidated information, removing any redundant party name labels or headers within individual notification items."
+          "path": "frontend/src/pages/AllPartiesListPage.tsx",
+          "operation": "create",
+          "description": "Create a new page component that displays all party names in a simple list format. Fetch all parties using the existing useGetAllParties hook from frontend/src/hooks/queries/useParties.ts. Display each party name prominently with basic styling. Include loading and error states. Ensure each party appears exactly once by using the party ID as the key."
         },
         {
-          "path": "frontend/src/components/dashboard/UpcomingPaymentsCalendar.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Remove duplicate party name displays in the upcoming payments calendar view. Ensure party names appear only once per party entry when displaying parties with payments due on the selected date, consolidating any redundant text or labels."
+          "description": "Add a new route for the AllPartiesListPage at path '/all-parties' in the router configuration. Import the AllPartiesListPage component and register it alongside existing routes like '/parties' and '/dashboard'."
         },
         {
-          "path": "frontend/src/pages/DashboardPage.tsx",
+          "path": "frontend/src/components/layout/AppShell.tsx",
           "operation": "modify",
-          "description": "Review the recent visits section and today's summary statistics for duplicate party name displays. Ensure party names are shown once per visit entry in the recent visits list, removing any redundant party identifiers or labels that may appear alongside the primary party name display."
+          "description": "Add a navigation link to 'All Parties' in the main navigation menu, positioned after the existing 'Parties' link. The link should navigate to '/all-parties' route. Use consistent styling with other navigation items."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Investigate and display duplicate party records to help identify data duplication issues",
+      "acceptanceCriteria": [
+        "Duplicate party records are identified and deduplicated",
+        "Each unique party appears only once in the database",
+        "Payment history and visit records are preserved and correctly associated with the consolidated party record"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/DuplicatePartiesPage.tsx",
+          "operation": "create",
+          "description": "Create a page that identifies and displays potential duplicate parties based on matching names. Fetch all parties using useGetAllParties and group them by name (case-insensitive). Display groups where more than one party shares the same name. For each duplicate group, show all party details (name, phone, PAN, address, due amount, ID) side-by-side for comparison. Include a clear warning message about the duplicate data issue. This is a diagnostic page to visualize the problem described in the screenshot showing 'ABC AUTO PARTS Bangesimal' appearing three times."
         },
         {
-          "path": "frontend/src/components/payments/PaymentHistory.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Remove duplicate party name context from the payment history component when displayed on party detail pages. Since the party context is already established by the parent page, eliminate redundant party name displays within individual payment record entries."
+          "description": "Add a new route for the DuplicatePartiesPage at path '/duplicates' in the router configuration. Import the DuplicatePartiesPage component and register it."
+        },
+        {
+          "path": "frontend/src/components/layout/AppShell.tsx",
+          "operation": "modify",
+          "description": "Add a temporary navigation link to 'Find Duplicates' in the Settings section or as a separate debug/admin menu item. This link should navigate to '/duplicates' route for investigating duplicate party records."
+        },
+        {
+          "path": "frontend/src/pages/SettingsPage.tsx",
+          "operation": "modify",
+          "description": "Add a new tab or section to the Settings page titled 'Data Health' that includes a link or button to navigate to the DuplicatePartiesPage. This provides easy access to the duplicate detection tool from the settings interface where data management tasks are typically performed."
         }
       ]
     }

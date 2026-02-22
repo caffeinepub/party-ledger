@@ -2,13 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-duplicate-display-of-party-names-in-the-user-interface-where-the-same-party-name-appears-multiple-times-in-a-single-view-or-component",
-      "featureTitle": "Remove duplicate display of party names in the user interface where the same party name appears multiple times in a single view or component",
+      "featureId": "feature-create-a-new-page-or-section-that-displays-a-comprehensive-list-of-all-party-names-in-the-system-showing-each-unique-party-entry-with-their-name-prominently-displayed",
+      "featureTitle": "Create a new page or section that displays a comprehensive list of all party names in the system, showing each unique party entry with their name prominently displayed",
       "files": [
-        "frontend/src/components/dashboard/TodayNotifications.tsx",
-        "frontend/src/components/dashboard/UpcomingPaymentsCalendar.tsx",
-        "frontend/src/components/payments/PaymentHistory.tsx",
-        "frontend/src/pages/DashboardPage.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/pages/AllPartiesListPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -21,6 +20,29 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-based-on-the-uploaded-screenshot-showing-abc-auto-parts-bangesimal-appearing-three-times-with-identical-details-phone-n-a-pan-0-due-34-920-investigate-and-resolve-any-data-duplication-issues-in-the-party-records-to-ensure-each-party-exists-only-once-in-the-system",
+      "featureTitle": "Based on the uploaded screenshot showing 'ABC AUTO PARTS Bangesimal' appearing three times with identical details (Phone: N/A, PAN: 0, Due: ₹34,920), investigate and resolve any data duplication issues in the party records to ensure each party exists only once in the system",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/layout/AppShell.tsx",
+        "frontend/src/pages/DuplicatePartiesPage.tsx",
+        "frontend/src/pages/SettingsPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
       ],
       "confidence": "high"
     }

@@ -1,29 +1,44 @@
 import Map "mo:core/Map";
-import Principal "mo:core/Principal";
+import List "mo:core/List";
+import Text "mo:core/Text";
 
 module {
-  type OldUserProfiles = Map.Map<Principal, Text>;
-  type NewUserProfiles = Map.Map<Principal, { name : Text }>;
-
+  type PartyId = Text;
+  type PaymentId = Text;
+  type Party = {
+    id : PartyId;
+    name : Text;
+    address : Text;
+    phone : Text;
+    pan : Text;
+    dueAmount : Int;
+  };
+  type PartyVisitRecord = {
+    amount : Int;
+    paymentDate : Int;
+    nextPaymentDate : ?Int;
+    comment : Text;
+    location : ?{ latitude : Float; longitude : Float };
+  };
   type OldActor = {
-    userProfiles : OldUserProfiles;
-    staffAccounts : Map.Map<Text, {
-      loginName : Text;
-      boundPrincipal : ?Principal;
-      isDisabled : Bool;
-      canViewAllRecords : Bool;
-    }>;
+    parties : Map.Map<PartyId, Party>;
+    partyPayments : Map.Map<PartyId, List.List<(PaymentId, PartyVisitRecord)>>;
   };
 
   type NewActor = {
-    userProfiles : NewUserProfiles;
+    parties : Map.Map<PartyId, Party>;
+    partyPayments : Map.Map<PartyId, List.List<(PaymentId, PartyVisitRecord)>>;
   };
 
   public func run(old : OldActor) : NewActor {
-    {
-      userProfiles = old.userProfiles.map<Principal, Text, { name : Text }>(
-        func(_p, name) { { name } }
-      );
+    let cleanedParties = Map.empty<PartyId, Party>();
+
+    for ((partyId, party) in old.parties.entries()) {
+      if (not cleanedParties.containsKey(partyId)) {
+        cleanedParties.add(partyId, party);
+      };
     };
+
+    { old with parties = cleanedParties };
   };
 };

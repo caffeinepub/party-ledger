@@ -4,26 +4,27 @@
   "summary": "New project",
   "architectural_notes": [],
   "known_issues": [],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-remove-duplicate-display-of-party-names-in-the-user-interface-where-the-same-party-name-appears-multiple-times-in-a-single-view-or-component",
-      "title": "Remove duplicate display of party names in the user interface where the same party name appears multiple times in a single view or component",
+      "id": "feature-create-a-new-page-or-section-that-displays-a-comprehensive-list-of-all-party-names-in-the-system-showing-each-unique-party-entry-with-their-name-prominently-displayed",
+      "title": "Create a new page or section that displays a comprehensive list of all party names in the system, showing each unique party entry with their name prominently displayed",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    }
-  ],
-  "new_feature_requests": [
+    },
     {
-      "id": "AR-1",
-      "summary": "Remove duplicate party name display",
-      "reqIds": [],
-      "status": "pending"
+      "id": "feature-based-on-the-uploaded-screenshot-showing-abc-auto-parts-bangesimal-appearing-three-times-with-identical-details-phone-n-a-pan-0-due-34-920-investigate-and-resolve-any-data-duplication-issues-in-the-party-records-to-ensure-each-party-exists-only-once-in-the-system",
+      "title": "Based on the uploaded screenshot showing 'ABC AUTO PARTS Bangesimal' appearing three times with identical details (Phone: N/A, PAN: 0, Due: ₹34,920), investigate and resolve any data duplication issues in the party records to ensure each party exists only once in the system",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
     }
   ],
-  "projectName": "Remove duplicate party name display",
+  "new_feature_requests": [],
+  "projectName": "Party Ledger",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

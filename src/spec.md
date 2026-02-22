@@ -1,10 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Remove duplicate party name displays in the user interface.
+**Goal:** Display all unique party names in the system and resolve duplicate party records.
 
 **Planned changes:**
-- Eliminate duplicate party name displays where the same party name appears multiple times in a single view or component
-- Ensure party names are displayed only once per logical grouping across all UI components
+- Create a comprehensive list view showing all party names in the system
+- Investigate and resolve duplicate party records (e.g., "ABC AUTO PARTS Bangesimal" appearing three times with identical details)
+- Ensure each party appears exactly once while preserving payment history and visit records
 
-**User-visible outcome:** Party names will appear only once in each view, providing a cleaner and less redundant interface while maintaining all necessary information.
+**User-visible outcome:** Users can view a complete, deduplicated list of all parties with each party appearing only once, accessible from the main navigation.

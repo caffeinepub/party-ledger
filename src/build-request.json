@@ -1,34 +1,55 @@
 {
   "kind": "build_request",
-  "title": "Remove duplicate party name display",
+  "title": "Display all party names in the system",
+  "projectName": "Party Ledger",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove duplicate display of party names in the user interface where the same party name appears multiple times in a single view or component",
+      "text": "Create a new page or section that displays a comprehensive list of all party names in the system, showing each unique party entry with their name prominently displayed",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-final"
+          "msg-latest"
         ],
         "quotes": [
-          "same party name show remove"
+          "all parties name"
         ]
       },
       "acceptanceCriteria": [
-        "Party names are displayed only once per logical grouping in all UI components",
-        "No visual duplication of party names occurs in lists, cards, or detail views",
-        "The change maintains clarity and does not reduce necessary information"
+        "All party names are displayed in a clear, readable format",
+        "Each party appears exactly once in the list",
+        "The list is accessible from the main navigation or a dedicated route"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Based on the uploaded screenshot showing 'ABC AUTO PARTS Bangesimal' appearing three times with identical details (Phone: N/A, PAN: 0, Due: ₹34,920), investigate and resolve any data duplication issues in the party records to ensure each party exists only once in the system",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-latest"
+        ],
+        "quotes": [
+          "all parties name"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Duplicate party records are identified and deduplicated",
+        "Each unique party appears only once in the database",
+        "Payment history and visit records are preserved and correctly associated with the consolidated party record"
       ]
     }
   ],
   "constraints": [
-    "Do not modify backend data structures or APIs",
-    "Preserve all existing functionality for party display and navigation"
+    "Maintain single-actor backend architecture in backend/main.mo",
+    "Do not modify immutable frontend paths including useInternetIdentity, useActor, main.tsx, and UI components",
+    "Preserve all existing payment and visit history data during any deduplication process"
   ],
   "nonGoals": [
-    "Changing the underlying data model for parties",
-    "Modifying party naming conventions or validation rules"
+    "Adding new party fields or metadata beyond name display",
+    "Implementing advanced filtering or search beyond existing PartiesPage functionality",
+    "Creating data export features for party names"
   ],
   "imageRequirements": {
     "required": [],
