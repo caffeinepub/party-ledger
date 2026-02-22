@@ -2,10 +2,13 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-project-state-json-to-reflect-completion-set-new-feature-requests-to-empty-array-update-summary-to-admin-management-system-with-internet-identity-principal-based-access-control-fully-migrated-and-add-backend-features-to-existing-features-if-desired",
-      "featureTitle": "Update project_state.json to reflect completion: set new_feature_requests to empty array, update summary to 'Admin Management System with Internet Identity Principal-based access control – FULLY MIGRATED', and add backend features to existing_features if desired",
+      "featureId": "feature-remove-duplicate-display-of-party-names-in-the-user-interface-where-the-same-party-name-appears-multiple-times-in-a-single-view-or-component",
+      "featureTitle": "Remove duplicate display of party names in the user interface where the same party name appears multiple times in a single view or component",
       "files": [
-        "project_state.json"
+        "frontend/src/components/dashboard/TodayNotifications.tsx",
+        "frontend/src/components/dashboard/UpcomingPaymentsCalendar.tsx",
+        "frontend/src/components/payments/PaymentHistory.tsx",
+        "frontend/src/pages/DashboardPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,47 +20,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-9"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-regenerate-frontend-file-summaries-txt-to-remove-all-old-password-related-descriptions",
-      "featureTitle": "Regenerate frontend-file-summaries.txt to remove all old password-related descriptions",
-      "files": [
-        "frontend-file-summaries.txt"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-11"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-a-visual-note-in-adminprincipalspanel-tsx-displaying-at-least-one-admin-is-required-when-only-one-admin-principal-remains",
-      "featureTitle": "Add a visual note in AdminPrincipalsPanel.tsx displaying 'At least one admin is required' when only one admin principal remains",
-      "files": [
-        "frontend/src/components/admin/AdminPrincipalsPanel.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-13"
+        "REQ-1"
       ],
       "confidence": "high"
     }

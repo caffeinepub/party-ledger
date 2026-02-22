@@ -1,210 +1,36 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Complete Password System Purge and Dead Code Cleanup",
+  "title": "Remove duplicate party name display",
   "requirements": [
     {
-      "id": "REQ-4",
-      "summary": "Delete password-related frontend files entirely",
+      "id": "REQ-1",
+      "summary": "Remove duplicate display of party names in the user interface where the same party name appears multiple times in a single view or component",
       "acceptanceCriteria": [
-        "StaffLoginScreen.tsx is deleted",
-        "ResetAdminPasswordDialog.tsx is deleted",
-        "StaffAuthContext.tsx is deleted",
-        "useStaffAuth.ts is deleted",
-        "staffSession.ts is deleted"
+        "Party names are displayed only once per logical grouping in all UI components",
+        "No visual duplication of party names occurs in lists, cards, or detail views",
+        "The change maintains clarity and does not reduce necessary information"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/auth/StaffLoginScreen.tsx",
-          "operation": "delete",
-          "description": "Delete the empty StaffLoginScreen.tsx placeholder file as password-based authentication has been completely removed from the application"
+          "path": "frontend/src/components/dashboard/TodayNotifications.tsx",
+          "operation": "modify",
+          "description": "Review and eliminate duplicate party name displays in the today's notifications table. Ensure each party is shown once per row with consolidated information, removing any redundant party name labels or headers within individual notification items."
         },
         {
-          "path": "frontend/src/components/auth/ResetAdminPasswordDialog.tsx",
-          "operation": "delete",
-          "description": "Delete the empty ResetAdminPasswordDialog.tsx placeholder file as password reset functionality is no longer needed"
+          "path": "frontend/src/components/dashboard/UpcomingPaymentsCalendar.tsx",
+          "operation": "modify",
+          "description": "Remove duplicate party name displays in the upcoming payments calendar view. Ensure party names appear only once per party entry when displaying parties with payments due on the selected date, consolidating any redundant text or labels."
         },
         {
-          "path": "frontend/src/context/StaffAuthContext.tsx",
-          "operation": "delete",
-          "description": "Delete the empty StaffAuthContext.tsx placeholder file as staff authentication context is obsolete"
+          "path": "frontend/src/pages/DashboardPage.tsx",
+          "operation": "modify",
+          "description": "Review the recent visits section and today's summary statistics for duplicate party name displays. Ensure party names are shown once per visit entry in the recent visits list, removing any redundant party identifiers or labels that may appear alongside the primary party name display."
         },
         {
-          "path": "frontend/src/hooks/useStaffAuth.ts",
-          "operation": "delete",
-          "description": "Delete the empty useStaffAuth.ts file as staff authentication hooks are no longer used"
-        },
-        {
-          "path": "frontend/src/utils/staffSession.ts",
-          "operation": "delete",
-          "description": "Delete the empty staffSession.ts utility file as staff session management is no longer required"
-        }
-      ]
-    },
-    {
-      "id": "REQ-5",
-      "summary": "Clean or delete useStaffAdmin.ts by removing all reset-password functions",
-      "acceptanceCriteria": [
-        "All reset-password functions are removed from useStaffAdmin.ts",
-        "File is deleted if no functional code remains after cleanup"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/queries/useStaffAdmin.ts",
-          "operation": "delete",
-          "description": "Delete useStaffAdmin.ts entirely as the file is already empty and contains no functional code after previous password-related cleanup"
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Delete StaffManagementPanel.tsx as admin management is now handled by AdminPrincipalsPanel.tsx",
-      "acceptanceCriteria": [
-        "StaffManagementPanel.tsx is deleted",
-        "AdminPrincipalsPanel.tsx remains as the sole admin management component"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/admin/StaffManagementPanel.tsx",
-          "operation": "delete",
-          "description": "Delete StaffManagementPanel.tsx as it is an empty placeholder and admin principal management is now fully handled by AdminPrincipalsPanel.tsx"
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Remove all imports and references to deleted password-related files across the frontend codebase",
-      "acceptanceCriteria": [
-        "No imports reference deleted password-related files",
-        "No staffAuth, useStaffAuth, or StaffAuthProvider references remain",
-        "All files compile without errors after import cleanup"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/payments/PaymentHistory.tsx",
           "operation": "modify",
-          "description": "Remove any imports or references to StaffLoginScreen, StaffAuthContext, StaffAuthProvider, or useStaffAuth from the root application component"
-        },
-        {
-          "path": "frontend/src/main.tsx",
-          "operation": "modify",
-          "description": "Remove any imports or references to StaffAuthContext, StaffAuthProvider, or useStaffAuth from the application entry point"
-        },
-        {
-          "path": "frontend/src/pages/SettingsPage.tsx",
-          "operation": "modify",
-          "description": "Remove any imports or references to StaffManagementPanel, useStaffAuth, or staffSession utilities from the settings page"
-        },
-        {
-          "path": "frontend/src/components/layout/AppShell.tsx",
-          "operation": "modify",
-          "description": "Remove any imports or references to useStaffAuth, StaffAuthContext, or staffSession utilities from the application shell layout"
-        },
-        {
-          "path": "frontend/src/context/AppReadinessContext.tsx",
-          "operation": "modify",
-          "description": "Remove any imports or references to StaffAuthContext, useStaffAuth, or staffSession utilities from the app readiness context"
-        }
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "summary": "Remove temporary type casts from useAdminPrincipals.ts after backend bindings are regenerated",
-      "acceptanceCriteria": [
-        "Frontend bindings are regenerated from backend declarations",
-        "All 'as any' type casts are removed from useAdminPrincipals.ts",
-        "TypeScript compilation succeeds with proper typing"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/queries/useAdminPrincipals.ts",
-          "operation": "modify",
-          "description": "Remove all temporary 'as any' type casts from useAdminPrincipals.ts after running 'dfx generate' to regenerate frontend bindings with updated backend types. Replace temporary extended actor interface with proper typed calls to the backend admin principal management functions."
-        }
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "summary": "Update project_state.json to reflect completion of password system migration",
-      "acceptanceCriteria": [
-        "project_state.json shows new_feature_requests as empty array",
-        "Summary reflects FULLY MIGRATED status",
-        "Backend features are documented in existing_features"
-      ],
-      "file_operations": [
-        {
-          "path": "project_state.json",
-          "operation": "modify",
-          "description": "Update project_state.json to reflect completion: set new_feature_requests to empty array, update summary to 'Admin Management System with Internet Identity Principal-based access control – FULLY MIGRATED', and add backend admin principal management features to existing_features array documenting the completed migration"
-        }
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "summary": "Update coverage.json and feature_evidence.json to reflect all requirements as implemented",
-      "acceptanceCriteria": [
-        "coverage.json shows all requirements as implemented",
-        "feature_evidence.json documents all completed features",
-        "Reports accurately reflect current implementation state"
-      ],
-      "file_operations": [
-        {
-          "path": "coverage.json",
-          "operation": "modify",
-          "description": "Update coverage.json to mark all 7 password removal and cleanup requirements as 'implemented' status after re-running the build process"
-        },
-        {
-          "path": "feature_evidence.json",
-          "operation": "modify",
-          "description": "Update feature_evidence.json to document all completed password removal and cleanup features with evidence of implementation after re-running the build process"
-        }
-      ]
-    },
-    {
-      "id": "REQ-11",
-      "summary": "Regenerate frontend-file-summaries.txt to remove all old password-related descriptions",
-      "acceptanceCriteria": [
-        "frontend-file-summaries.txt contains no references to password functionality",
-        "All summaries accurately reflect current file contents",
-        "Deleted files are removed from the summaries"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend-file-summaries.txt",
-          "operation": "modify",
-          "description": "Regenerate frontend-file-summaries.txt to remove all descriptions of deleted password-related files (StaffLoginScreen, ResetAdminPasswordDialog, StaffAuthContext, useStaffAuth, staffSession, useStaffAdmin, StaffManagementPanel) and update summaries for modified files to reflect removal of password-related imports and references"
-        }
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "summary": "Update SettingsPage.tsx to ensure the Admin tab only displays AdminPrincipalsPanel",
-      "acceptanceCriteria": [
-        "Admin tab renders only AdminPrincipalsPanel",
-        "No references to StaffManagementPanel remain in SettingsPage",
-        "UI displays cleanly without layout issues"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/SettingsPage.tsx",
-          "operation": "modify",
-          "description": "Verify that the Admin tab in SettingsPage.tsx renders only AdminPrincipalsPanel with no leftover references to StaffManagementPanel. Remove any conditional rendering or tab content that references the deleted StaffManagementPanel component."
-        }
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "summary": "Add visual note in AdminPrincipalsPanel.tsx displaying 'At least one admin is required' when only one admin remains",
-      "acceptanceCriteria": [
-        "Message 'At least one admin is required' displays when admin count is 1",
-        "Message is visually distinct and user-friendly",
-        "Message does not display when multiple admins exist"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/admin/AdminPrincipalsPanel.tsx",
-          "operation": "modify",
-          "description": "Add a small visual note (using Alert or similar UI component) that displays 'At least one admin is required' when the admin principals list contains only one entry. Show this message above or below the admin list in a muted/info style so users understand why the last admin cannot be removed."
+          "description": "Remove duplicate party name context from the payment history component when displayed on party detail pages. Since the party context is already established by the parent page, eliminate redundant party name displays within individual payment record entries."
         }
       ]
     }

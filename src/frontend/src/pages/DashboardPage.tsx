@@ -74,9 +74,9 @@ export default function DashboardPage() {
       {/* Visits List - Simplified for Fast View */}
       <Card>
         <CardHeader>
-          <CardTitle>Today's Visits</CardTitle>
+          <CardTitle>Recent Visits</CardTitle>
           <CardDescription>
-            {count === 0 ? 'No visits recorded today' : `${count} visit${count !== 1 ? 's' : ''} recorded`}
+            {count === 0 ? 'No visits recorded today' : `${count} visit${count !== 1 ? 's' : ''} recorded today`}
           </CardDescription>
         </CardHeader>
         <CardContent>

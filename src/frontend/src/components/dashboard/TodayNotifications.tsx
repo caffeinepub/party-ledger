@@ -60,52 +60,43 @@ export default function TodayNotifications() {
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {notifications.slice(0, 5).map((notification) => {
-            console.log('[TodayNotifications Render]', {
-              partyId: notification.partyId,
-              partyName: notification.partyName,
-              partyPhone: notification.partyPhone,
-              recordsCount: notification.records.length,
-            });
-
-            return (
-              <div
-                key={notification.partyId}
-                className="flex items-center justify-between gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold truncate">
-                    {notification.partyName || notification.partyId}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {notification.records.length} payment{notification.records.length !== 1 ? 's' : ''} due
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  {notification.partyPhone && (
-                    <Button
-                      size="sm"
-                      variant="default"
-                      asChild
-                      className="shrink-0"
-                    >
-                      <a href={createTelLink(notification.partyPhone)}>
-                        <Phone className="h-4 w-4 mr-2" />
-                        Call
-                      </a>
-                    </Button>
-                  )}
+          {notifications.slice(0, 5).map((notification) => (
+            <div
+              key={notification.partyId}
+              className="flex items-center justify-between gap-4 p-3 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+            >
+              <div className="flex-1 min-w-0">
+                <h3 className="font-semibold truncate">
+                  {notification.partyName || notification.partyId}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {notification.records.length} payment{notification.records.length !== 1 ? 's' : ''} due
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {notification.partyPhone && (
                   <Button
                     size="sm"
-                    variant="outline"
-                    onClick={() => navigate({ to: '/parties/$partyId', params: { partyId: notification.partyId } })}
+                    variant="default"
+                    asChild
+                    className="shrink-0"
                   >
-                    <ArrowRight className="h-4 w-4" />
+                    <a href={createTelLink(notification.partyPhone)}>
+                      <Phone className="h-4 w-4 mr-2" />
+                      Call
+                    </a>
                   </Button>
-                </div>
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => navigate({ to: '/parties/$partyId', params: { partyId: notification.partyId } })}
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
               </div>
-            );
-          })}
+            </div>
+          ))}
           {notifications.length > 5 && (
             <div className="text-center pt-2">
               <Button variant="link" onClick={() => navigate({ to: '/reports' })}>

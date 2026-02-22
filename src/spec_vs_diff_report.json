@@ -1,94 +1,25 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-22T08:28:29.055Z",
-  "summary": "The diff shows only 4 modified files (backend/main.mo, AdminPrincipalsPanel.tsx, frontend-file-summaries.txt, project_state.json) with no file deletions. Most requirements involve deleting files or removing code sections, which are not evidenced in the diff. REQ-13 appears implemented in AdminPrincipalsPanel.tsx. Project metadata updates are incomplete.",
-  "missing_requirements": [
+  "generatedAt": "2026-02-22T08:43:59.445Z",
+  "summary": "The diff shows modifications to 6 frontend files focused on removing duplicate party name displays. The changes align well with REQ-1, particularly in dashboard components where party names were displayed redundantly. The modifications maintain functionality while improving UI clarity by showing party names once per logical grouping.",
+  "missing_requirements": [],
+  "hallucinated_features": [
     {
-      "id": "REQ-1",
-      "requirement": "Remove all password-related types from backend/migration.mo",
-      "reason": "backend/migration.mo is not present in the diff, so no evidence of OldStaffAccount or OldActor type removal",
-      "evidence": []
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "Make migration function aggressive in wiping password data",
-      "reason": "backend/migration.mo is not present in the diff, so no evidence of migration function changes",
-      "evidence": []
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Remove all password-related code from backend/main.mo",
-      "reason": "backend/main.mo is modified but truncated; no evidence showing removal of adminPassword, staffPasswords, or verifyAdminPassword references",
+      "description": "Modifications to PaymentHistory component that appear to remove payment details (amount, date, location visualization)",
+      "reason": "The diff shows PaymentHistory.tsx was modified but the changes appear to remove payment detail display elements that were not requested for removal. The BuildRequest only asked to remove duplicate party names, not payment information display.",
       "evidence": [
-        "backend/main.mo"
+        "frontend/src/components/payments/PaymentHistory.tsx"
       ]
-    },
-    {
-      "id": "REQ-4",
-      "requirement": "Delete password-related frontend files",
-      "reason": "No file deletions shown in diff; required files (StaffLoginScreen.tsx, ResetAdminPasswordDialog.tsx, StaffAuthContext.tsx, useStaffAuth.ts, staffSession.ts) are not listed as removed",
-      "evidence": []
-    },
-    {
-      "id": "REQ-5",
-      "requirement": "Clean or delete useStaffAdmin.ts",
-      "reason": "useStaffAdmin.ts is not present in the diff; no evidence of reset-password function removal or file deletion",
-      "evidence": []
-    },
-    {
-      "id": "REQ-6",
-      "requirement": "Delete StaffManagementPanel.tsx",
-      "reason": "StaffManagementPanel.tsx is not listed as removed in the diff",
-      "evidence": []
-    },
-    {
-      "id": "REQ-7",
-      "requirement": "Remove imports and references to deleted password-related files",
-      "reason": "App.tsx, main.tsx, SettingsPage.tsx, AppShell.tsx, and AppReadinessContext.tsx are not present in the diff; no evidence of import cleanup",
-      "evidence": []
-    },
-    {
-      "id": "REQ-8",
-      "requirement": "Regenerate frontend bindings and remove type casts from useAdminPrincipals.ts",
-      "reason": "useAdminPrincipals.ts is not present in the diff; no evidence of as any cast removal or binding regeneration",
-      "evidence": []
-    },
-    {
-      "id": "REQ-9",
-      "requirement": "Update project_state.json to reflect completion",
-      "reason": "project_state.json still shows new_feature_requests with pending status items; summary does not contain FULLY MIGRATED text as required",
-      "evidence": [
-        "project_state.json"
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "requirement": "Update coverage.json and feature_evidence.json",
-      "reason": "coverage.json and feature_evidence.json are not present in the diff; no evidence of updates",
-      "evidence": []
-    },
-    {
-      "id": "REQ-11",
-      "requirement": "Regenerate frontend-file-summaries.txt to remove password-related descriptions",
-      "reason": "frontend-file-summaries.txt is modified but truncated; cannot verify complete removal of password functionality references across all file descriptions",
-      "evidence": [
-        "frontend-file-summaries.txt"
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "requirement": "Update SettingsPage.tsx to display only AdminPrincipalsPanel",
-      "reason": "SettingsPage.tsx is not present in the diff; no evidence of StaffManagementPanel reference removal",
-      "evidence": []
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.85,
+  "confidence": 0.75,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/admin/AdminPrincipalsPanel.tsx",
+    "frontend/src/components/dashboard/TodayNotifications.tsx",
+    "frontend/src/components/dashboard/UpcomingPaymentsCalendar.tsx",
+    "frontend/src/components/payments/PaymentHistory.tsx",
+    "frontend/src/pages/DashboardPage.tsx",
     "project_state.json"
   ]
 }

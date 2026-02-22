@@ -25,22 +25,20 @@ export default function PaymentHistory({ payments }: PaymentHistoryProps) {
               <IndianRupee className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">Payment ID: {payment.paymentId}</span>
             </div>
-          </div>
-          
-          <div className="flex items-center gap-4 flex-wrap">
-            {payment.hasNextPaymentDate && (
-              <div className="flex items-center gap-2 text-sm">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-muted-foreground">Next payment scheduled</span>
-              </div>
-            )}
-            
-            {payment.hasLocation && (
-              <div className="flex items-center gap-1 text-sm text-green-600">
-                <MapPin className="h-4 w-4" />
-                <span>Location data saved</span>
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {payment.hasLocation && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Location recorded">
+                  <MapPin className="h-3 w-3" />
+                  <span>Location</span>
+                </div>
+              )}
+              {payment.hasNextPaymentDate && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors" title="Next payment date set">
+                  <Calendar className="h-3 w-3" />
+                  <span>Next Due</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       ))}
